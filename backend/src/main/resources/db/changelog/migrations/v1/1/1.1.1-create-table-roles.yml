@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.1-create-table-roles
+      author: loubna
+      changes:
+        - createTable:
+            tableName: roles
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: 1.1.1-insert-roles
+      author: loubna
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: FONCTIONNAIRE
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: CHEF_HIERARCHIE
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: SIGNATAIRE

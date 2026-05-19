@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <include file="db/changelog/migrations/v1/1/1.1.1-create-table-roles.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.5-create-table-directions.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.6-create-table-divisions.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.7-create-table-services.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.2-create-table-users.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.3-create-table-user-roles.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.4-create-table-refresh-tokens.yml"/>
+
+</databaseChangeLog>
