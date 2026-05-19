@@ -12,5 +12,7 @@
     <include file="db/changelog/migrations/v1/1/1.1.2-create-table-users.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.3-create-table-user-roles.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.4-create-table-refresh-tokens.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.8-create-table-jours-feries.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.9-create-table-quotas.yml"/>
 
 </databaseChangeLog>

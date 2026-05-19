@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.8-create-table-jours-feries
+      author: loubna
+      changes:
+        - createTable:
+            tableName: jours_feries
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: date
+                  type: DATE
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: libelle
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
