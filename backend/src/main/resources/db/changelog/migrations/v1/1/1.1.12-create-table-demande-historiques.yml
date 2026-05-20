@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.12-create-table-demande-historiques
+      author: loubna
+      changes:
+        - createTable:
+            tableName: demande_historiques
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: demande_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modifie_par_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: statut_action
+                  type: VARCHAR(50) # The new status state
+                  constraints:
+                    nullable: false
+              - column:
+                  name: commentaire
+                  type: VARCHAR(255) # Reason for rejection or note
+                  constraints:
+                    nullable: true
+              - column:
+                  name: date_action
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: demande_historiques
+            baseColumnNames: demande_id
+            referencedTableName: demandes
+            referencedColumnNames: id
+            constraintName: fk_historique_demande
+
+        - addForeignKeyConstraint:
+            baseTableName: demande_historiques
+            baseColumnNames: modifie_par_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_historique_user
