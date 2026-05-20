@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.11-create-table-pieces-justificatives
+      author: loubna
+      changes:
+        - createTable:
+            tableName: pieces_justificatives
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: demande_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nom_fichier
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: url_fichier
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type_document
+                  type: VARCHAR(100) # ex: 'CERTIFICAT_MEDICAL', 'DECISION_SIGNEE'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_upload
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: pieces_justificatives
+            baseColumnNames: demande_id
+            referencedTableName: demandes
+            referencedColumnNames: id
+            constraintName: fk_pieces_demande

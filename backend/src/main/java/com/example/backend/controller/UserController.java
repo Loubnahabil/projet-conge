@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/fonctionnaires")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 

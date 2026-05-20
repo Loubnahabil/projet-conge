@@ -14,5 +14,9 @@
     <include file="db/changelog/migrations/v1/1/1.1.4-create-table-refresh-tokens.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.8-create-table-jours-feries.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.9-create-table-quotas.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.10-create-table-demandes.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.11-create-table-pieces-justificatives.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.12-create-table-demande-historiques.yml"/>
+
 
 </databaseChangeLog>
