@@ -11,7 +11,6 @@ const initialState: AuthState = {
 };
 
 // THUNK — calls authApi.login then Redux stores the result
-// 3 automatic states: pending, fulfilled, rejected
 export const loginThunk = createAsyncThunk(
   "auth/login",
   async (credentials: LoginRequest, { rejectWithValue }) => {
@@ -43,7 +42,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     // normal reducer — clears state on logout
-    // no API call needed here, just clear Redux
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
@@ -59,12 +57,10 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // login started → show loading spinner
       .addCase(loginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      // login succeeded → store everything
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.accessToken = action.payload.accessToken;
@@ -76,7 +72,6 @@ const authSlice = createSlice({
           role: action.payload.role,
         };
       })
-      // login failed → store error message
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;

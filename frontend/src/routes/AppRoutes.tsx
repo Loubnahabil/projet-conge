@@ -4,34 +4,61 @@ import {
   Navigate,
 } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
+import { MainLayout } from "../components/templates/MainLayout";
+import PrivateRoute from "./PrivateRoute";
+import { StructurePage } from "../pages/Admin/StructurePage";
+import { JourFeriePage } from "../pages/Admin/JourFeriePage"; // 👈 Import your holiday component
+import { FonctionnairePage } from "../pages/Admin/FonctionnairePage";
 
-// define all routes as objects
-// we will add more routes here as we build features
+const DashboardPlaceholder = () => (
+  <div style={{ padding: "20px", fontSize: "1.2rem", color: "#333" }}>
+    <h2>Bienvenue dans votre Tableau de Bord Central</h2>
+    <p>C'est ici que s'afficheront vos statistiques de congés bientôt.</p>
+  </div>
+);
+
 const router = createBrowserRouter([
   {
-    // redirect root to login
     path: "/",
     element: <Navigate to="/login" replace />,
   },
   {
-    // public route — no token needed
     path: "/login",
     element: <LoginPage />,
   },
-  // protected routes will be added here later like:
-  // {
-  //     path: '/dashboard',
-  //     element: (
-  //         <PrivateRoute>
-  //             <DashboardPage />
-  //         </PrivateRoute>
-  //     )
-  // }
+  {
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: "/dashboard",
+        element: <DashboardPlaceholder />,
+      },
+      {
+        path: "/admin/structure",
+        element: <StructurePage />,
+      },
+      {
+        path: "/admin/jours-feries", // 👈 Connect the holiday path layout
+        element: <JourFeriePage />,
+      },
+
+      {
+        path: "/admin/fonctionnaires", // 👈 Maps the employee directory route path
+        element: <FonctionnairePage />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <Navigate to="/login" replace />,
+  },
 ]);
 
 const AppRoutes = () => {
-  // RouterProvider replaces BrowserRouter
-  // it takes the router object we defined above
   return <RouterProvider router={router} />;
 };
 
