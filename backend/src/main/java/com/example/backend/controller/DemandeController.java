@@ -4,13 +4,12 @@ import com.example.backend.dto.request.DemandeRequestDTO;
 import com.example.backend.dto.request.ProcessWorkflowRequestDTO;
 import com.example.backend.dto.response.DemandeResponseDTO;
 import com.example.backend.dto.response.PieceJustificativeResponseDTO;
-import com.example.backend.service.DemandeService;
 import com.example.backend.exception.ResourceNotFoundException;
+import com.example.backend.service.DemandeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -44,7 +43,7 @@ public class DemandeController {
     }
 
     @PutMapping("/{id}/visa-chef")
-    @PreAuthorize("hasAuthority('CHEF_HIERARCHIE')")
+    //@PreAuthorize("hasAuthority('CHEF_HIERARCHIE')")
     public ResponseEntity<DemandeResponseDTO> processVisaChef(
             @PathVariable Long id,
             @RequestParam boolean approve,
@@ -74,7 +73,7 @@ public class DemandeController {
     }
 
     @PutMapping("/{id}/rejet-signataire")
-    @PreAuthorize("hasAuthority('SIGNATAIRE')")
+    //@PreAuthorize("hasAuthority('SIGNATAIRE')")
     public ResponseEntity<DemandeResponseDTO> rejectBySignataire(
             @PathVariable Long id,
             @RequestBody(required = false) ProcessWorkflowRequestDTO request,

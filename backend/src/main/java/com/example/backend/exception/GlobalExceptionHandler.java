@@ -37,8 +37,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleGeneral(Exception e) {
+        // 1. Force the complete error trace to print in IntelliJ
+        e.printStackTrace();
+
+        // 2. Build a clear description of the crash
+        String actualErrorMessage = e.getClass().getName() + " : " + e.getMessage();
+
+        // 3. Send it to the frontend box
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Une erreur interne s'est produite"));
+                .body(Map.of("error", actualErrorMessage));
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
