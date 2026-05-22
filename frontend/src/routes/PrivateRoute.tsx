@@ -9,6 +9,7 @@ interface PrivateRouteProps {
 const PrivateRoute = ({ children }: PrivateRouteProps) => {
   // check if user is logged in by reading token from Redux
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  console.log("ACCESS TOKEN IN PRIVATEROUTE:", accessToken);
 
   // not logged in → redirect to login
   if (!accessToken) {

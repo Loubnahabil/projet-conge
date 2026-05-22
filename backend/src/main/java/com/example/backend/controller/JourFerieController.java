@@ -20,21 +20,18 @@ public class JourFerieController {
 
     // GET /api/jours-feries
     @GetMapping
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<JourFerieResponseDTO>> getAll() {
         return ResponseEntity.ok(jourFerieService.getAll());
     }
 
     // GET /api/jours-feries/1
     @GetMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<JourFerieResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(jourFerieService.getById(id));
     }
 
     // POST /api/jours-feries
     @PostMapping
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<JourFerieResponseDTO> create(
             @Valid @RequestBody JourFerieRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -43,7 +40,6 @@ public class JourFerieController {
 
     // PUT /api/jours-feries/1
     @PutMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<JourFerieResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody JourFerieRequestDTO request) {
@@ -52,7 +48,6 @@ public class JourFerieController {
 
     // DELETE /api/jours-feries/1
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         jourFerieService.delete(id);
         return ResponseEntity.noContent().build();

@@ -43,7 +43,6 @@ public class DemandeController {
     }
 
     @PutMapping("/{id}/visa-chef")
-    //@PreAuthorize("hasAuthority('CHEF_HIERARCHIE')")
     public ResponseEntity<DemandeResponseDTO> processVisaChef(
             @PathVariable Long id,
             @RequestParam boolean approve,

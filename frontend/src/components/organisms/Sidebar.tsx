@@ -9,20 +9,44 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store"; // adjust path if different
 
 const DRAWER_WIDTH = 240;
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+  console.log("ROLE FROM REDUX:", role);
 
-  // Updated layout matrix array
+  const isAdmin = role === "ADMIN";
+
   const menuItems = [
-    { text: "Tableau de Bord", path: "/dashboard" },
-    { text: "Structure organisationnelle", path: "/admin/structure" },
-    { text: "Jours Fériés", path: "/admin/jours-feries" },
-    { text: "Gestion des Fonctionnaires", path: "/admin/fonctionnaires" }, // 👈 Added Employee Matrix link
+    // visible to everyone logged in
+    { text: "Tableau de Bord", path: "/dashboard", adminOnly: false },
+    // admin only
+    {
+      text: "Structure organisationnelle",
+      path: "/admin/structure",
+      adminOnly: true,
+    },
+    { text: "Jours Fériés", path: "/admin/jours-feries", adminOnly: true },
+    {
+      text: "Gestion des Fonctionnaires",
+      path: "/admin/fonctionnaires",
+      adminOnly: true,
+    },
+    // Added Quota Management Link Here 👇
+    {
+      text: "Gestion des Quotas",
+      path: "/admin/quotas",
+      adminOnly: true,
+    },
   ];
+
+  // filter out admin items if user is not admin
+  const visibleItems = menuItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <Drawer
@@ -41,7 +65,7 @@ export const Sidebar = () => {
       <Toolbar />
       <Box sx={{ overflow: "auto", mt: 2 }}>
         <List>
-          {menuItems.map((item) => {
+          {visibleItems.map((item) => {
             const isSelected = location.pathname === item.path;
             return (
               <ListItem key={item.text} disablePadding>

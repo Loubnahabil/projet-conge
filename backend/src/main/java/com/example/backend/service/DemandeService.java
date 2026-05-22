@@ -152,6 +152,9 @@ public class DemandeService {
         User chef = userRepository.findById(chefId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
 
+        // 🔴 ENFORCE RULE 1: Verify Chef belongs to the correct administrative hierarchy path
+        verifyChefHierarchy(demande.getUser(), chef);
+
         StatutDemande nextStatus = approve ? StatutDemande.VISEE_CHEF : StatutDemande.REJETEE_CHEF;
         demande.setStatut(nextStatus);
 
@@ -182,6 +185,19 @@ public class DemandeService {
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
+        // --- AUTOMATIC TRIGGER: IF SIGNATAIRE UPLOADS DECISION_SIGNEE ---
+        if ("DECISION_SIGNEE".equalsIgnoreCase(typeDocument)) {
+            if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
+                throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.");
+            }
+
+            // 🔴 ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
+            verifySignatoryDirection(demande.getUser(), currentUser);
+
+            // Flip state machine status automatically
+            demande.setStatut(StatutDemande.SIGNEE_DIRECTEUR);
+        }
+
         // Store file onto disk partition
         String fileUrl = documentStorageService.storeFile(file);
 
@@ -198,14 +214,7 @@ public class DemandeService {
 
         String logCommentaire = "Ajout de la pièce justificative: " + file.getOriginalFilename() + " (" + typeDocument + ")";
 
-        // --- AUTOMATIC TRIGGER: IF SIGNATAIRE UPLOADS DECISION_SIGNEE ---
         if ("DECISION_SIGNEE".equalsIgnoreCase(typeDocument)) {
-            if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
-                throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.");
-            }
-
-            // Flip state machine status automatically
-            demande.setStatut(StatutDemande.SIGNEE_DIRECTEUR);
             logCommentaire = "Décision signée déposée par le signataire. Demande validée et clôturée automatiquement.";
 
             // Quota deduction mechanics
@@ -245,6 +254,41 @@ public class DemandeService {
                 .build();
     }
 
+    @Transactional
+    public DemandeResponseDTO rejeterSignataire(Long signataireId, Long demandeId, ProcessWorkflowRequestDTO request) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+
+        if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
+            throw new BusinessException("Seules les demandes visées par le chef peuvent être traitées par le signataire.");
+        }
+
+        // Mandatory Rejection Comment Check
+        if (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank()) {
+            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la direction.");
+        }
+
+        User signataire = userRepository.findById(signataireId)
+                .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
+
+        // 🔴 ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
+        verifySignatoryDirection(demande.getUser(), signataire);
+
+        // Switch status to rejected
+        demande.setStatut(StatutDemande.REJETEE_DIRECTEUR);
+
+        DemandeHistorique log = DemandeHistorique.builder()
+                .demande(demande)
+                .modifiePar(signataire)
+                .statutAction(StatutDemande.REJETEE_DIRECTEUR)
+                .commentaire(request.getCommentaire())
+                .dateAction(LocalDateTime.now())
+                .build();
+        historiqueRepository.save(log);
+
+        return demandeMapper.toDTO(demandeRepository.save(demande));
+    }
+
     /**
      * Calculates net administrative working days (Skips Saturdays, Sundays, and dynamic Holidays)
      */
@@ -265,35 +309,87 @@ public class DemandeService {
         return count;
     }
 
-    @Transactional
-    public DemandeResponseDTO rejeterSignataire(Long signataireId, Long demandeId, ProcessWorkflowRequestDTO request) {
-        Demande demande = demandeRepository.findById(demandeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+    // ==========================================
+    // 🔒 PRIVATE HIERARCHY BUSINESS VALIDATIONS
+    // ==========================================
 
-        if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
-            throw new BusinessException("Seules les demandes visées par le chef peuvent être traitées par le signataire.");
+    /**
+     * Dynamic Checker for Rule 1: Reviewer must be an authorized manager inside the employee's structural tree path.
+     */
+    private void verifyChefHierarchy(User employee, User reviewer) {
+        ServiceEntity empService = employee.getService();
+        ServiceEntity revService = reviewer.getService();
+
+        if (empService == null || revService == null) {
+            throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.");
         }
 
-        // Mandatory Rejection Comment Check
-        if (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank()) {
-            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la direction.");
+        // Check Level 1: Chef de Service match inside the exact same service instance
+        if (checkUserHasRole(reviewer, "CHEF_SERVICE") && empService.getId().equals(revService.getId())) {
+            return;
         }
 
-        User signataire = userRepository.findById(signataireId)
-                .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
+        Division empDivision = empService.getDivision();
+        Division revDivision = revService.getDivision();
 
-        // Switch status to rejected
-        demande.setStatut(StatutDemande.REJETEE_DIRECTEUR);
+        if (empDivision != null && revDivision != null) {
+            // Check Level 2: Chef de Division match managing this structural division
+            if (checkUserHasRole(reviewer, "CHEF_DIVISION") && empDivision.getId().equals(revDivision.getId())) {
+                return;
+            }
 
-        DemandeHistorique log = DemandeHistorique.builder()
-                .demande(demande)
-                .modifiePar(signataire)
-                .statutAction(StatutDemande.REJETEE_DIRECTEUR)
-                .commentaire(request.getCommentaire())
-                .dateAction(LocalDateTime.now())
-                .build();
-        historiqueRepository.save(log);
+            Direction empDirection = empDivision.getDirection();
+            Direction revDirection = revDivision.getDirection();
 
-        return demandeMapper.toDTO(demandeRepository.save(demande));
+            if (empDirection != null && revDirection != null) {
+                // Check Level 3: General Director match managing the entire direction branch
+                if (checkUserHasRole(reviewer, "DIRECTEUR") && empDirection.getId().equals(revDirection.getId())) {
+                    return;
+                }
+            }
+        }
+
+        throw new BusinessException("Action refusée: Vous ne faites pas partie de la ligne hiérarchique de ce fonctionnaire.");
+    }
+
+    /**
+     * Dynamic Checker for Rule 2: Signatory must have SIGNATAIRE role and reside inside the exact same Direction.
+     */
+    private void verifySignatoryDirection(User employee, User signatory) {
+        if (!checkUserHasRole(signatory, "SIGNATAIRE")) {
+            throw new BusinessException("Action annulée: L'utilisateur exécutant cette action ne possède pas le rôle de signataire.");
+        }
+
+        Direction empDirection = getUserDirectionBranch(employee);
+        Direction sigDirection = getUserDirectionBranch(signatory);
+
+        if (empDirection == null || sigDirection == null) {
+            throw new BusinessException("Action refusée: Structure de Direction introuvable pour le fonctionnaire ou le signataire.");
+        }
+
+        if (!empDirection.getId().equals(sigDirection.getId())) {
+            throw new BusinessException("Action refusée: Le signataire doit impérativement appartenir à la même Direction administrative ("
+                    + empDirection.getNom() + ") que le fonctionnaire.");
+        }
+    }
+
+    /**
+     * Traverse up the object properties matrix safely to reach the top-level Direction
+     */
+    private Direction getUserDirectionBranch(User user) {
+        if (user.getService() != null && user.getService().getDivision() != null) {
+            return user.getService().getDivision().getDirection();
+        }
+        return null;
+    }
+
+    /**
+     * Utility method to safely match role strings (supports raw keys or ROLE_ prefixes)
+     */
+    private boolean checkUserHasRole(User user, String targetRole) {
+        if (user.getRoles() == null) return false;
+        return user.getRoles().stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(targetRole) ||
+                        role.getName().equalsIgnoreCase("ROLE_" + targetRole));
     }
 }

@@ -20,7 +20,6 @@ public class UserController {
 
     // GET /api/fonctionnaires?search=ali&page=0&size=10
     @GetMapping
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<UserResponseDTO>> getAll(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
@@ -31,7 +30,6 @@ public class UserController {
 
     // GET /api/fonctionnaires/1
     @GetMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> getById(
             @PathVariable Long id) {
         return ResponseEntity.ok(userService.getById(id));
@@ -39,7 +37,6 @@ public class UserController {
 
     // POST /api/fonctionnaires
     @PostMapping
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> create(
             @Valid @RequestBody CreateUserRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -48,7 +45,6 @@ public class UserController {
 
     // PUT /api/fonctionnaires/1
     @PutMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserRequestDTO request) {
@@ -58,7 +54,6 @@ public class UserController {
 
     // PATCH /api/fonctionnaires/1/toggle
     @PatchMapping("/{id}/toggle")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UserResponseDTO> toggle(
             @PathVariable Long id) {
         return ResponseEntity.ok(
@@ -67,7 +62,6 @@ public class UserController {
 
     // DELETE /api/fonctionnaires/1
     @DeleteMapping("/{id}")
-    //@PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();

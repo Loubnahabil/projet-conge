@@ -2,15 +2,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
 import type { AuthState, LoginRequest } from "../../types/auth.types";
 
+// ✅ read from localStorage on page load so refresh doesn't wipe state
 const initialState: AuthState = {
-  user: null,
-  accessToken: null,
-  refreshToken: null,
+  user: JSON.parse(localStorage.getItem("user") || "null"),
+  accessToken: localStorage.getItem("accessToken"),
+  refreshToken: localStorage.getItem("refreshToken"),
   loading: false,
   error: null,
 };
 
-// THUNK — calls authApi.login then Redux stores the result
 export const loginThunk = createAsyncThunk(
   "auth/login",
   async (credentials: LoginRequest, { rejectWithValue }) => {
@@ -26,12 +26,10 @@ export const loginThunk = createAsyncThunk(
             };
           };
         };
-
         return rejectWithValue(
           err.response?.data?.error || "Erreur de connexion",
         );
       }
-
       return rejectWithValue("Erreur de connexion");
     }
   },
@@ -41,16 +39,17 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    // normal reducer — clears state on logout
     logout: (state) => {
       state.user = null;
       state.accessToken = null;
       state.refreshToken = null;
       state.loading = false;
       state.error = null;
+      // ✅ clear localStorage on logout
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
     },
-
-    // normal reducer — clears error when user retypes
     clearError: (state) => {
       state.error = null;
     },
@@ -71,6 +70,18 @@ const authSlice = createSlice({
           prenom: action.payload.prenom,
           role: action.payload.role,
         };
+        // ✅ save to localStorage so refresh doesn't wipe state
+        localStorage.setItem("accessToken", action.payload.accessToken);
+        localStorage.setItem("refreshToken", action.payload.refreshToken);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            email: action.payload.email,
+            nom: action.payload.nom,
+            prenom: action.payload.prenom,
+            role: action.payload.role,
+          }),
+        );
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;

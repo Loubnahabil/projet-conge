@@ -32,4 +32,9 @@ public class AuthController {
     public ResponseEntity<?> me(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(Map.of("email", userDetails.getUsername()));
     }
+
+    @PostMapping("/api/auth/logout")
+    public ResponseEntity<Map<String, String>> logout() {
+        return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
+    }
 }
