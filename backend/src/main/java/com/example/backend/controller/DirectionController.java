@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/directions")
 @RequiredArgsConstructor
-//@PreAuthorize("hasAuthority('ADMIN')")
 public class DirectionController {
 
     private final DirectionService directionService;

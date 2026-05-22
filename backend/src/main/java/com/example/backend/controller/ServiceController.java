@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/services")
 @RequiredArgsConstructor
-//@PreAuthorize("hasAuthority('ADMIN')")
 public class ServiceController {
 
     private final ServiceService serviceService;

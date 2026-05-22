@@ -39,6 +39,4 @@ export const userApi = {
     axiosInstance
       .patch<UserResponseDTO>(`/api/users/${id}/toggle`)
       .then((res: AxiosResponse<UserResponseDTO>) => res.data),
-
-  delete: (id: number) => axiosInstance.delete(`/api/users/${id}`),
 };

@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/divisions")
 @RequiredArgsConstructor
-//@PreAuthorize("hasAuthority('ADMIN')")
 public class DivisionController {
 
     private final DivisionService divisionService;

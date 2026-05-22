@@ -22,7 +22,7 @@ public class DemandeHistorique {
     private Demande demande;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modifie_par_id", nullable = false)
+    @JoinColumn(name = "modifie_par_id")
     private User modifiePar;
 
     @Enumerated(EnumType.STRING)
