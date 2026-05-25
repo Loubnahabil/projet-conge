@@ -49,7 +49,8 @@ export const SignatairePage = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        const data = await demandeApi.getMyDemandes();
+        // ✅ FIXED: Now calls the specific signature queue instead of personal requests
+        const data = await demandeApi.getDemandesASigner();
         setDemandes(data);
       } catch {
         setError("Erreur lors du chargement des demandes.");
@@ -72,8 +73,11 @@ export const SignatairePage = () => {
     setError(null);
     try {
       await demandeApi.rejetSignataire(rejectDialog.targetId, { commentaire });
-      const updated = await demandeApi.getMyDemandes();
+
+      // ✅ FIXED: Refresh the board using the correct management queue endpoint
+      const updated = await demandeApi.getDemandesASigner();
       setDemandes(updated);
+
       setRejectDialog({ open: false, targetId: null });
       setCommentaire("");
     } catch (err: unknown) {
@@ -100,8 +104,11 @@ export const SignatairePage = () => {
         selectedFile,
         "DECISION_SIGNEE",
       );
-      const updated = await demandeApi.getMyDemandes();
+
+      // ✅ FIXED: Refresh the board using the correct management queue endpoint
+      const updated = await demandeApi.getDemandesASigner();
       setDemandes(updated);
+
       setUploadDialog({ open: false, targetId: null });
       setSelectedFile(null);
     } catch (err: unknown) {

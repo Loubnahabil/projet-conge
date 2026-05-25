@@ -16,7 +16,7 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
     List<Demande> findByUserId(Long userId);
 
     // =========================================================================
-    // 🔍 NEW: HIERARCHY QUERIES FOR SUPERVISOR DASHBOARDS
+    // 🔍 HIERARCHY QUERIES FOR SUPERVISOR DASHBOARDS
     // =========================================================================
 
     // Level 1: Fetch pending requests for a specific Service ID
@@ -25,8 +25,17 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
     // Level 2: Fetch pending requests for an entire Division ID branch
     List<Demande> findByUser_Service_Division_IdAndStatut(Long divisionId, StatutDemande statut);
 
-    // Level 3: Fetch pending requests for an entire Direction ID tree block
-    List<Demande> findByUser_Service_Division_Direction_IdAndStatut(Long directionId, StatutDemande statut);
+    // ✅ Level 3: FIXED - Explicit JPQL Join path to guarantee precise Direction ID structural matching
+    @Query("SELECT d FROM Demande d " +
+            "JOIN d.user u " +
+            "JOIN u.service s " +
+            "JOIN s.division div " +
+            "JOIN div.direction dir " +
+            "WHERE dir.id = :directionId AND d.statut = :statut")
+    List<Demande> findByDirectionIdAndStatut(
+            @Param("directionId") Long directionId,
+            @Param("statut") StatutDemande statut
+    );
 
     // =========================================================================
     // 🔒 EXISTING LEAVE VALIDATION GUARD CLAUSES

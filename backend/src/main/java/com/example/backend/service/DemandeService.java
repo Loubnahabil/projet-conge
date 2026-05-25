@@ -350,7 +350,7 @@ public class DemandeService {
             throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.");
         }
 
-        // ✅ Updated rule: CHEF_HIERARCHIE controls requests from their exact shared Service block
+        // CHEF_HIERARCHIE controls requests from their exact shared Service block
         if (checkUserHasRole(reviewer, "CHEF_HIERARCHIE") && empService.getId().equals(revService.getId())) {
             return;
         }
@@ -418,5 +418,25 @@ public class DemandeService {
         historiqueRepository.save(log);
 
         return demandeMapper.toDTO(demandeRepository.save(demande));
+    }
+
+    // =========================================================================
+    // 🔍 DIRECTION TREE FETCH (For Signataire Validation Dashboard)
+    // =========================================================================
+    @Transactional(readOnly = true)
+    public List<DemandeResponseDTO> getDemandesASignerPourDirecteur(Long signataireId) {
+        User signataire = userRepository.findById(signataireId)
+                .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
+
+        Direction sigDirection = getUserDirectionBranch(signataire);
+        if (sigDirection == null) {
+            throw new BusinessException("Action refusée: Le signataire n'a pas d'affectation de Direction valide.");
+        }
+
+        // ✅ FIXED: Calls the optimized custom JPQL join query to clear out multi-level graph lookup issues
+        List<Demande> validatedDemandes = demandeRepository
+                .findByDirectionIdAndStatut(sigDirection.getId(), StatutDemande.VISEE_CHEF);
+
+        return demandeMapper.toDTOList(validatedDemandes);
     }
 }

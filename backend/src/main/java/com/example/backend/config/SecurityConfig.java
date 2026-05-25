@@ -70,15 +70,20 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
 
-                        // 2. Specific FONCTIONNAIRE operations (PUT workflow endpoints)
+                        // 2. Specific Workflow & Queue Queries
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/visa-chef").hasAuthority("CHEF_HIERARCHIE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/rejet-signataire").hasAuthority("SIGNATAIRE")
+                        .requestMatchers("/api/demandes/a-viser").hasAuthority("CHEF_HIERARCHIE")
+                        .requestMatchers("/api/demandes/a-signer").hasAuthority("SIGNATAIRE")
+                        .requestMatchers("/api/demandes/my-requests").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
 
-                        .requestMatchers("/api/demandes/a-viser").hasAnyAuthority("CHEF_HIERARCHIE")
-                        // 3. Catch-all for Demandes (GET /my-requests, POST, etc.) - FONCTIONNAIRE only
+                        // ✅ FIX: Explicitly grant access to both profiles for uploads before hitting the catch-all
+                        .requestMatchers(HttpMethod.POST, "/api/demandes/*/upload").hasAnyAuthority("FONCTIONNAIRE", "SIGNATAIRE")
+
+                        // 3. Catch-all for Demandes lifecycle requests - FONCTIONNAIRE only
                         .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
 
-                        // 4. Handle exceptions for general endpoints before blocking via ADMIN rules
+                        // 4. User Profiles & Context boundaries
                         .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
