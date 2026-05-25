@@ -112,4 +112,12 @@ export const demandeApi = {
     );
     return response.data;
   },
+
+  // NEW: GET /api/demandes/a-signer (For Signataire validation queues)
+  getDemandesASigner: async (): Promise<DemandeResponse[]> => {
+    const response = await axiosInstance.get<DemandeResponse[]>(
+      "/api/demandes/a-signer",
+    );
+    return response.data;
+  },
 };

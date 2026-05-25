@@ -96,4 +96,11 @@ public class DemandeController {
         Long currentUserId = getAuthenticatedUserId(userDetails);
         return ResponseEntity.ok(demandeService.annulerDemande(currentUserId, id));
     }
+
+    // NEW: Handles GET /api/demandes/a-signer for Signataire profiles
+    @GetMapping("/a-signer")
+    public ResponseEntity<List<DemandeResponseDTO>> getDemandesASigner(@AuthenticationPrincipal UserDetails userDetails) {
+        Long signataireId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.getDemandesASignerPourDirecteur(signataireId));
+    }
 }
