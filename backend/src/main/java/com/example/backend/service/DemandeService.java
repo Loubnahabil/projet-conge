@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +38,37 @@ public class DemandeService {
     @Transactional(readOnly = true)
     public List<DemandeResponseDTO> getUserDemandes(Long userId) {
         return demandeMapper.toDTOList(demandeRepository.findByUserId(userId));
+    }
+
+    // =========================================================================
+    // 🔍 STRATIFIED HIERARCHY FETCH (For Chef Validation Dashboard)
+    // =========================================================================
+    @Transactional(readOnly = true)
+    public List<DemandeResponseDTO> getDemandesAViserPourChef(Long chefId) {
+        User chef = userRepository.findById(chefId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
+
+        ServiceEntity chefService = chef.getService();
+        if (chefService == null) {
+            throw new BusinessException("Action refusée: Le validateur n'a pas d'affectation administrative valide.");
+        }
+
+        List<Demande> pendingDemandes;
+
+        // Directly target the exact administrative service branch
+        if (checkUserHasRole(chef, "CHEF_HIERARCHIE")) {
+            pendingDemandes = demandeRepository.findByUser_Service_IdAndStatut(chefService.getId(), StatutDemande.SOUMISE);
+        } else {
+            // Fallback for profiles that do not have the designated supervisor authority
+            return Collections.emptyList();
+        }
+
+        // Filter out self-submitted records to avoid self-validation anomalies
+        List<Demande> filteredDemandes = pendingDemandes.stream()
+                .filter(d -> !d.getUser().getId().equals(chefId))
+                .collect(Collectors.toList());
+
+        return demandeMapper.toDTOList(filteredDemandes);
     }
 
     @Transactional
@@ -152,7 +184,7 @@ public class DemandeService {
         User chef = userRepository.findById(chefId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
 
-        // 🔴 ENFORCE RULE 1: Verify Chef belongs to the correct administrative hierarchy path
+        // ENFORCE RULE 1: Verify Chef belongs to the correct administrative hierarchy path
         verifyChefHierarchy(demande.getUser(), chef);
 
         StatutDemande nextStatus = approve ? StatutDemande.VISEE_CHEF : StatutDemande.REJETEE_CHEF;
@@ -161,7 +193,7 @@ public class DemandeService {
         // Fallback default message if approving without a custom text entry
         String finalCommentaire = (request != null && request.getCommentaire() != null && !request.getCommentaire().isBlank())
                 ? request.getCommentaire()
-                : (approve ? "Approuvé par le chef de division." : "Rejeté par le chef de division.");
+                : (approve ? "Approuvé par le supérieur hiérarchique." : "Rejeté par le supérieur hiérarchique.");
 
         DemandeHistorique log = DemandeHistorique.builder()
                 .demande(demande)
@@ -191,7 +223,7 @@ public class DemandeService {
                 throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.");
             }
 
-            // 🔴 ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
+            // ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
             verifySignatoryDirection(demande.getUser(), currentUser);
 
             // Flip state machine status automatically
@@ -271,7 +303,7 @@ public class DemandeService {
         User signataire = userRepository.findById(signataireId)
                 .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
 
-        // 🔴 ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
+        // ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
         verifySignatoryDirection(demande.getUser(), signataire);
 
         // Switch status to rejected
@@ -289,9 +321,6 @@ public class DemandeService {
         return demandeMapper.toDTO(demandeRepository.save(demande));
     }
 
-    /**
-     * Calculates net administrative working days (Skips Saturdays, Sundays, and dynamic Holidays)
-     */
     private int calculateBusinessDays(LocalDate start, LocalDate end) {
         Set<LocalDate> holidayDates = jourFerieRepository.findAll().stream()
                 .map(JourFerie::getDate)
@@ -313,9 +342,6 @@ public class DemandeService {
     // 🔒 PRIVATE HIERARCHY BUSINESS VALIDATIONS
     // ==========================================
 
-    /**
-     * Dynamic Checker for Rule 1: Reviewer must be an authorized manager inside the employee's structural tree path.
-     */
     private void verifyChefHierarchy(User employee, User reviewer) {
         ServiceEntity empService = employee.getService();
         ServiceEntity revService = reviewer.getService();
@@ -324,37 +350,14 @@ public class DemandeService {
             throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.");
         }
 
-        // Check Level 1: Chef de Service match inside the exact same service instance
-        if (checkUserHasRole(reviewer, "CHEF_SERVICE") && empService.getId().equals(revService.getId())) {
+        // ✅ Updated rule: CHEF_HIERARCHIE controls requests from their exact shared Service block
+        if (checkUserHasRole(reviewer, "CHEF_HIERARCHIE") && empService.getId().equals(revService.getId())) {
             return;
         }
 
-        Division empDivision = empService.getDivision();
-        Division revDivision = revService.getDivision();
-
-        if (empDivision != null && revDivision != null) {
-            // Check Level 2: Chef de Division match managing this structural division
-            if (checkUserHasRole(reviewer, "CHEF_DIVISION") && empDivision.getId().equals(revDivision.getId())) {
-                return;
-            }
-
-            Direction empDirection = empDivision.getDirection();
-            Direction revDirection = revDivision.getDirection();
-
-            if (empDirection != null && revDirection != null) {
-                // Check Level 3: General Director match managing the entire direction branch
-                if (checkUserHasRole(reviewer, "DIRECTEUR") && empDirection.getId().equals(revDirection.getId())) {
-                    return;
-                }
-            }
-        }
-
-        throw new BusinessException("Action refusée: Vous ne faites pas partie de la ligne hiérarchique de ce fonctionnaire.");
+        throw new BusinessException("Action refusée: Vous ne faites pas partie de la ligne hiérarchique de ce fonctionnaire au sein du service.");
     }
 
-    /**
-     * Dynamic Checker for Rule 2: Signatory must have SIGNATAIRE role and reside inside the exact same Direction.
-     */
     private void verifySignatoryDirection(User employee, User signatory) {
         if (!checkUserHasRole(signatory, "SIGNATAIRE")) {
             throw new BusinessException("Action annulée: L'utilisateur exécutant cette action ne possède pas le rôle de signataire.");
@@ -373,9 +376,6 @@ public class DemandeService {
         }
     }
 
-    /**
-     * Traverse up the object properties matrix safely to reach the top-level Direction
-     */
     private Direction getUserDirectionBranch(User user) {
         if (user.getService() != null && user.getService().getDivision() != null) {
             return user.getService().getDivision().getDirection();
@@ -383,13 +383,40 @@ public class DemandeService {
         return null;
     }
 
-    /**
-     * Utility method to safely match role strings (supports raw keys or ROLE_ prefixes)
-     */
     private boolean checkUserHasRole(User user, String targetRole) {
         if (user.getRoles() == null) return false;
         return user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(targetRole) ||
                         role.getName().equalsIgnoreCase("ROLE_" + targetRole));
+    }
+
+    @Transactional
+    public DemandeResponseDTO annulerDemande(Long userId, Long demandeId) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+
+        if (!demande.getUser().getId().equals(userId)) {
+            throw new BusinessException("Action refusée: Vous ne pouvez annuler que vos propres demandes.");
+        }
+
+        if (demande.getStatut() != StatutDemande.BROUILLON && demande.getStatut() != StatutDemande.SOUMISE) {
+            throw new BusinessException("Impossible d'annuler une demande déjà traitée ou validée.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        demande.setStatut(StatutDemande.ANNULEE);
+
+        DemandeHistorique log = DemandeHistorique.builder()
+                .demande(demande)
+                .modifiePar(user)
+                .statutAction(StatutDemande.ANNULEE)
+                .commentaire("Demande annulée par le fonctionnaire.")
+                .dateAction(LocalDateTime.now())
+                .build();
+        historiqueRepository.save(log);
+
+        return demandeMapper.toDTO(demandeRepository.save(demande));
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrPprContainingIgnoreCase(
             String nom, String prenom, String ppr, Pageable pageable
     );
+
+    // Finds all users in the same service, excluding the logged-in user
+    List<User> findByServiceIdAndIdNot(Long serviceId, Long userId);
 }

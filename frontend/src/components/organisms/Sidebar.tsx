@@ -10,43 +10,60 @@ import {
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../store"; // adjust path if different
+import type { RootState } from "../../store";
 
 const DRAWER_WIDTH = 240;
+
+interface MenuItem {
+  text: string;
+  path: string;
+  roles: string[] | "all";
+}
+
+const menuItems: MenuItem[] = [
+  // ── Universal Roles ────────────────────────────────────────────────────────
+  { text: "Tableau de Bord", path: "/dashboard", roles: "all" },
+
+  // FIXED: Restriced explicitly to FONCTIONNAIRE so management profiles bypass it
+  { text: "Mes Demandes", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
+
+  // ── Chef roles ────────────────────────────────────────────────────────────
+  {
+    text: "Demandes à viser",
+    path: "/chef/demandes",
+    roles: ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"],
+  },
+
+  // ── Signataire ────────────────────────────────────────────────────────────
+  {
+    text: "Demandes à signer",
+    path: "/signataire/demandes",
+    roles: ["SIGNATAIRE"],
+  },
+
+  // ── Admin ─────────────────────────────────────────────────────────────────
+  {
+    text: "Structure organisationnelle",
+    path: "/admin/structure",
+    roles: ["ADMIN"],
+  },
+  { text: "Jours Fériés", path: "/admin/jours-feries", roles: ["ADMIN"] },
+  {
+    text: "Gestion des Fonctionnaires",
+    path: "/admin/fonctionnaires",
+    roles: ["ADMIN"],
+  },
+  { text: "Gestion des Quotas", path: "/admin/quotas", roles: ["ADMIN"] },
+];
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const role = useSelector((state: RootState) => state.auth.user?.role);
-  console.log("ROLE FROM REDUX:", role);
 
-  const isAdmin = role === "ADMIN";
-
-  const menuItems = [
-    // visible to everyone logged in
-    { text: "Tableau de Bord", path: "/dashboard", adminOnly: false },
-    // admin only
-    {
-      text: "Structure organisationnelle",
-      path: "/admin/structure",
-      adminOnly: true,
-    },
-    { text: "Jours Fériés", path: "/admin/jours-feries", adminOnly: true },
-    {
-      text: "Gestion des Fonctionnaires",
-      path: "/admin/fonctionnaires",
-      adminOnly: true,
-    },
-    // Added Quota Management Link Here 👇
-    {
-      text: "Gestion des Quotas",
-      path: "/admin/quotas",
-      adminOnly: true,
-    },
-  ];
-
-  // filter out admin items if user is not admin
-  const visibleItems = menuItems.filter((item) => !item.adminOnly || isAdmin);
+  const visibleItems = menuItems.filter(
+    (item) => item.roles === "all" || (role && item.roles.includes(role)),
+  );
 
   return (
     <Drawer

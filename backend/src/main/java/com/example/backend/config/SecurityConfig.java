@@ -46,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5174"));
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         configuration.setAllowCredentials(true);
@@ -64,31 +64,32 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // public endpoints
+                        // 1. Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
 
-                        // ADMIN only — gestion des fonctionnaires
+                        // 2. Specific FONCTIONNAIRE operations (PUT workflow endpoints)
+                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*/visa-chef").hasAuthority("CHEF_HIERARCHIE")
+                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*/rejet-signataire").hasAuthority("SIGNATAIRE")
+
+                        .requestMatchers("/api/demandes/a-viser").hasAnyAuthority("CHEF_HIERARCHIE")
+                        // 3. Catch-all for Demandes (GET /my-requests, POST, etc.) - FONCTIONNAIRE only
+                        .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
+
+                        // 4. Handle exceptions for general endpoints before blocking via ADMIN rules
+                        .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
-                        // ADMIN only — structure organisationnelle
+                        // 5. Structural/Config rules - ADMIN only
                         .requestMatchers("/api/directions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/divisions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/services/**").hasAuthority("ADMIN")
-
-                        // ADMIN only — jours fériés
                         .requestMatchers("/api/jours-feries/**").hasAuthority("ADMIN")
-                        // ADMIN only — quotas annuels
                         .requestMatchers("/api/admin/quotas/**").hasAuthority("ADMIN")
 
-                        // CHEF_HIERARCHIE only — visa
-                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*/visa-chef")
-                        .hasAuthority("CHEF_HIERARCHIE")
-
-                        // SIGNATAIRE only — rejet
-                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*/rejet-signataire")
-                        .hasAuthority("SIGNATAIRE")
-
-                        // everything else just needs a valid token
+                        // Everything else requires authentication
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
