@@ -6,24 +6,26 @@ import com.example.backend.dto.response.UserResponseDTO;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.ServiceEntity;
 import com.example.backend.entity.User;
-import com.example.backend.entity.Quota; // Added import for Quota
+import com.example.backend.entity.Quota;
 import com.example.backend.exception.DuplicateResourceException;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.UserMapper;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.ServiceRepository;
-import com.example.backend.repository.QuotaRepository; // Added import for QuotaRepository
+import com.example.backend.repository.QuotaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +34,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final ServiceRepository serviceRepository;
-    private final QuotaRepository quotaRepository; // Added field injection
+    private final QuotaRepository quotaRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     // GET all with search and pagination
-    public Page<UserResponseDTO> getAll(
-            String search, int page, int size) {
-
+    public Page<UserResponseDTO> getAll(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         if (search != null && !search.isBlank()) {
@@ -53,6 +53,24 @@ public class UserService {
                 .map(userMapper::toDTO);
     }
 
+    // GET colleagues from same service
+    public List<UserResponseDTO> getColleaguesFromSameService(String email) {
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Fonctionnaire connecté introuvable"));
+
+        if (currentUser.getService() == null) {
+            return Collections.emptyList();
+        }
+
+        Long serviceId = currentUser.getService().getId();
+        List<User> colleagues = userRepository.findByServiceIdAndIdNot(serviceId, currentUser.getId());
+
+        return colleagues.stream()
+                .map(userMapper::toDTO)
+                .toList();
+    }
+
     // GET one by id
     public UserResponseDTO getById(Long id) {
         User user = userRepository.findById(id)
@@ -63,33 +81,21 @@ public class UserService {
 
     // CREATE
     @Transactional
-    public UserResponseDTO create(
-            CreateUserRequestDTO request) {
-
-        // validate no duplicate email
+    public UserResponseDTO create(CreateUserRequestDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException(
-                    "Email déjà utilisé: " + request.getEmail());
+            throw new DuplicateResourceException("Email déjà utilisé: " + request.getEmail());
         }
 
-        // validate no duplicate ppr
         if (userRepository.existsByPpr(request.getPpr())) {
-            throw new DuplicateResourceException(
-                    "PPR déjà utilisé: " + request.getPpr());
+            throw new DuplicateResourceException("PPR déjà utilisé: " + request.getPpr());
         }
 
-        // find service
-        ServiceEntity service = serviceRepository
-                .findById(request.getServiceId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Service non trouvé"));
+        ServiceEntity service = serviceRepository.findById(request.getServiceId())
+                .orElseThrow(() -> new ResourceNotFoundException("Service non trouvé"));
 
-        // find role
         Role role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Rôle non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Rôle non trouvé"));
 
-        // build and save user
         User user = User.builder()
                 .nom(request.getNom())
                 .prenom(request.getPrenom())
@@ -105,7 +111,6 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
-        // Initialize automatic 30-day baseline quota for the current administrative year
         int currentYear = java.time.LocalDate.now().getYear();
         Quota initialQuota = Quota.builder()
                 .user(savedUser)
@@ -122,9 +127,7 @@ public class UserService {
 
     // UPDATE
     @Transactional
-    public UserResponseDTO update(
-            Long id, UpdateUserRequestDTO request) {
-
+    public UserResponseDTO update(Long id, UpdateUserRequestDTO request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Fonctionnaire non trouvé avec l'id: " + id));
@@ -134,17 +137,14 @@ public class UserService {
         if (request.getGrade() != null) user.setGrade(request.getGrade());
 
         if (request.getServiceId() != null) {
-            ServiceEntity service = serviceRepository
-                    .findById(request.getServiceId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Service non trouvé"));
+            ServiceEntity service = serviceRepository.findById(request.getServiceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Service non trouvé"));
             user.setService(service);
         }
 
         if (request.getRoleId() != null) {
             Role role = roleRepository.findById(request.getRoleId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Rôle non trouvé"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Rôle non trouvé"));
             user.setRoles(new HashSet<>(Set.of(role)));
         }
 

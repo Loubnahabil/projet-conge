@@ -31,6 +31,13 @@ public class DemandeController {
         return ResponseEntity.ok(demandeService.getUserDemandes(currentUserId));
     }
 
+    // NEW: Handles GET /api/demandes/a-viser for supervisor profiles
+    @GetMapping("/a-viser")
+    public ResponseEntity<List<DemandeResponseDTO>> getDemandesAViser(@AuthenticationPrincipal UserDetails userDetails) {
+        Long chefId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.getDemandesAViserPourChef(chefId));
+    }
+
     @PostMapping
     public ResponseEntity<DemandeResponseDTO> create(
             @Valid @RequestBody DemandeRequestDTO request,
@@ -46,7 +53,7 @@ public class DemandeController {
     public ResponseEntity<DemandeResponseDTO> processVisaChef(
             @PathVariable Long id,
             @RequestParam boolean approve,
-            @RequestBody(required = false) ProcessWorkflowRequestDTO request, // Optional payload structure
+            @RequestBody(required = false) ProcessWorkflowRequestDTO request,
             @AuthenticationPrincipal UserDetails userDetails) {
 
         Long chefId = getAuthenticatedUserId(userDetails);
@@ -72,7 +79,6 @@ public class DemandeController {
     }
 
     @PutMapping("/{id}/rejet-signataire")
-    //@PreAuthorize("hasAuthority('SIGNATAIRE')")
     public ResponseEntity<DemandeResponseDTO> rejectBySignataire(
             @PathVariable Long id,
             @RequestBody(required = false) ProcessWorkflowRequestDTO request,
@@ -80,5 +86,14 @@ public class DemandeController {
 
         Long signataireId = getAuthenticatedUserId(userDetails);
         return ResponseEntity.ok(demandeService.rejeterSignataire(signataireId, id, request));
+    }
+
+    @PutMapping("/{id}/annuler")
+    public ResponseEntity<DemandeResponseDTO> annulerDemande(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Long currentUserId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.annulerDemande(currentUserId, id));
     }
 }

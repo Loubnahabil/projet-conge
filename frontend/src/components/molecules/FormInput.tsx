@@ -22,10 +22,18 @@ export const FormInput = ({
       fullWidth
       label={label}
       type={type}
-      margin="normal"
+      size="small" // Standardizes padding layout with your other TextFields
       error={error}
       helperText={helperText}
       {...registration} // This spreads the form tracking hooks into the input box
+      // Fixed: Adds uniform separation to stacked inputs without causing awkward gaps in dynamic Grid columns
+      sx={{ mb: 2.5 }}
+      // Fixed: Automatically shrinks the floating label if it's a date type to avoid placeholder collisions
+      slotProps={{
+        inputLabel: {
+          shrink: type === "date" ? true : undefined,
+        },
+      }}
     />
   );
 };

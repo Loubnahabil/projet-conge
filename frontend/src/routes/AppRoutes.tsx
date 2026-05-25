@@ -11,8 +11,10 @@ import PrivateRoute from "./PrivateRoute";
 import { StructurePage } from "../pages/Admin/StructurePage";
 import { JourFeriePage } from "../pages/Admin/JourFeriePage";
 import { FonctionnairePage } from "../pages/Admin/FonctionnairePage";
-// Import your Quota view here 👇 (adjust path to match your project tree)
 import QuotaManagementPage from "../pages/Admin/QuotaManagementPage";
+import MesDemandePage from "../pages/MesDemandePage";
+import ChefDashboardPage from "../pages/Chefdashboardpage";
+import SignatairePage from "../pages/Signatairepage";
 
 const DashboardPlaceholder = () => (
   <div style={{ padding: "20px", fontSize: "1.2rem", color: "#333" }}>
@@ -21,19 +23,41 @@ const DashboardPlaceholder = () => (
   </div>
 );
 
-// AdminRoute is now a proper React component — hooks work here
+// ── Role guards ───────────────────────────────────────────────────────────────
+
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const role = useSelector((state: RootState) => state.auth.user?.role);
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
-
-  // not logged in at all → go to login
   if (!accessToken) return <Navigate to="/login" replace />;
-
-  // logged in but not admin → go to dashboard
   if (role !== "ADMIN") return <Navigate to="/dashboard" replace />;
-
   return <>{children}</>;
 };
+
+const ChefRoute = ({ children }: { children: React.ReactNode }) => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  if (!accessToken) return <Navigate to="/login" replace />;
+  // CHEF_HIERARCHIE, CHEF_SERVICE, CHEF_DIVISION, DIRECTEUR all count as chef
+  const chefRoles = [
+    "CHEF_HIERARCHIE",
+    "CHEF_SERVICE",
+    "CHEF_DIVISION",
+    "DIRECTEUR",
+  ];
+  if (!role || !chefRoles.includes(role))
+    return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+};
+
+const SignataireRoute = ({ children }: { children: React.ReactNode }) => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  if (!accessToken) return <Navigate to="/login" replace />;
+  if (role !== "SIGNATAIRE") return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+};
+
+// ── Router ────────────────────────────────────────────────────────────────────
 
 const router = createBrowserRouter([
   {
@@ -55,6 +79,30 @@ const router = createBrowserRouter([
         path: "/dashboard",
         element: <DashboardPlaceholder />,
       },
+      // ── Fonctionnaire ──────────────────────────────────────────────────────
+      {
+        path: "/mes-demandes",
+        element: <MesDemandePage />,
+      },
+      // ── Chef ──────────────────────────────────────────────────────────────
+      {
+        path: "/chef/demandes",
+        element: (
+          <ChefRoute>
+            <ChefDashboardPage />
+          </ChefRoute>
+        ),
+      },
+      // ── Signataire ────────────────────────────────────────────────────────
+      {
+        path: "/signataire/demandes",
+        element: (
+          <SignataireRoute>
+            <SignatairePage />
+          </SignataireRoute>
+        ),
+      },
+      // ── Admin ─────────────────────────────────────────────────────────────
       {
         path: "/admin/structure",
         element: (
@@ -79,7 +127,6 @@ const router = createBrowserRouter([
           </AdminRoute>
         ),
       },
-      // Added Secure Quota Route Protection Wrapper Here 👇
       {
         path: "/admin/quotas",
         element: (
