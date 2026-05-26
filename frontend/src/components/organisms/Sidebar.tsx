@@ -21,10 +21,11 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  // ── Universal Roles ────────────────────────────────────────────────────────
-  { text: "Tableau de Bord", path: "/dashboard", roles: "all" },
+  // ── Admin Dashboard ────────────────────────────────────────────────────────
+  // FIXED: Changed from "all" to ["ADMIN"] to perfectly match Spring Security
+  { text: "Tableau de Bord", path: "/dashboard", roles: ["ADMIN"] },
 
-  // FIXED: Restriced explicitly to FONCTIONNAIRE so management profiles bypass it
+  // ── Fonctionnaire Roles ────────────────────────────────────────────────────
   { text: "Mes Demandes", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
 
   // ── Chef roles ────────────────────────────────────────────────────────────
@@ -41,7 +42,7 @@ const menuItems: MenuItem[] = [
     roles: ["SIGNATAIRE"],
   },
 
-  // ── Admin ─────────────────────────────────────────────────────────────────
+  // ── Admin Management Links ────────────────────────────────────────────────
   {
     text: "Structure organisationnelle",
     path: "/admin/structure",

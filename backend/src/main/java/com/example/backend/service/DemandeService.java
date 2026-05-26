@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class DemandeService {
     private final PieceJustificativeRepository pieceJustificativeRepository;
     private final DocumentStorageService documentStorageService;
     private final DemandeMapper demandeMapper;
+    private final EmailService emailService; // ← injected
 
     @Transactional(readOnly = true)
     public List<DemandeResponseDTO> getUserDemandes(Long userId) {
@@ -55,15 +57,12 @@ public class DemandeService {
 
         List<Demande> pendingDemandes;
 
-        // Directly target the exact administrative service branch
         if (checkUserHasRole(chef, "CHEF_HIERARCHIE")) {
             pendingDemandes = demandeRepository.findByUser_Service_IdAndStatut(chefService.getId(), StatutDemande.SOUMISE);
         } else {
-            // Fallback for profiles that do not have the designated supervisor authority
             return Collections.emptyList();
         }
 
-        // Filter out self-submitted records to avoid self-validation anomalies
         List<Demande> filteredDemandes = pendingDemandes.stream()
                 .filter(d -> !d.getUser().getId().equals(chefId))
                 .collect(Collectors.toList());
@@ -79,62 +78,57 @@ public class DemandeService {
         User interim = userRepository.findById(request.getInterimId())
                 .orElseThrow(() -> new ResourceNotFoundException("Intérimaire introuvable"));
 
-        // 1. Seniority Constraint: Must have at least 1 year of service
+        // 1. Seniority Constraint
         if (applicant.getDateDebutFonction() == null || applicant.getDateDebutFonction().plusYears(1).isAfter(LocalDate.now())) {
             throw new BusinessException("Un fonctionnaire ne peut pas demander de congé avant un an d'ancienneté.");
         }
 
-        // 2. Ensure Interim belongs to the exact same administrative service
+        // 2. Same service check
         if (applicant.getService() == null || interim.getService() == null ||
                 !applicant.getService().getId().equals(interim.getService().getId())) {
             throw new BusinessException("L'intérimaire doit obligatoirement appartenir au même service administratif.");
         }
 
-        // 3. Interim Availability Constraint: Interim cannot be on leave during the same period
+        // 3. Interim availability
         boolean interimIsAway = demandeRepository.isInterimOnLeave(request.getInterimId(), request.getDateDebut(), request.getDateFin());
         if (interimIsAway) {
             throw new BusinessException("L'intérimaire sélectionné est lui-même en congé ou a une demande validée sur cette période.");
         }
 
-        // 4. Date order guard clause
+        // 4. Date order
         if (request.getDateDebut().isAfter(request.getDateFin())) {
             throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.");
         }
 
-        // 5. Overlapping Periods Validation Check
+        // 5. Overlapping periods
         boolean overlapExists = demandeRepository.hasOverlappingLeave(
-                currentUserId, request.getDateDebut(), request.getDateFin()
-        );
+                currentUserId, request.getDateDebut(), request.getDateFin());
         if (overlapExists) {
             throw new BusinessException("Vous avez déjà un congé planifié ou en cours de validation sur cette période.");
         }
 
-        // 6. Calculate Net Business Days Duration
+        // 6. Calculate business days
         int businessDaysDuration = calculateBusinessDays(request.getDateDebut(), request.getDateFin());
         if (businessDaysDuration <= 0) {
             throw new BusinessException("La période sélectionnée ne contient aucun jour ouvrable.");
         }
 
-        // 7. Manage Workflow Status Mapping & Sick Leave Enforcement
+        // 7. Status mapping
         StatutDemande initialStatus = submitInstantly ? StatutDemande.SOUMISE : StatutDemande.BROUILLON;
-
-        // Sick Leave Constraint: If type is MALADIE, block instant submission to force a draft upload first
         if (request.getTypeConge() == TypeConge.MALADIE && submitInstantly) {
             initialStatus = StatutDemande.BROUILLON;
         }
 
-        // 8. Quota Shield Check (Only applied to Annual Leaves)
+        // 8. Quota check
         if (request.getTypeConge() == TypeConge.ANNUEL) {
             int targetYear = request.getDateDebut().getYear();
             Quota quota = quotaRepository.findByUserIdAndAnnee(currentUserId, targetYear)
                     .orElseThrow(() -> new BusinessException("Aucun quota annuel configuré pour l'année administrative " + targetYear));
-
             if (quota.getJoursRestants() < businessDaysDuration) {
                 throw new BusinessException("Solde de congé insuffisant ! Jours restants disponibles: " + quota.getJoursRestants());
             }
         }
 
-        // Build and preserve core transaction state
         Demande demande = Demande.builder()
                 .user(applicant)
                 .interim(interim)
@@ -148,13 +142,11 @@ public class DemandeService {
 
         Demande savedDemande = demandeRepository.save(demande);
 
-        // Define historical comment log string
         String logCommentaire = submitInstantly ? "Soumission initiale de la demande." : "Enregistrement en mode brouillon.";
         if (request.getTypeConge() == TypeConge.MALADIE && submitInstantly) {
             logCommentaire = "Enregistré automatiquement en mode brouillon. Un justificatif médical est obligatoire avant toute soumission.";
         }
 
-        // Record Initial State Transition Log
         DemandeHistorique logEntry = DemandeHistorique.builder()
                 .demande(savedDemande)
                 .modifiePar(applicant)
@@ -163,6 +155,13 @@ public class DemandeService {
                 .dateAction(LocalDateTime.now())
                 .build();
         historiqueRepository.save(logEntry);
+
+        // ── EMAIL TRIGGER 1: notify chef when demande is actually submitted ──
+        if (initialStatus == StatutDemande.SOUMISE) {
+            findChefDuService(applicant).ifPresent(chef ->
+                    emailService.sendDemandeSubmittedToChef(savedDemande, chef)
+            );
+        }
 
         return demandeMapper.toDTO(savedDemande);
     }
@@ -176,7 +175,6 @@ public class DemandeService {
             throw new BusinessException("La demande n'est pas dans un état permettant la validation du chef.");
         }
 
-        // Mandatory Rejection Comment Check
         if (!approve && (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank())) {
             throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la demande.");
         }
@@ -184,13 +182,11 @@ public class DemandeService {
         User chef = userRepository.findById(chefId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
 
-        // ENFORCE RULE 1: Verify Chef belongs to the correct administrative hierarchy path
         verifyChefHierarchy(demande.getUser(), chef);
 
         StatutDemande nextStatus = approve ? StatutDemande.VISEE_CHEF : StatutDemande.REJETEE_CHEF;
         demande.setStatut(nextStatus);
 
-        // Fallback default message if approving without a custom text entry
         String finalCommentaire = (request != null && request.getCommentaire() != null && !request.getCommentaire().isBlank())
                 ? request.getCommentaire()
                 : (approve ? "Approuvé par le supérieur hiérarchique." : "Rejeté par le supérieur hiérarchique.");
@@ -204,7 +200,22 @@ public class DemandeService {
                 .build();
         historiqueRepository.save(log);
 
-        return demandeMapper.toDTO(demandeRepository.save(demande));
+        Demande savedDemande = demandeRepository.save(demande);
+
+        if (approve) {
+            // ── EMAIL TRIGGER 2a: notify fonctionnaire his demande was approved ──
+            emailService.sendVisaChefApprovedToFonctionnaire(savedDemande);
+
+            // ── EMAIL TRIGGER 2b: notify signataire a dossier awaits his signature ──
+            findSignataireDeLaDirection(demande.getUser()).ifPresent(signataire ->
+                    emailService.sendVisaChefApprovedToSignataire(savedDemande, signataire)
+            );
+        } else {
+            // ── EMAIL TRIGGER 3: notify fonctionnaire his demande was rejected ──
+            emailService.sendVisaChefRejectedToFonctionnaire(savedDemande, finalCommentaire);
+        }
+
+        return demandeMapper.toDTO(savedDemande);
     }
 
     @Transactional
@@ -217,23 +228,17 @@ public class DemandeService {
         User currentUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
-        // --- AUTOMATIC TRIGGER: IF SIGNATAIRE UPLOADS DECISION_SIGNEE ---
         if ("DECISION_SIGNEE".equalsIgnoreCase(typeDocument)) {
             if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
                 throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.");
             }
 
-            // ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
             verifySignatoryDirection(demande.getUser(), currentUser);
-
-            // Flip state machine status automatically
             demande.setStatut(StatutDemande.SIGNEE_DIRECTEUR);
         }
 
-        // Store file onto disk partition
         String fileUrl = documentStorageService.storeFile(file);
 
-        // Build metadata entity record
         PieceJustificative attachment = PieceJustificative.builder()
                 .demande(demande)
                 .nomFichier(file.getOriginalFilename())
@@ -249,7 +254,6 @@ public class DemandeService {
         if ("DECISION_SIGNEE".equalsIgnoreCase(typeDocument)) {
             logCommentaire = "Décision signée déposée par le signataire. Demande validée et clôturée automatiquement.";
 
-            // Quota deduction mechanics
             if (demande.getTypeConge() == TypeConge.ANNUEL) {
                 int targetYear = demande.getDateDebut().getYear();
                 Quota quota = quotaRepository.findByUserIdAndAnnee(demande.getUser().getId(), targetYear)
@@ -263,10 +267,13 @@ public class DemandeService {
                 quota.setJoursRestants(quota.getJoursAlloues() - quota.getJoursUtilises());
                 quotaRepository.save(quota);
             }
+
             demandeRepository.save(demande);
+
+            // ── EMAIL TRIGGER 4: notify fonctionnaire his leave is officially granted ──
+            emailService.sendSignedToFonctionnaire(demande);
         }
 
-        // Save modification log step
         DemandeHistorique uploadLog = DemandeHistorique.builder()
                 .demande(demande)
                 .modifiePar(currentUser)
@@ -295,7 +302,6 @@ public class DemandeService {
             throw new BusinessException("Seules les demandes visées par le chef peuvent être traitées par le signataire.");
         }
 
-        // Mandatory Rejection Comment Check
         if (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank()) {
             throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la direction.");
         }
@@ -303,10 +309,8 @@ public class DemandeService {
         User signataire = userRepository.findById(signataireId)
                 .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
 
-        // ENFORCE RULE 2: Verify Signatory belongs to the exact same top-level Direction
         verifySignatoryDirection(demande.getUser(), signataire);
 
-        // Switch status to rejected
         demande.setStatut(StatutDemande.REJETEE_DIRECTEUR);
 
         DemandeHistorique log = DemandeHistorique.builder()
@@ -318,29 +322,17 @@ public class DemandeService {
                 .build();
         historiqueRepository.save(log);
 
-        return demandeMapper.toDTO(demandeRepository.save(demande));
+        Demande savedDemande = demandeRepository.save(demande);
+
+        // ── EMAIL TRIGGER 5: notify fonctionnaire his demande was rejected by direction ──
+        emailService.sendSignataireRejectedToFonctionnaire(savedDemande, request.getCommentaire());
+
+        return demandeMapper.toDTO(savedDemande);
     }
 
-    private int calculateBusinessDays(LocalDate start, LocalDate end) {
-        Set<LocalDate> holidayDates = jourFerieRepository.findAll().stream()
-                .map(JourFerie::getDate)
-                .collect(Collectors.toSet());
-
-        int count = 0;
-        LocalDate current = start;
-        while (!current.isAfter(end)) {
-            DayOfWeek day = current.getDayOfWeek();
-            if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY && !holidayDates.contains(current)) {
-                count++;
-            }
-            current = current.plusDays(1);
-        }
-        return count;
-    }
-
-    // ==========================================
+    // =========================================================================
     // 🔒 PRIVATE HIERARCHY BUSINESS VALIDATIONS
-    // ==========================================
+    // =========================================================================
 
     private void verifyChefHierarchy(User employee, User reviewer) {
         ServiceEntity empService = employee.getService();
@@ -350,7 +342,6 @@ public class DemandeService {
             throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.");
         }
 
-        // CHEF_HIERARCHIE controls requests from their exact shared Service block
         if (checkUserHasRole(reviewer, "CHEF_HIERARCHIE") && empService.getId().equals(revService.getId())) {
             return;
         }
@@ -388,6 +379,65 @@ public class DemandeService {
         return user.getRoles().stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(targetRole) ||
                         role.getName().equalsIgnoreCase("ROLE_" + targetRole));
+    }
+
+    // =========================================================================
+    // 📧 PRIVATE EMAIL RECIPIENT LOOKUP HELPERS
+    // =========================================================================
+
+    /**
+     * Finds the CHEF_HIERARCHIE in the same service as the applicant.
+     * Used for trigger 1 (soumission).
+     */
+    private Optional<User> findChefDuService(User applicant) {
+        if (applicant.getService() == null) return Optional.empty();
+
+        return userRepository.findByService_Id(applicant.getService().getId())
+                .stream()
+                .filter(u -> !u.getId().equals(applicant.getId()))
+                .filter(u -> checkUserHasRole(u, "CHEF_HIERARCHIE"))
+                .filter(u -> Boolean.TRUE.equals(u.getEnabled()))
+                .findFirst();
+    }
+
+    /**
+     * Finds the SIGNATAIRE in the same Direction as the fonctionnaire.
+     * Used for trigger 2b (visa chef approved → notify signataire).
+     */
+    private Optional<User> findSignataireDeLaDirection(User fonctionnaire) {
+        Direction dir = getUserDirectionBranch(fonctionnaire);
+        if (dir == null) return Optional.empty();
+
+        return userRepository.findAll()
+                .stream()
+                .filter(u -> checkUserHasRole(u, "SIGNATAIRE"))
+                .filter(u -> Boolean.TRUE.equals(u.getEnabled()))
+                .filter(u -> {
+                    Direction uDir = getUserDirectionBranch(u);
+                    return uDir != null && uDir.getId().equals(dir.getId());
+                })
+                .findFirst();
+    }
+
+    // =========================================================================
+    // 📅 BUSINESS DAYS CALCULATOR
+    // =========================================================================
+
+    private int calculateBusinessDays(LocalDate start, LocalDate end) {
+        Set<LocalDate> holidayDates = jourFerieRepository.findAll().stream()
+                .map(JourFerie::getDate)
+                .collect(Collectors.toSet());
+
+        int count = 0;
+        LocalDate current = start;
+        while (!current.isAfter(end)) {
+            DayOfWeek day = current.getDayOfWeek();
+            if (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY && !holidayDates.contains(current)) {
+                count++;
+            }
+            current = current.plusDays(1);
+        }
+        return count;
     }
 
     @Transactional
@@ -433,7 +483,6 @@ public class DemandeService {
             throw new BusinessException("Action refusée: Le signataire n'a pas d'affectation de Direction valide.");
         }
 
-        // ✅ FIXED: Calls the optimized custom JPQL join query to clear out multi-level graph lookup issues
         List<Demande> validatedDemandes = demandeRepository
                 .findByDirectionIdAndStatut(sigDirection.getId(), StatutDemande.VISEE_CHEF);
 
