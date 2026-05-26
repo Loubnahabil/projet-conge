@@ -24,4 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // Finds all users in the same service, excluding the logged-in user
     List<User> findByServiceIdAndIdNot(Long serviceId, Long userId);
+
+    List<User> findByService_Id(Long serviceId);
 }

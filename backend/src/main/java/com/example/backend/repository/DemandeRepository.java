@@ -60,4 +60,27 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
             @Param("dateDebutReq") LocalDate dateDebutReq,
             @Param("dateFinReq") LocalDate dateFinReq
     );
+
+    @Query("SELECT d.statut, COUNT(d) FROM Demande d GROUP BY d.statut")
+    List<Object[]> countByStatut();
+
+    // ── Count by type de congé ────────────────────────────────────────────────────
+    @Query("SELECT d.typeConge, COUNT(d) FROM Demande d GROUP BY d.typeConge")
+    List<Object[]> countByTypeConge();
+
+    // ── Count by direction ────────────────────────────────────────────────────────
+    @Query("SELECT dir.nom, COUNT(d) FROM Demande d " +
+            "JOIN d.user u JOIN u.service s JOIN s.division div JOIN div.direction dir " +
+            "GROUP BY dir.nom ORDER BY COUNT(d) DESC")
+    List<Object[]> countByDirection();
+
+    // ── Count by month for a given year ──────────────────────────────────────────
+    @Query("SELECT MONTH(d.dateDemande), COUNT(d) FROM Demande d " +
+            "WHERE YEAR(d.dateDemande) = :annee " +
+            "GROUP BY MONTH(d.dateDemande) ORDER BY MONTH(d.dateDemande)")
+    List<Object[]> countByMoisForAnnee(@Param("annee") int annee);
+
+    // ── Count by statut for a given statut value (used for en-cours counts) ───────
+    long countByStatut(StatutDemande statut);
+
 }

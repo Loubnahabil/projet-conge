@@ -88,6 +88,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
                         // 5. Structural/Config rules - ADMIN only
+                        .requestMatchers("/api/statistiques/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/directions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/divisions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/services/**").hasAuthority("ADMIN")

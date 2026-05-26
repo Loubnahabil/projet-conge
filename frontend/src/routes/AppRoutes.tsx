@@ -15,13 +15,7 @@ import QuotaManagementPage from "../pages/Admin/QuotaManagementPage";
 import MesDemandePage from "../pages/MesDemandePage";
 import ChefDashboardPage from "../pages/Chefdashboardpage";
 import SignatairePage from "../pages/Signatairepage";
-
-const DashboardPlaceholder = () => (
-  <div style={{ padding: "20px", fontSize: "1.2rem", color: "#333" }}>
-    <h2>Bienvenue dans votre Tableau de Bord Central</h2>
-    <p>C'est ici que s'afficheront vos statistiques de congés bientôt.</p>
-  </div>
-);
+import AdminDashboardPage from "../pages/Admin/Admindashboardpage";
 
 // ── Role guards ───────────────────────────────────────────────────────────────
 
@@ -77,7 +71,11 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <DashboardPlaceholder />,
+        element: (
+          <AdminRoute>
+            <AdminDashboardPage />
+          </AdminRoute>
+        ),
       },
       // ── Fonctionnaire ──────────────────────────────────────────────────────
       {
