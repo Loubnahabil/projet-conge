@@ -2,20 +2,24 @@ package com.example.backend.controller;
 
 import com.example.backend.dto.request.DemandeRequestDTO;
 import com.example.backend.dto.request.ProcessWorkflowRequestDTO;
+import com.example.backend.dto.response.DemandeHistoriqueResponseDTO;
 import com.example.backend.dto.response.DemandeResponseDTO;
 import com.example.backend.dto.response.PieceJustificativeResponseDTO;
 import com.example.backend.exception.ResourceNotFoundException;
+import com.example.backend.service.DemandeHistoriqueService;
 import com.example.backend.service.DemandeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/demandes")
@@ -24,6 +28,8 @@ public class DemandeController {
 
     private final DemandeService demandeService;
     private final com.example.backend.repository.UserRepository userRepository;
+    private final DemandeHistoriqueService historiqueService;
+
 
     @GetMapping("/my-requests")
     public ResponseEntity<List<DemandeResponseDTO>> getMyDemandes(@AuthenticationPrincipal UserDetails userDetails) {
@@ -103,4 +109,26 @@ public class DemandeController {
         Long signataireId = getAuthenticatedUserId(userDetails);
         return ResponseEntity.ok(demandeService.getDemandesASignerPourDirecteur(signataireId));
     }
+
+    // Journal d'audit complet
+    @GetMapping("/audit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DemandeHistoriqueResponseDTO>> getJournalAudit() {
+        return ResponseEntity.ok(historiqueService.getToutesLesActions());
+    }
+
+    // Historique d'une demande spécifique
+    @GetMapping("/{id}/historique")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DemandeHistoriqueResponseDTO>> getHistoriqueDemande(@PathVariable Long id) {
+        return ResponseEntity.ok(historiqueService.getHistoriquePourDemande(id));
+    }
+
+    // Toutes les demandes pour la vue admin
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DemandeResponseDTO>> getAllDemandes() {
+        return ResponseEntity.ok(demandeService.getAllDemandes());
+    }
+
 }

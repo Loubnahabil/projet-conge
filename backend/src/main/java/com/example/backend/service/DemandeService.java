@@ -488,4 +488,15 @@ public class DemandeService {
 
         return demandeMapper.toDTOList(validatedDemandes);
     }
+
+    @Transactional(readOnly = true)
+    public List<DemandeResponseDTO> getAllDemandes() {
+        return demandeMapper.toDTOList(
+                demandeRepository.findAll(
+                        org.springframework.data.domain.Sort.by(
+                                org.springframework.data.domain.Sort.Direction.DESC, "dateDemande"
+                        )
+                )
+        );
+    }
 }
