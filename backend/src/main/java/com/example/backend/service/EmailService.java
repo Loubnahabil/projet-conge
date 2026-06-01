@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EmailService {
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     private final JavaMailSender mailSender;
 
     // =========================================================================
@@ -244,6 +245,89 @@ public class EmailService {
         );
 
         send(demande.getUser().getEmail(), subject, body);
+    }
+
+
+    // =========================================================================
+// TRIGGER 6 — Rappel chef : demande SOUMISE, dateDebut dans 3 jours
+// Recipient: Chef hiérarchique
+// =========================================================================
+    @Async
+    public void sendRappelChef(Demande demande, User chef) {
+        String subject = String.format("[Congés] ⚠️ Rappel — Demande en attente de visa — %s %s",
+                demande.getUser().getNom(), demande.getUser().getPrenom());
+
+        String body = String.format("""
+            Bonjour %s %s,
+
+            ⚠️ RAPPEL URGENT — Une demande de congé attend toujours votre visa
+            alors que la date de départ est dans 3 jours.
+
+            ─── Détails du dossier ───────────────────────────
+            Fonctionnaire  : %s %s
+            Type de congé  : %s
+            Date de départ : %s
+            Date de retour : %s
+            Durée          : %d jour(s) ouvrable(s)
+            Statut actuel  : En attente de visa chef
+            ──────────────────────────────────────────────────
+
+            Veuillez traiter cette demande dans les plus brefs délais.
+
+            Cordialement,
+            Système de Gestion des Congés
+            """,
+                chef.getPrenom(), chef.getNom(),
+                demande.getUser().getPrenom(), demande.getUser().getNom(),
+                formatTypeConge(demande.getTypeConge().name()),
+                demande.getDateDebut(),
+                demande.getDateFin(),
+                demande.getDuree()
+        );
+
+        send(chef.getEmail(), subject, body);
+    }
+
+    // =========================================================================
+// TRIGGER 7 — Rappel signataire : demande VISEE_CHEF, dateDebut dans 3 jours
+// Recipient: Signataire
+// =========================================================================
+    @Async
+    public void sendRappelSignataire(Demande demande, User signataire) {
+        String subject = String.format("[Congés] ⚠️ Rappel — Dossier en attente de signature — %s %s",
+                demande.getUser().getNom(), demande.getUser().getPrenom());
+
+        String body = String.format("""
+            Bonjour %s %s,
+
+            ⚠️ RAPPEL URGENT — Un dossier visé par le chef attend toujours
+            votre signature alors que la date de départ est dans 3 jours.
+
+            ─── Détails du dossier ───────────────────────────
+            Référence      : DEM-2026-00%d
+            Fonctionnaire  : %s %s
+            Type de congé  : %s
+            Date de départ : %s
+            Date de retour : %s
+            Durée          : %d jour(s) ouvrable(s)
+            Statut actuel  : Visée chef — en attente de signature
+            ──────────────────────────────────────────────────
+
+            Veuillez déposer la décision signée dans les plus brefs délais.
+
+            Cordialement,
+            Système de Gestion des Congés
+            """,
+                signataire.getPrenom(), signataire.getNom(),
+                demande.getId(),
+                demande.getUser().getPrenom(), demande.getUser().getNom(),
+                formatTypeConge(demande.getTypeConge().name()),
+                demande.getDateDebut(),
+                demande.getDateFin(),
+                demande.getDuree()
+        );
+
+        send(signataire.getEmail(), subject, body);
     }
 
     // =========================================================================

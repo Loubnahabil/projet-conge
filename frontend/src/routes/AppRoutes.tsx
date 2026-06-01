@@ -12,10 +12,11 @@ import { StructurePage } from "../pages/Admin/StructurePage";
 import { JourFeriePage } from "../pages/Admin/JourFeriePage";
 import { FonctionnairePage } from "../pages/Admin/FonctionnairePage";
 import QuotaManagementPage from "../pages/Admin/QuotaManagementPage";
-import MesDemandePage from "../pages/MesDemandePage";
+import { MesDemandePage } from "../pages/MesDemandePage";
 import ChefDashboardPage from "../pages/Chefdashboardpage";
 import SignatairePage from "../pages/Signatairepage";
 import AdminDashboardPage from "../pages/Admin/Admindashboardpage";
+import AuditPage from "../pages/Admin/Auditpage";
 
 // ── Role guards ───────────────────────────────────────────────────────────────
 
@@ -130,6 +131,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <QuotaManagementPage />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "/admin/audit",
+        element: (
+          <AdminRoute>
+            <AuditPage />
           </AdminRoute>
         ),
       },

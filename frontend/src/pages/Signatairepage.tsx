@@ -19,15 +19,34 @@ import {
   CircularProgress,
   IconButton,
   Tooltip,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { Cancel, UploadFile } from "@mui/icons-material";
 import { AppButton } from "../components/atoms/AppButton";
 import { demandeApi } from "../api/demandeApi";
 import type { DemandeResponse } from "../types/Demande.types";
 
+const statutLabel: Record<
+  string,
+  { label: string; color: "success" | "error" | "info" | "default" }
+> = {
+  SIGNEE_DIRECTEUR: { label: "Signée", color: "success" },
+  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
+};
+
 export const SignatairePage = () => {
+  const [tab, setTab] = useState(0);
+
+  // Tab 0 — pending
   const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingPending, setLoadingPending] = useState(true);
+
+  // Tab 1 — treated
+  const [traitees, setTraitees] = useState<DemandeResponse[]>([]);
+  const [loadingTraitees, setLoadingTraitees] = useState(false);
+  const [traiteesFetched, setTraiteesFetched] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -47,19 +66,29 @@ export const SignatairePage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        // ✅ FIXED: Now calls the specific signature queue instead of personal requests
-        const data = await demandeApi.getDemandesASigner();
-        setDemandes(data);
-      } catch {
-        setError("Erreur lors du chargement des demandes.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+    demandeApi
+      .getDemandesASigner()
+      .then(setDemandes)
+      .catch(() => setError("Erreur lors du chargement des demandes."))
+      .finally(() => setLoadingPending(false));
   }, []);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+    if (newValue === 1 && !traiteesFetched) {
+      setLoadingTraitees(true);
+      demandeApi
+        .getDemandesTraiteesSignataire()
+        .then(setTraitees)
+        .catch(() =>
+          setError("Erreur lors du chargement des demandes traitées."),
+        )
+        .finally(() => {
+          setLoadingTraitees(false);
+          setTraiteesFetched(true);
+        });
+    }
+  };
 
   const pendingDemandes = demandes.filter((d) => d.statut === "VISEE_CHEF");
 
@@ -73,11 +102,9 @@ export const SignatairePage = () => {
     setError(null);
     try {
       await demandeApi.rejetSignataire(rejectDialog.targetId, { commentaire });
-
-      // ✅ FIXED: Refresh the board using the correct management queue endpoint
       const updated = await demandeApi.getDemandesASigner();
       setDemandes(updated);
-
+      setTraiteesFetched(false); // invalidate cache
       setRejectDialog({ open: false, targetId: null });
       setCommentaire("");
     } catch (err: unknown) {
@@ -104,11 +131,9 @@ export const SignatairePage = () => {
         selectedFile,
         "DECISION_SIGNEE",
       );
-
-      // ✅ FIXED: Refresh the board using the correct management queue endpoint
       const updated = await demandeApi.getDemandesASigner();
       setDemandes(updated);
-
+      setTraiteesFetched(false); // invalidate cache
       setUploadDialog({ open: false, targetId: null });
       setSelectedFile(null);
     } catch (err: unknown) {
@@ -125,7 +150,7 @@ export const SignatairePage = () => {
     }
   };
 
-  if (loading) {
+  if (loadingPending) {
     return (
       <Box
         sx={{
@@ -140,13 +165,15 @@ export const SignatairePage = () => {
     );
   }
 
+  const commonHeadCell = { fontWeight: 600, color: "#475569" };
+
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
       <Typography
         variant="h5"
-        sx={{ fontWeight: 700, color: "#1e293b", mb: 4 }}
+        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Demandes visées — en attente de signature
+        Tableau de bord — Signataire
       </Typography>
 
       {error && (
@@ -155,105 +182,182 @@ export const SignatairePage = () => {
         </Alert>
       )}
 
-      <TableContainer
-        component={Paper}
-        sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+      <Tabs
+        value={tab}
+        onChange={handleTabChange}
+        sx={{ mb: 3, borderBottom: "1px solid #e2e8f0" }}
       >
-        <Table>
-          <TableHead sx={{ bgcolor: "#f8fafc" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Fonctionnaire
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Service
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Type
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Date début
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Date fin
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Durée (j)
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {pendingDemandes.length === 0 ? (
+        <Tab label={`À signer (${pendingDemandes.length})`} />
+        <Tab label="Demandes traitées" />
+      </Tabs>
+
+      {/* ── Tab 0: Pending ── */}
+      {tab === 0 && (
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+        >
+          <Table>
+            <TableHead sx={{ bgcolor: "#f8fafc" }}>
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  align="center"
-                  sx={{ py: 6, color: "#64748b" }}
-                >
-                  Aucune demande en attente de signature.
+                <TableCell sx={commonHeadCell}>Fonctionnaire</TableCell>
+                <TableCell sx={commonHeadCell}>Service</TableCell>
+                <TableCell sx={commonHeadCell}>Type</TableCell>
+                <TableCell sx={commonHeadCell}>Date début</TableCell>
+                <TableCell sx={commonHeadCell}>Date fin</TableCell>
+                <TableCell sx={commonHeadCell}>Durée (j)</TableCell>
+                <TableCell align="right" sx={{ ...commonHeadCell, pr: 4 }}>
+                  Actions
                 </TableCell>
               </TableRow>
-            ) : (
-              pendingDemandes.map((d) => (
-                <TableRow key={d.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
-                  <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
-                    {d.userNomComplet}
-                  </TableCell>
-                  <TableCell sx={{ color: "#475569" }}>
-                    {d.userServiceNom}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
-                      size="small"
-                      color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
-                    />
-                  </TableCell>
-                  <TableCell>{d.dateDebut}</TableCell>
-                  <TableCell>{d.dateFin}</TableCell>
-                  <TableCell>{d.duree}</TableCell>
-                  <TableCell align="right" sx={{ pr: 2 }}>
-                    <Tooltip title="Déposer décision signée">
-                      <IconButton
-                        size="small"
-                        sx={{ color: "#16a34a", mr: 1 }}
-                        onClick={() => {
-                          setSelectedFile(null);
-                          setError(null);
-                          setUploadDialog({ open: true, targetId: d.id });
-                        }}
-                      >
-                        <UploadFile fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Rejeter">
-                      <IconButton
-                        size="small"
-                        sx={{ color: "#d32f2f" }}
-                        onClick={() => {
-                          setCommentaire("");
-                          setError(null);
-                          setRejectDialog({ open: true, targetId: d.id });
-                        }}
-                      >
-                        <Cancel fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+            </TableHead>
+            <TableBody>
+              {pendingDemandes.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={7}
+                    align="center"
+                    sx={{ py: 6, color: "#64748b" }}
+                  >
+                    Aucune demande en attente de signature.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : (
+                pendingDemandes.map((d) => (
+                  <TableRow
+                    key={d.id}
+                    sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
+                  >
+                    <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
+                      {d.userNomComplet}
+                    </TableCell>
+                    <TableCell sx={{ color: "#475569" }}>
+                      {d.userServiceNom}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
+                        size="small"
+                        color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
+                      />
+                    </TableCell>
+                    <TableCell>{d.dateDebut}</TableCell>
+                    <TableCell>{d.dateFin}</TableCell>
+                    <TableCell>{d.duree}</TableCell>
+                    <TableCell align="right" sx={{ pr: 2 }}>
+                      <Tooltip title="Déposer décision signée">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#16a34a", mr: 1 }}
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setError(null);
+                            setUploadDialog({ open: true, targetId: d.id });
+                          }}
+                        >
+                          <UploadFile fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Rejeter">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#d32f2f" }}
+                          onClick={() => {
+                            setCommentaire("");
+                            setError(null);
+                            setRejectDialog({ open: true, targetId: d.id });
+                          }}
+                        >
+                          <Cancel fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-      {/* Reject Dialog */}
+      {/* ── Tab 1: Treated ── */}
+      {tab === 1 &&
+        (loadingTraitees ? (
+          <Box sx={{ display: "flex", justifyContent: "center", pt: 6 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+          >
+            <Table>
+              <TableHead sx={{ bgcolor: "#f8fafc" }}>
+                <TableRow>
+                  <TableCell sx={commonHeadCell}>Fonctionnaire</TableCell>
+                  <TableCell sx={commonHeadCell}>Service</TableCell>
+                  <TableCell sx={commonHeadCell}>Type</TableCell>
+                  <TableCell sx={commonHeadCell}>Date début</TableCell>
+                  <TableCell sx={commonHeadCell}>Date fin</TableCell>
+                  <TableCell sx={commonHeadCell}>Durée (j)</TableCell>
+                  <TableCell sx={commonHeadCell}>Statut</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {traitees.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      align="center"
+                      sx={{ py: 6, color: "#64748b" }}
+                    >
+                      Aucune demande traitée pour l'instant.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  traitees.map((d) => {
+                    const s = statutLabel[d.statut] ?? {
+                      label: d.statut,
+                      color: "default" as const,
+                    };
+                    return (
+                      <TableRow
+                        key={d.id}
+                        sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
+                      >
+                        <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
+                          {d.userNomComplet}
+                        </TableCell>
+                        <TableCell sx={{ color: "#475569" }}>
+                          {d.userServiceNom}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={
+                              d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"
+                            }
+                            size="small"
+                            color={
+                              d.typeConge === "ANNUEL" ? "primary" : "warning"
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>{d.dateDebut}</TableCell>
+                        <TableCell>{d.dateFin}</TableCell>
+                        <TableCell>{d.duree}</TableCell>
+                        <TableCell>
+                          <Chip label={s.label} size="small" color={s.color} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ))}
+
+      {/* ── Reject Dialog ── */}
       <Dialog
         open={rejectDialog.open}
         onClose={() => setRejectDialog({ open: false, targetId: null })}
@@ -265,6 +369,7 @@ export const SignatairePage = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            {error && <Alert severity="error">{error}</Alert>}
             <TextField
               label="Motif du rejet *"
               multiline
@@ -291,7 +396,7 @@ export const SignatairePage = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Upload Dialog */}
+      {/* ── Upload Dialog ── */}
       <Dialog
         open={uploadDialog.open}
         onClose={() => setUploadDialog({ open: false, targetId: null })}
@@ -303,6 +408,7 @@ export const SignatairePage = () => {
         </DialogTitle>
         <DialogContent dividers>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            {error && <Alert severity="error">{error}</Alert>}
             <input
               ref={fileInputRef}
               type="file"

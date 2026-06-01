@@ -1,6 +1,7 @@
 import { axiosInstance } from "./axiosInstance";
 import type { DemandeResponse, DemandeRequest } from "../types/Demande.types";
 import type { UserResponseDTO } from "../types/user.types";
+import type { HistoryRecord } from "../types/Demande.types";
 
 export type UploadResponse = {
   message: string;
@@ -17,7 +18,7 @@ export const demandeApi = {
     return response.data;
   },
 
-  // NEW: GET /api/demandes/a-viser (For Chef validation queues)
+  // GET /api/demandes/a-viser (For Chef validation queues)
   getDemandesAViser: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
       "/api/demandes/a-viser",
@@ -36,6 +37,18 @@ export const demandeApi = {
       {
         params: { submit },
       },
+    );
+    return response.data;
+  },
+
+  // PUT /api/demandes/{id}
+  update: async (
+    id: number,
+    payload: DemandeRequest,
+  ): Promise<DemandeResponse> => {
+    const response = await axiosInstance.put<DemandeResponse>(
+      `/api/demandes/${id}`,
+      payload,
     );
     return response.data;
   },
@@ -113,10 +126,39 @@ export const demandeApi = {
     return response.data;
   },
 
-  // NEW: GET /api/demandes/a-signer (For Signataire validation queues)
+  // GET /api/demandes/a-signer (For Signataire validation queues)
   getDemandesASigner: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
       "/api/demandes/a-signer",
+    );
+    return response.data;
+  },
+
+  getDemandeHistory: async (id: number): Promise<HistoryRecord[]> => {
+    const response = await axiosInstance.get<HistoryRecord[]>(
+      `/api/demandes/${id}/historique`,
+    );
+    return response.data;
+  },
+  soumettre: async (id: number): Promise<DemandeResponse> => {
+    const response = await axiosInstance.put<DemandeResponse>(
+      `/api/demandes/${id}/soumettre`,
+    );
+    return response.data;
+  },
+
+  // Add to demandeApi object:
+
+  getDemandesTraiteesChef: async (): Promise<DemandeResponse[]> => {
+    const response = await axiosInstance.get<DemandeResponse[]>(
+      "/api/demandes/traitees-chef",
+    );
+    return response.data;
+  },
+
+  getDemandesTraiteesSignataire: async (): Promise<DemandeResponse[]> => {
+    const response = await axiosInstance.get<DemandeResponse[]>(
+      "/api/demandes/traitees-signataire",
     );
     return response.data;
   },

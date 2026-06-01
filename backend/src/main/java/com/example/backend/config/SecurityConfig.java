@@ -71,6 +71,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**").permitAll()
 
                         // 2. Specific Workflow & Queue Queries
+                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*/soumettre").hasAuthority("FONCTIONNAIRE")
+                        .requestMatchers(HttpMethod.PUT, "/api/demandes/*").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/visa-chef").hasAuthority("CHEF_HIERARCHIE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/rejet-signataire").hasAuthority("SIGNATAIRE")
                         .requestMatchers("/api/demandes/a-viser").hasAuthority("CHEF_HIERARCHIE")
@@ -80,8 +82,7 @@ public class SecurityConfig {
                         // ✅ FIX: Explicitly grant access to both profiles for uploads before hitting the catch-all
                         .requestMatchers(HttpMethod.POST, "/api/demandes/*/upload").hasAnyAuthority("FONCTIONNAIRE", "SIGNATAIRE")
 
-                        // 3. Catch-all for Demandes lifecycle requests - FONCTIONNAIRE only
-                        .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
+
 
                         // 4. User Profiles & Context boundaries
                         .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
@@ -94,6 +95,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/services/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/jours-feries/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/admin/quotas/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/demandes/audit").hasAuthority("ADMIN")
+                        .requestMatchers("/api/demandes/all").hasAuthority("ADMIN")
+                        .requestMatchers("/api/demandes/audit").hasAuthority("ADMIN")
+                        .requestMatchers("/api/demandes/all").hasAuthority("ADMIN")
+                        .requestMatchers("/api/demandes/*/historique").hasAnyAuthority("ADMIN", "FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
+
+                        .requestMatchers("/api/demandes/traitees-chef").hasAuthority("CHEF_HIERARCHIE")
+                        .requestMatchers("/api/demandes/traitees-signataire").hasAuthority("SIGNATAIRE")
+                        // 3. Catch-all for Demandes lifecycle requests - FONCTIONNAIRE only
+                        .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
 
                         // Everything else requires authentication
                         .anyRequest().authenticated())

@@ -55,6 +55,7 @@ const menuItems: MenuItem[] = [
     roles: ["ADMIN"],
   },
   { text: "Gestion des Quotas", path: "/admin/quotas", roles: ["ADMIN"] },
+  { text: "Journal d'Audit", path: "/admin/audit", roles: ["ADMIN"] },
 ];
 
 export const Sidebar = () => {
