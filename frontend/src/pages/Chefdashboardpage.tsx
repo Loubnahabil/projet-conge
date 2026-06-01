@@ -19,19 +19,38 @@ import {
   CircularProgress,
   IconButton,
   Tooltip,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { CheckCircle, Cancel } from "@mui/icons-material";
 import { AppButton } from "../components/atoms/AppButton";
 import { demandeApi } from "../api/demandeApi";
 import type { DemandeResponse } from "../types/Demande.types";
 
+const statutLabel: Record<
+  string,
+  { label: string; color: "success" | "error" | "warning" | "info" | "default" }
+> = {
+  VISEE_CHEF: { label: "Visée", color: "success" },
+  REJETEE_CHEF: { label: "Rejetée", color: "error" },
+  SIGNEE_DIRECTEUR: { label: "Signée directeur", color: "info" },
+  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
+};
+
 export const ChefDashboardPage = () => {
+  const [tab, setTab] = useState(0);
+
+  // Tab 0 — pending
   const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingPending, setLoadingPending] = useState(true);
+
+  // Tab 1 — treated
+  const [traitees, setTraitees] = useState<DemandeResponse[]>([]);
+  const [loadingTraitees, setLoadingTraitees] = useState(false);
+  const [traiteesFetched, setTraiteesFetched] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-
-  // dialog state
   const [dialog, setDialog] = useState<{
     open: boolean;
     mode: "approve" | "reject" | null;
@@ -40,19 +59,30 @@ export const ChefDashboardPage = () => {
   const [commentaire, setCommentaire] = useState("");
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        // FIXED: Now requesting pending validations for subordinate agents
-        const data = await demandeApi.getDemandesAViser();
-        setDemandes(data);
-      } catch {
-        setError("Erreur lors du chargement des demandes à viser.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
+    demandeApi
+      .getDemandesAViser()
+      .then(setDemandes)
+      .catch(() => setError("Erreur lors du chargement des demandes à viser."))
+      .finally(() => setLoadingPending(false));
   }, []);
+
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setTab(newValue);
+    // lazy-load treated demandes only once
+    if (newValue === 1 && !traiteesFetched) {
+      setLoadingTraitees(true);
+      demandeApi
+        .getDemandesTraiteesChef()
+        .then(setTraitees)
+        .catch(() =>
+          setError("Erreur lors du chargement des demandes traitées."),
+        )
+        .finally(() => {
+          setLoadingTraitees(false);
+          setTraiteesFetched(true);
+        });
+    }
+  };
 
   const pendingDemandes = demandes.filter((d) => d.statut === "SOUMISE");
 
@@ -74,10 +104,10 @@ export const ChefDashboardPage = () => {
       await demandeApi.visaChef(dialog.targetId, dialog.mode === "approve", {
         commentaire: commentaire || undefined,
       });
-
-      // FIXED: Refresh with supervisor dataset to keep security contexts happy
       const updated = await demandeApi.getDemandesAViser();
       setDemandes(updated);
+      // invalidate treated cache so it reloads next time the tab is opened
+      setTraiteesFetched(false);
       setDialog({ open: false, mode: null, targetId: null });
     } catch (err: unknown) {
       const e = err as {
@@ -93,7 +123,7 @@ export const ChefDashboardPage = () => {
     }
   };
 
-  if (loading) {
+  if (loadingPending) {
     return (
       <Box
         sx={{
@@ -112,9 +142,9 @@ export const ChefDashboardPage = () => {
     <Box sx={{ p: 3, minHeight: "100vh" }}>
       <Typography
         variant="h5"
-        sx={{ fontWeight: 700, color: "#1e293b", mb: 4 }}
+        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Demandes en attente de visa
+        Tableau de bord — Chef hiérarchique
       </Typography>
 
       {error && (
@@ -123,101 +153,197 @@ export const ChefDashboardPage = () => {
         </Alert>
       )}
 
-      <TableContainer
-        component={Paper}
-        sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+      <Tabs
+        value={tab}
+        onChange={handleTabChange}
+        sx={{ mb: 3, borderBottom: "1px solid #e2e8f0" }}
       >
-        <Table>
-          <TableHead sx={{ bgcolor: "#f8fafc" }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Fonctionnaire
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Service
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Type
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Date début
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Date fin
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Durée (j)
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Intérimaire
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
-              >
-                Actions
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {pendingDemandes.length === 0 ? (
+        <Tab label={`À viser (${pendingDemandes.length})`} />
+        <Tab label="Demandes traitées" />
+      </Tabs>
+
+      {/* ── Tab 0: Pending ── */}
+      {tab === 0 && (
+        <TableContainer
+          component={Paper}
+          sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+        >
+          <Table>
+            <TableHead sx={{ bgcolor: "#f8fafc" }}>
               <TableRow>
-                <TableCell
-                  colSpan={8}
-                  align="center"
-                  sx={{ py: 6, color: "#64748b" }}
-                >
-                  Aucune demande en attente.
-                </TableCell>
+                {[
+                  "Fonctionnaire",
+                  "Service",
+                  "Type",
+                  "Date début",
+                  "Date fin",
+                  "Durée (j)",
+                  "Intérimaire",
+                  "Actions",
+                ].map((h, i) => (
+                  <TableCell
+                    key={h}
+                    align={i === 7 ? "right" : "left"}
+                    sx={{
+                      fontWeight: 600,
+                      color: "#475569",
+                      ...(i === 7 && { pr: 4 }),
+                    }}
+                  >
+                    {h}
+                  </TableCell>
+                ))}
               </TableRow>
-            ) : (
-              pendingDemandes.map((d) => (
-                <TableRow key={d.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
-                  <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
-                    {d.userNomComplet}
-                  </TableCell>
-                  <TableCell sx={{ color: "#475569" }}>
-                    {d.userServiceNom}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
-                      size="small"
-                      color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
-                    />
-                  </TableCell>
-                  <TableCell>{d.dateDebut}</TableCell>
-                  <TableCell>{d.dateFin}</TableCell>
-                  <TableCell>{d.duree}</TableCell>
-                  <TableCell>{d.interimNomComplet || "Aucun"}</TableCell>
-                  <TableCell align="right" sx={{ pr: 2 }}>
-                    <Tooltip title="Approuver">
-                      <IconButton
-                        size="small"
-                        sx={{ color: "#16a34a", mr: 1 }}
-                        onClick={() => openDialog("approve", d.id)}
-                      >
-                        <CheckCircle fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Rejeter">
-                      <IconButton
-                        size="small"
-                        sx={{ color: "#d32f2f" }}
-                        onClick={() => openDialog("reject", d.id)}
-                      >
-                        <Cancel fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
+            </TableHead>
+            <TableBody>
+              {pendingDemandes.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={8}
+                    align="center"
+                    sx={{ py: 6, color: "#64748b" }}
+                  >
+                    Aucune demande en attente.
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              ) : (
+                pendingDemandes.map((d) => (
+                  <TableRow
+                    key={d.id}
+                    sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
+                  >
+                    <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
+                      {d.userNomComplet}
+                    </TableCell>
+                    <TableCell sx={{ color: "#475569" }}>
+                      {d.userServiceNom}
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
+                        size="small"
+                        color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
+                      />
+                    </TableCell>
+                    <TableCell>{d.dateDebut}</TableCell>
+                    <TableCell>{d.dateFin}</TableCell>
+                    <TableCell>{d.duree}</TableCell>
+                    <TableCell>{d.interimNomComplet || "Aucun"}</TableCell>
+                    <TableCell align="right" sx={{ pr: 2 }}>
+                      <Tooltip title="Approuver">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#16a34a", mr: 1 }}
+                          onClick={() => openDialog("approve", d.id)}
+                        >
+                          <CheckCircle fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Rejeter">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#d32f2f" }}
+                          onClick={() => openDialog("reject", d.id)}
+                        >
+                          <Cancel fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
-      {/* Confirm Dialog */}
+      {/* ── Tab 1: Treated ── */}
+      {tab === 1 &&
+        (loadingTraitees ? (
+          <Box sx={{ display: "flex", justifyContent: "center", pt: 6 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer
+            component={Paper}
+            sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
+          >
+            <Table>
+              <TableHead sx={{ bgcolor: "#f8fafc" }}>
+                <TableRow>
+                  {[
+                    "Fonctionnaire",
+                    "Service",
+                    "Type",
+                    "Date début",
+                    "Date fin",
+                    "Durée (j)",
+                    "Statut",
+                  ].map((h) => (
+                    <TableCell
+                      key={h}
+                      sx={{ fontWeight: 600, color: "#475569" }}
+                    >
+                      {h}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {traitees.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      align="center"
+                      sx={{ py: 6, color: "#64748b" }}
+                    >
+                      Aucune demande traitée pour l'instant.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  traitees.map((d) => {
+                    const s = statutLabel[d.statut] ?? {
+                      label: d.statut,
+                      color: "default" as const,
+                    };
+                    return (
+                      <TableRow
+                        key={d.id}
+                        sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
+                      >
+                        <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
+                          {d.userNomComplet}
+                        </TableCell>
+                        <TableCell sx={{ color: "#475569" }}>
+                          {d.userServiceNom}
+                        </TableCell>
+                        <TableCell>
+                          <Chip
+                            label={
+                              d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"
+                            }
+                            size="small"
+                            color={
+                              d.typeConge === "ANNUEL" ? "primary" : "warning"
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>{d.dateDebut}</TableCell>
+                        <TableCell>{d.dateFin}</TableCell>
+                        <TableCell>{d.duree}</TableCell>
+                        <TableCell>
+                          <Chip label={s.label} size="small" color={s.color} />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ))}
+
+      {/* ── Confirm Dialog ── */}
       <Dialog
         open={dialog.open}
         onClose={() => setDialog({ open: false, mode: null, targetId: null })}

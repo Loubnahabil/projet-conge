@@ -499,4 +499,109 @@ public class DemandeService {
                 )
         );
     }
+
+    @Transactional
+    public DemandeResponseDTO updateDemande(Long userId, Long demandeId, DemandeRequestDTO request) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+
+        if (!demande.getUser().getId().equals(userId)) {
+            throw new BusinessException("Action refusée: Vous ne pouvez modifier que vos propres demandes.");
+        }
+
+        if (demande.getStatut() != StatutDemande.BROUILLON && demande.getStatut() != StatutDemande.SOUMISE) {
+            throw new BusinessException("Modification impossible: la demande a déjà été traitée par le chef hiérarchique.");
+        }
+
+        User interim = userRepository.findById(request.getInterimId())
+                .orElseThrow(() -> new ResourceNotFoundException("Intérimaire introuvable"));
+
+        if (!demande.getUser().getService().getId().equals(interim.getService().getId())) {
+            throw new BusinessException("L'intérimaire doit appartenir au même service.");
+        }
+
+        if (request.getDateDebut().isAfter(request.getDateFin())) {
+            throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.");
+        }
+
+        int businessDays = calculateBusinessDays(request.getDateDebut(), request.getDateFin());
+        if (businessDays <= 0) {
+            throw new BusinessException("La période ne contient aucun jour ouvrable.");
+        }
+
+        demande.setInterim(interim);
+        demande.setDateDebut(request.getDateDebut());
+        demande.setDateFin(request.getDateFin());
+        demande.setDuree(businessDays);
+        demande.setTypeConge(request.getTypeConge());
+
+        DemandeHistorique log = DemandeHistorique.builder()
+                .demande(demande)
+                .modifiePar(demande.getUser())
+                .statutAction(StatutDemande.BROUILLON)
+                .commentaire("Demande modifiée par le fonctionnaire.")
+                .dateAction(LocalDateTime.now())
+                .build();
+        historiqueRepository.save(log);
+
+        return demandeMapper.toDTO(demandeRepository.save(demande));
+    }
+    @Transactional
+    public DemandeResponseDTO soumettreDemande(Long userId, Long demandeId) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+
+        if (!demande.getUser().getId().equals(userId)) {
+            throw new BusinessException("Action refusée.");
+        }
+
+        if (demande.getStatut() != StatutDemande.BROUILLON) {
+            throw new BusinessException("Seules les demandes en brouillon peuvent être soumises.");
+        }
+
+        if (demande.getTypeConge() == TypeConge.MALADIE) {
+            boolean hasJustificatif = !demande.getPiecesJustificatives().isEmpty();
+            if (!hasJustificatif) {
+                throw new BusinessException("Un justificatif médical est obligatoire avant de soumettre un congé maladie.");
+            }
+        }
+
+        demande.setStatut(StatutDemande.SOUMISE);
+
+        DemandeHistorique log = DemandeHistorique.builder()
+                .demande(demande)
+                .modifiePar(demande.getUser())
+                .statutAction(StatutDemande.SOUMISE)
+                .commentaire("Soumission de la demande.")
+                .dateAction(LocalDateTime.now())
+                .build();
+        historiqueRepository.save(log);
+
+        findChefDuService(demande.getUser()).ifPresent(chef ->
+                emailService.sendDemandeSubmittedToChef(demande, chef)
+        );
+
+        return demandeMapper.toDTO(demandeRepository.save(demande));
+    }
+
+    // For CHEF: history of demandes they treated
+    @Transactional(readOnly = true)
+    public List<DemandeResponseDTO> getDemandesTraiteesPourChef(Long chefId) {
+        User chef = userRepository.findById(chefId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
+        if (!checkUserHasRole(chef, "CHEF_HIERARCHIE")) {
+            throw new BusinessException("Action refusée: rôle CHEF_HIERARCHIE requis.");
+        }
+        return demandeMapper.toDTOList(demandeRepository.findTraiteesByChefId(chefId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<DemandeResponseDTO> getDemandesTraiteesPourSignataire(Long signataireId) {
+        User signataire = userRepository.findById(signataireId)
+                .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
+        if (!checkUserHasRole(signataire, "SIGNATAIRE")) {
+            throw new BusinessException("Action refusée: rôle SIGNATAIRE requis.");
+        }
+        return demandeMapper.toDTOList(demandeRepository.findTraiteesBySignataireId(signataireId));
+    }
 }

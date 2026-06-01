@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -112,23 +111,52 @@ public class DemandeController {
 
     // Journal d'audit complet
     @GetMapping("/audit")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DemandeHistoriqueResponseDTO>> getJournalAudit() {
         return ResponseEntity.ok(historiqueService.getToutesLesActions());
     }
 
     // Historique d'une demande spécifique
     @GetMapping("/{id}/historique")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DemandeHistoriqueResponseDTO>> getHistoriqueDemande(@PathVariable Long id) {
         return ResponseEntity.ok(historiqueService.getHistoriquePourDemande(id));
     }
 
     // Toutes les demandes pour la vue admin
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<DemandeResponseDTO>> getAllDemandes() {
         return ResponseEntity.ok(demandeService.getAllDemandes());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DemandeResponseDTO> updateDemande(
+            @PathVariable Long id,
+            @Valid @RequestBody DemandeRequestDTO request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long currentUserId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.updateDemande(currentUserId, id, request));
+    }
+    @PutMapping("/{id}/soumettre")
+    public ResponseEntity<DemandeResponseDTO> soumettreDemande(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long currentUserId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.soumettreDemande(currentUserId, id));
+    }
+
+    // Demandes already treated by the chef (history tab)
+    @GetMapping("/traitees-chef")
+    public ResponseEntity<List<DemandeResponseDTO>> getDemandesTraiteesChef(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long chefId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.getDemandesTraiteesPourChef(chefId));
+    }
+
+    // Demandes already treated by the signataire (history tab)
+    @GetMapping("/traitees-signataire")
+    public ResponseEntity<List<DemandeResponseDTO>> getDemandesTraiteesSignataire(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long signataireId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.getDemandesTraiteesPourSignataire(signataireId));
     }
 
 }

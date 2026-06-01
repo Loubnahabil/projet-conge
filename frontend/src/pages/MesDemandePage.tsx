@@ -16,7 +16,7 @@ import {
   CircularProgress,
   IconButton,
   Button,
-  Grid,
+  Grid, // MUI v6 standard Grid layout (Grid2)
   Stack,
   Divider,
   Tooltip,
@@ -44,6 +44,7 @@ import type {
   DemandeResponse,
   TypeConge,
   DemandeRequest,
+  HistoryRecord,
 } from "../types/Demande.types";
 import type { UserResponseDTO } from "../types/user.types";
 
@@ -60,16 +61,6 @@ interface BackendErrorResponse {
       message?: string;
     };
   };
-}
-
-// Extended to match history records structure
-interface HistoryRecord {
-  id: number;
-  demandeId: number;
-  modifieParId: number;
-  statutAction: string;
-  commentaire: string;
-  dateAction: string;
 }
 
 const statutConfig: Record<
@@ -99,16 +90,14 @@ const MOROCCAN_HOLIDAYS = [
 export const MesDemandePage = () => {
   const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
   const [colleagues, setColleagues] = useState<UserResponseDTO[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // View control flags
   const [isFormViewOpen, setIsFormViewOpen] = useState(false);
   const [isDetailViewOpen, setIsDetailViewOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  // Details tracking states
   const [selectedDemande, setSelectedDemande] =
     useState<DemandeResponse | null>(null);
   const [demandeHistory, setDemandeHistory] = useState<HistoryRecord[]>([]);
@@ -135,6 +124,7 @@ export const MesDemandePage = () => {
   const watchTypeConge = useWatch({ control, name: "typeConge" });
   const watchDateDebut = useWatch({ control, name: "dateDebut" });
   const watchDateFin = useWatch({ control, name: "dateFin" });
+  const watchInterimId = useWatch({ control, name: "interimId" });
 
   let calculatedDuree = 0;
   if (watchDateDebut && watchDateFin) {
@@ -146,13 +136,9 @@ export const MesDemandePage = () => {
       while (current <= end) {
         const dayOfWeek = current.getDay();
         const dateStr = current.toISOString().split("T")[0];
-
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         const isHoliday = MOROCCAN_HOLIDAYS.includes(dateStr);
-
-        if (!isWeekend && !isHoliday) {
-          days++;
-        }
+        if (!isWeekend && !isHoliday) days++;
         current.setDate(current.getDate() + 1);
       }
       calculatedDuree = days;
@@ -168,7 +154,7 @@ export const MesDemandePage = () => {
       setDemandes(myDemandes);
       setColleagues(users);
     } catch {
-      setError("Erreur lors du chargement des données.");
+      setError("Erreur lors du chargement des donnees.");
     } finally {
       setLoading(false);
     }
@@ -206,115 +192,15 @@ export const MesDemandePage = () => {
 
   const handleOpenDetailView = async (d: DemandeResponse) => {
     setSelectedDemande(d);
+    setDemandeHistory([]);
     setActionLoading(true);
+    setIsDetailViewOpen(true);
+    setIsFormViewOpen(false);
     try {
-      // Type-safe check: verify if the method exists without casting to 'any'
-      const apiWithHistory = demandeApi as unknown as Record<string, unknown>;
-
-      if (typeof apiWithHistory.getDemandeHistory === "function") {
-        const history = await (
-          apiWithHistory.getDemandeHistory as (
-            id: number,
-          ) => Promise<HistoryRecord[]>
-        )(d.id);
-        setDemandeHistory(history);
-      } else {
-        // Fixed: 'baseTime' is now declared with 'const' since it's never reassigned
-        const baseTime = new Date().toISOString().split("T")[0];
-        const mockLogs: HistoryRecord[] = [];
-
-        if (d.statut === "BROUILLON") {
-          mockLogs.push({
-            id: 1,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "BROUILLON",
-            commentaire: "Enregistrement en mode brouillon.",
-            dateAction: `${baseTime} 12:45`,
-          });
-        } else if (d.statut === "SOUMISE") {
-          mockLogs.push({
-            id: 1,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "BROUILLON",
-            commentaire: "Brouillon créé.",
-            dateAction: `${baseTime} 10:15`,
-          });
-          mockLogs.push({
-            id: 2,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "SOUMISE",
-            commentaire: "Soumission initiale de la demande.",
-            dateAction: `${baseTime} 13:16`,
-          });
-        } else if (d.statut === "VISEE_CHEF") {
-          mockLogs.push({
-            id: 1,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "SOUMISE",
-            commentaire: "Soumission initiale de la demande.",
-            dateAction: `${baseTime} 09:00`,
-          });
-          mockLogs.push({
-            id: 2,
-            demandeId: d.id,
-            modifieParId: 30010,
-            statutAction: "VISEE_CHEF",
-            commentaire: "Dossier vérifié et validé.",
-            dateAction: `${baseTime} 14:37`,
-          });
-        } else if (d.statut === "SIGNEE_DIRECTEUR") {
-          mockLogs.push({
-            id: 1,
-            demandeId: d.id,
-            modifieParId: 30014,
-            statutAction: "SOUMISE",
-            commentaire: "Soumission initiale de la demande.",
-            dateAction: `${baseTime} 11:20`,
-          });
-          mockLogs.push({
-            id: 2,
-            demandeId: d.id,
-            modifieParId: 30010,
-            statutAction: "VISEE_CHEF",
-            commentaire: "Vérification hiérarchique acceptée.",
-            dateAction: `${baseTime} 14:00`,
-          });
-          mockLogs.push({
-            id: 3,
-            demandeId: d.id,
-            modifieParId: 30011,
-            statutAction: "SIGNEE_DIRECTEUR",
-            commentaire: "Décision signée déposée par le signataire.",
-            dateAction: `${baseTime} 15:28`,
-          });
-        } else if (d.statut === "ANNULEE") {
-          mockLogs.push({
-            id: 1,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "SOUMISE",
-            commentaire: "Soumission initiale.",
-            dateAction: `${baseTime} 10:00`,
-          });
-          mockLogs.push({
-            id: 2,
-            demandeId: d.id,
-            modifieParId: 30013,
-            statutAction: "ANNULEE",
-            commentaire: "Demande annulée par le fonctionnaire.",
-            dateAction: `${baseTime} 13:27`,
-          });
-        }
-        setDemandeHistory(mockLogs.reverse()); // Show newest tracking records first
-      }
-      setIsDetailViewOpen(true);
-      setIsFormViewOpen(false);
+      const history = await demandeApi.getDemandeHistory(d.id);
+      setDemandeHistory(history);
     } catch {
-      setError("Impossible de charger l'historique de l'état.");
+      setError("Impossible de charger l'historique de l'etat.");
     } finally {
       setActionLoading(false);
     }
@@ -333,11 +219,10 @@ export const MesDemandePage = () => {
   ) => {
     if (data.typeConge === "MALADIE" && submitInstantly && !selectedFile) {
       setFileError(
-        "Une pièce justificative (Certificat médical) est obligatoire pour soumettre un congé maladie.",
+        "Une piece justificative (Certificat medical) est obligatoire pour soumettre un conge maladie.",
       );
       return;
     }
-
     setActionLoading(true);
     setError(null);
     try {
@@ -351,7 +236,7 @@ export const MesDemandePage = () => {
       let activeDemandeId = editingId;
 
       if (editingId) {
-        await demandeApi.create(payload, submitInstantly);
+        await demandeApi.update(editingId, payload);
       } else {
         const createdDemande = await demandeApi.create(
           payload,
@@ -377,26 +262,25 @@ export const MesDemandePage = () => {
       const errorWithResponse = err as BackendErrorResponse;
       setError(
         errorWithResponse.response?.data?.message ||
-          "Erreur lors du traitement du congé.",
+          "Erreur lors du traitement du conge.",
       );
     } finally {
       setActionLoading(false);
     }
   };
 
-  const handleDirectSubmitFromTable = async (id: number) => {
+  const handleDirectSubmitFromTable = async (demande: DemandeResponse) => {
     setActionLoading(true);
+    setError(null);
     try {
-      const fallbackPayload: DemandeRequest = {
-        dateDebut: "",
-        dateFin: "",
-        typeConge: "ANNUEL" as TypeConge,
-        interimId: id,
-      };
-      await demandeApi.create(fallbackPayload, true);
+      if (!demande.interimId) {
+        setError("Un intérimaire valide doit être désigné avant de soumettre.");
+        return;
+      }
+      await demandeApi.soumettre(demande.id);
       setDemandes(await demandeApi.getMyDemandes());
     } catch {
-      setError("Impossible de soumettre le document.");
+      setError("Impossible de soumettre la demande.");
     } finally {
       setActionLoading(false);
     }
@@ -412,7 +296,6 @@ export const MesDemandePage = () => {
     setCancelDialogOpen(false);
     setActionLoading(true);
     setError(null);
-
     try {
       await demandeApi.annulerDemande(selectedDemandeId);
       const updatedDemandes = await demandeApi.getMyDemandes();
@@ -438,24 +321,23 @@ export const MesDemandePage = () => {
     return found ? `${found.nom} ${found.prenom}` : `ID: ${id}`;
   };
 
-  if (loading) {
+  const formatDate = (iso: string) => {
+    if (!iso) return "—";
+    const d = new Date(iso);
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "60vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
+      d.toLocaleDateString("fr-MA", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }) +
+      " " +
+      d.toLocaleTimeString("fr-MA", { hour: "2-digit", minute: "2-digit" })
     );
-  }
+  };
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
-      {/* 1. FORM VIEW (CREATE / EDIT) */}
+      {/* 1. FORM VIEW */}
       {isFormViewOpen && !isDetailViewOpen && (
         <Paper
           sx={{
@@ -475,8 +357,8 @@ export const MesDemandePage = () => {
             </IconButton>
             <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
               {editingId
-                ? `Modifier la Demande N° #${editingId}`
-                : "Nouvelle Demande de Congé"}
+                ? `Modifier la Demande N #${editingId}`
+                : "Nouvelle Demande de Conge"}
             </Typography>
           </Stack>
 
@@ -485,8 +367,8 @@ export const MesDemandePage = () => {
             color="textSecondary"
             sx={{ mb: 3, pl: 5 }}
           >
-            Saisissez vos dates d'absence. Les week-ends et jours fériés
-            nationaux sont automatiquement exclus du décompte final.
+            Saisissez vos dates d'absence. Les week-ends et jours feries
+            nationaux sont automatiquement exclus du decompte final.
           </Typography>
 
           <Divider sx={{ mb: 4 }} />
@@ -497,7 +379,9 @@ export const MesDemandePage = () => {
             </Alert>
           )}
 
+          {/* ✅ Fixed for MUI v6 container declaration */}
           <Grid container spacing={3}>
+            {/* ✅ Fixed size structure for sub items */}
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Date de la Demande"
@@ -510,22 +394,21 @@ export const MesDemandePage = () => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 select
-                label="Type de congé *"
+                label="Type de conge *"
                 size="small"
                 fullWidth
-                defaultValue=""
+                value={watchTypeConge || ""} // 🟢 ADD THIS LINE
                 {...register("typeConge")}
                 error={!!errors.typeConge}
                 helperText={errors.typeConge?.message}
               >
-                <MenuItem value="ANNUEL">Congé Annuel</MenuItem>
-                <MenuItem value="MALADIE">Congé Maladie</MenuItem>
+                <MenuItem value="ANNUEL">Conge Annuel</MenuItem>
+                <MenuItem value="MALADIE">Conge Maladie</MenuItem>
               </TextField>
             </Grid>
-
             <Grid size={{ xs: 12, sm: 4 }}>
               <FormInput
-                label="Date de début *"
+                label="Date de debut *"
                 type="date"
                 registration={register("dateDebut")}
                 error={!!errors.dateDebut}
@@ -543,7 +426,7 @@ export const MesDemandePage = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }}>
               <TextField
-                label="Durée calculée"
+                label="Duree calculee"
                 value={`${calculatedDuree} jours`}
                 size="small"
                 disabled
@@ -551,14 +434,13 @@ export const MesDemandePage = () => {
                 slotProps={{ input: { style: { fontWeight: "bold" } } }}
               />
             </Grid>
-
             <Grid size={{ xs: 12 }}>
               <TextField
                 select
-                label="Intérimaire (Collègues du même service) *"
+                label="Interimaire (Collegues du meme service) *"
                 size="small"
                 fullWidth
-                defaultValue=""
+                value={watchInterimId || ""} // 🟢 ADD THIS LINE
                 {...register("interimId")}
                 error={!!errors.interimId}
                 helperText={errors.interimId?.message}
@@ -570,13 +452,12 @@ export const MesDemandePage = () => {
                 ))}
               </TextField>
             </Grid>
-
             <Grid size={{ xs: 12 }}>
               <Typography
                 variant="subtitle2"
                 sx={{ fontWeight: 600, color: "#475569", mb: 1 }}
               >
-                Pièces Justificatives{" "}
+                Pieces Justificatives{" "}
                 {watchTypeConge === "MALADIE" && (
                   <span style={{ color: "#ef4444" }}>*</span>
                 )}
@@ -604,8 +485,8 @@ export const MesDemandePage = () => {
                 <CloudUpload sx={{ fontSize: 32, color: "#64748b", mb: 1 }} />
                 <Typography variant="body2" sx={{ color: "#475569" }}>
                   {selectedFile
-                    ? `Fichier prêt : ${selectedFile.name}`
-                    : "Sélectionner ou glisser un justificatif officiel (PDF, PNG, JPG)"}
+                    ? `Fichier pret : ${selectedFile.name}`
+                    : "Selectionner ou glisser un justificatif officiel (PDF, PNG, JPG)"}
                 </Typography>
               </Box>
               {fileError && (
@@ -652,7 +533,7 @@ export const MesDemandePage = () => {
         </Paper>
       )}
 
-      {/* 2. SPLIT DETAIL VIEW (VISIBILITY BUTTON INTERACTION) */}
+      {/* 2. DETAIL VIEW */}
       {!isFormViewOpen && isDetailViewOpen && selectedDemande && (
         <Paper
           sx={{
@@ -687,8 +568,8 @@ export const MesDemandePage = () => {
                 >
                   DEM-2026-00{selectedDemande.id} —{" "}
                   {selectedDemande.typeConge === "ANNUEL"
-                    ? "Congé annuel"
-                    : "Congé maladie"}
+                    ? "Conge annuel"
+                    : "Conge maladie"}
                 </Typography>
                 <Stack
                   direction="row"
@@ -713,7 +594,8 @@ export const MesDemandePage = () => {
               </Box>
             </Stack>
 
-            {selectedDemande.statut === "SOUMISE" && (
+            {(selectedDemande.statut === "BROUILLON" ||
+              selectedDemande.statut === "SOUMISE") && (
               <Button
                 variant="contained"
                 color="error"
@@ -731,8 +613,9 @@ export const MesDemandePage = () => {
             )}
           </Box>
 
+          {/* ✅ Fixed for MUI v6 container declaration */}
           <Grid container spacing={4}>
-            {/* Left Box: Info Summary */}
+            {/* Left: Info */}
             <Grid size={{ xs: 12, md: 7 }}>
               <Paper
                 variant="outlined"
@@ -745,108 +628,60 @@ export const MesDemandePage = () => {
                   INFORMATIONS DOSSIER
                 </Typography>
                 <Stack spacing={2}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid #e2e8f0",
-                      pb: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Type de congé
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {selectedDemande.typeConge === "ANNUEL"
-                        ? "🌴 Congé Annuel"
-                        : "🤒 Congé Maladie"}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid #e2e8f0",
-                      pb: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Date de départ
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {selectedDemande.dateDebut}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid #e2e8f0",
-                      pb: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Date de retour
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {selectedDemande.dateFin}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid #e2e8f0",
-                      pb: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Durée accordée
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 700, color: "#0f172a" }}
+                  {[
+                    {
+                      label: "Type de conge",
+                      value:
+                        selectedDemande.typeConge === "ANNUEL"
+                          ? "Conge Annuel"
+                          : "Conge Maladie",
+                    },
+                    {
+                      label: "Date de depart",
+                      value: selectedDemande.dateDebut,
+                    },
+                    { label: "Date de retour", value: selectedDemande.dateFin },
+                    {
+                      label: "Duree accordee",
+                      value: `${selectedDemande.duree} jours ouvrables`,
+                      bold: true,
+                    },
+                    { label: "Annee administrative", value: "2026" },
+                    {
+                      label: "Interim designe",
+                      value: getInterimName(selectedDemande.interimId),
+                      blue: true,
+                    },
+                  ].map((row, i, arr) => (
+                    <Box
+                      key={row.label}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        borderBottom:
+                          i < arr.length - 1 ? "1px solid #e2e8f0" : "none",
+                        pb: i < arr.length - 1 ? 1 : 0,
+                      }}
                     >
-                      {selectedDemande.duree} jours ouvrables
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      borderBottom: "1px solid #e2e8f0",
-                      pb: 1,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Année administrative
-                    </Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      2026
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      pb: 0,
-                    }}
-                  >
-                    <Typography variant="body2" color="textSecondary">
-                      Intérim désigné
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 600, color: "#2563eb" }}
-                    >
-                      {getInterimName(selectedDemande.interimId)}
-                    </Typography>
-                  </Box>
+                      <Typography variant="body2" color="textSecondary">
+                        {row.label}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: row.bold ? 700 : 600,
+                          color: row.blue ? "#2563eb" : "#0f172a",
+                        }}
+                      >
+                        {row.value}
+                      </Typography>
+                    </Box>
+                  ))}
                 </Stack>
               </Paper>
             </Grid>
 
-            {/* Right Box: Processing History State Timeline */}
+            {/* Right: History Timeline */}
             <Grid size={{ xs: 12, md: 5 }}>
               <Paper
                 variant="outlined"
@@ -856,16 +691,22 @@ export const MesDemandePage = () => {
                   variant="subtitle1"
                   sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
                 >
-                  HISTORIQUE DES ÉTATS
+                  HISTORIQUE DES ETATS
                 </Typography>
 
-                {demandeHistory.length === 0 ? (
+                {actionLoading ? (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "center", py: 4 }}
+                  >
+                    <CircularProgress size={24} />
+                  </Box>
+                ) : demandeHistory.length === 0 ? (
                   <Typography
                     variant="body2"
                     color="textSecondary"
                     sx={{ fontStyle: "italic" }}
                   >
-                    Aucun historique de suivi enregistré.
+                    Aucun historique de suivi enregistre.
                   </Typography>
                 ) : (
                   <Stack
@@ -886,7 +727,6 @@ export const MesDemandePage = () => {
                   >
                     {demandeHistory.map((log, index) => (
                       <Box key={log.id} sx={{ position: "relative" }}>
-                        {/* Timeline Marker node circle */}
                         <Box
                           sx={{
                             position: "absolute",
@@ -902,9 +742,13 @@ export const MesDemandePage = () => {
                         <Typography
                           variant="caption"
                           color="textSecondary"
-                          sx={{ display: "block", fontWeight: 500 }}
+                          sx={{
+                            display: "block",
+                            fontWeight: 500,
+                            fontFamily: "monospace",
+                          }}
                         >
-                          {log.dateAction}
+                          {formatDate(log.dateAction)}
                         </Typography>
                         <Typography
                           variant="body2"
@@ -917,18 +761,6 @@ export const MesDemandePage = () => {
                           {statutConfig[log.statutAction]?.label ||
                             log.statutAction}
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          color="textSecondary"
-                          sx={{
-                            display: "block",
-                            mt: 0.3,
-                            fontStyle: "italic",
-                          }}
-                        >
-                          Par ID Agent: {log.modifieParId} —{" "}
-                          {log.commentaire || "Aucune note ajoutée"}
-                        </Typography>
                       </Box>
                     ))}
                   </Stack>
@@ -939,48 +771,42 @@ export const MesDemandePage = () => {
         </Paper>
       )}
 
-      {/* 3. BASE LIST DATATABLE VIEW */}
+      {/* 3. DEFAULT LIST VIEW TABLE */}
       {!isFormViewOpen && !isDetailViewOpen && (
-        <>
+        <Paper
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+          }}
+        >
           <Box
             sx={{
+              p: 3,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              mb: 4,
             }}
           >
-            <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
-              Mon Espace Congés (Fonctionnaire)
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              Mes Demandes de Congé
             </Typography>
-            <AppButton
-              text="+ Nouvelle Demande"
-              onClick={handleOpenCreateForm}
-            />
+            <Button variant="contained" onClick={handleOpenCreateForm}>
+              Nouvelle Demande
+            </Button>
           </Box>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
-
-          <TableContainer
-            component={Paper}
-            sx={{ borderRadius: "12px", border: "1px solid #e2e8f0" }}
-          >
+          <TableContainer>
             <Table>
               <TableHead sx={{ bgcolor: "#f8fafc" }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 600 }}>N° Demande</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Type de congé</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Date début</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Date fin</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Début</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Fin</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Durée</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>
-                    Statut de la Demande
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: 600 }} align="center">
+                  <TableCell sx={{ fontWeight: 600 }}>Statut</TableCell>
+                  <TableCell align="right" sx={{ fontWeight: 600, pr: 3 }}>
                     Actions
                   </TableCell>
                 </TableRow>
@@ -991,90 +817,75 @@ export const MesDemandePage = () => {
                     <TableCell
                       colSpan={7}
                       align="center"
-                      sx={{ py: 6, color: "#64748b" }}
+                      sx={{ py: 3, color: "text.secondary" }}
                     >
-                      Aucune demande enregistrée.
+                      Aucune demande trouvée.
                     </TableCell>
                   </TableRow>
                 ) : (
                   demandes.map((d) => {
-                    const chip = statutConfig[d.statut] || {
-                      label: d.statut,
-                      color: "default",
-                    };
                     const isBrouillon = d.statut === "BROUILLON";
                     const isSoumise = d.statut === "SOUMISE";
+                    const canEdit = isBrouillon || isSoumise;
 
                     return (
-                      <TableRow
-                        key={d.id}
-                        sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
-                      >
-                        <TableCell sx={{ fontWeight: 600 }}>#{d.id}</TableCell>
+                      <TableRow key={d.id} hover>
+                        <TableCell>#{d.id}</TableCell>
                         <TableCell>
-                          {d.typeConge === "ANNUEL"
-                            ? "🌴 Congé annuel"
-                            : "🤒 Congé maladie"}
+                          {d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
                         </TableCell>
                         <TableCell>{d.dateDebut}</TableCell>
                         <TableCell>{d.dateFin}</TableCell>
-                        <TableCell sx={{ fontWeight: 600 }}>
-                          {d.duree} jours
-                        </TableCell>
+                        <TableCell>{d.duree} j</TableCell>
                         <TableCell>
                           <Chip
-                            label={chip.label}
-                            color={chip.color}
+                            label={statutConfig[d.statut]?.label || d.statut}
+                            color={statutConfig[d.statut]?.color || "default"}
                             size="small"
-                            sx={{ fontWeight: 600 }}
                           />
                         </TableCell>
-                        <TableCell align="center">
-                          <Box
-                            sx={{
-                              display: "flex",
-                              flexDirection: "row",
-                              gap: 1,
-                              justifyContent: "center",
-                            }}
+                        <TableCell align="right" sx={{ pr: 2 }}>
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            sx={{ justifyContent: "flex-end" }} // ✅ Fixed for MUI v6
                           >
+                            <Tooltip title="Voir Détails">
+                              <IconButton
+                                color="info"
+                                onClick={() => handleOpenDetailView(d)}
+                                size="small"
+                              >
+                                <Visibility fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+
+                            {canEdit && (
+                              <Tooltip title="Modifier">
+                                <IconButton
+                                  color="primary"
+                                  onClick={() => handleOpenEditForm(d)}
+                                  size="small"
+                                >
+                                  <Edit fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+
                             {isBrouillon && (
                               <>
-                                <Tooltip title="Modifier">
-                                  <IconButton
-                                    color="primary"
-                                    onClick={() => handleOpenEditForm(d)}
-                                    size="small"
-                                  >
-                                    <Edit fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
                                 <Tooltip title="Soumettre">
                                   <IconButton
                                     sx={{ color: "#16a34a" }}
                                     onClick={() =>
-                                      handleDirectSubmitFromTable(d.id)
+                                      handleDirectSubmitFromTable(d)
                                     }
                                     size="small"
                                   >
                                     <Send fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
-                              </>
-                            )}
-
-                            {isSoumise && (
-                              <>
-                                <Tooltip title="Voir">
-                                  <IconButton
-                                    color="info"
-                                    onClick={() => handleOpenDetailView(d)}
-                                    size="small"
-                                  >
-                                    <Visibility fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Annuler">
+                                <Tooltip title="Annuler (Supprimer)">
                                   <IconButton
                                     color="error"
                                     onClick={() =>
@@ -1088,18 +899,20 @@ export const MesDemandePage = () => {
                               </>
                             )}
 
-                            {!isBrouillon && !isSoumise && (
-                              <Tooltip title="Voir">
+                            {isSoumise && (
+                              <Tooltip title="Annuler la demande">
                                 <IconButton
-                                  color="info"
-                                  onClick={() => handleOpenDetailView(d)}
+                                  color="error"
+                                  onClick={() =>
+                                    handleCancelDemandeFromTable(d.id)
+                                  }
                                   size="small"
                                 >
-                                  <Visibility fontSize="small" />
+                                  <Cancel fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                             )}
-                          </Box>
+                          </Stack>
                         </TableCell>
                       </TableRow>
                     );
@@ -1108,38 +921,30 @@ export const MesDemandePage = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </>
+        </Paper>
       )}
 
-      {/* Confirmation Dialog Popups */}
+      {/* Confirmation Dialog for Cancellations */}
       <Dialog
         open={cancelDialogOpen}
         onClose={() => setCancelDialogOpen(false)}
-        slotProps={{ paper: { sx: { borderRadius: "12px", p: 1 } } }}
       >
-        <DialogTitle sx={{ fontWeight: 700, color: "#1e293b" }}>
-          Annuler la demande de congé ?
-        </DialogTitle>
+        <DialogTitle>Confirmer l'annulation</DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: "#475569" }}>
-            Êtes-vous sûr de vouloir annuler cette demande ? Cette action mettra
-            à jour le statut de votre dossier.
+          <DialogContentText>
+            Êtes-vous sûr de vouloir annuler ou supprimer cette demande de congé
+            administrative ? Cette action est irréversible.
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button
-            onClick={() => setCancelDialogOpen(false)}
-            color="inherit"
-            sx={{ fontWeight: 600 }}
-          >
-            Retour
+        <DialogActions>
+          <Button onClick={() => setCancelDialogOpen(false)} color="inherit">
+            Ignorer
           </Button>
           <Button
             onClick={handleConfirmCancellation}
             color="error"
-            variant="contained"
             autoFocus
-            sx={{ fontWeight: 600, borderRadius: "6px" }}
+            variant="contained"
           >
             Confirmer
           </Button>
@@ -1148,5 +953,3 @@ export const MesDemandePage = () => {
     </Box>
   );
 };
-
-export default MesDemandePage;

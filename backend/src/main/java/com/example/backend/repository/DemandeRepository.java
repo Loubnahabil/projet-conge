@@ -83,4 +83,29 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
     // ── Count by statut for a given statut value (used for en-cours counts) ───────
     long countByStatut(StatutDemande statut);
 
+
+
+    // For CHEF: demandes they already treated (approved or rejected)
+    @Query("SELECT DISTINCT d FROM Demande d " +
+            "JOIN d.historiques h " +
+            "WHERE h.modifiePar.id = :chefId " +
+            "AND d.statut IN (" +
+            "  com.example.backend.entity.StatutDemande.VISEE_CHEF, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_CHEF, " +
+            "  com.example.backend.entity.StatutDemande.SIGNEE_DIRECTEUR, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_DIRECTEUR)")
+    List<Demande> findTraiteesByChefId(@Param("chefId") Long chefId);
+
+    // For SIGNATAIRE: demandes they already treated (signed or rejected)
+    @Query("SELECT DISTINCT d FROM Demande d " +
+            "JOIN d.historiques h " +
+            "WHERE h.modifiePar.id = :signataireId " +
+            "AND d.statut IN (" +
+            "  com.example.backend.entity.StatutDemande.SIGNEE_DIRECTEUR, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_DIRECTEUR)")
+    List<Demande> findTraiteesBySignataireId(@Param("signataireId") Long signataireId);
+
+    List<Demande> findByDateDebutAndStatut(LocalDate dateDebut, StatutDemande statut);
+
+
 }

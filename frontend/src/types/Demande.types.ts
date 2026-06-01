@@ -33,6 +33,18 @@ export interface DemandeResponse {
   statut: StatutDemande;
 }
 
+export interface HistoryRecord {
+  id: number;
+  demandeId: number;
+  statutAction: string;
+  commentaire: string;
+  dateAction: string;
+  acteurNom: string;
+  acteurPrenom: string;
+  acteurEmail: string;
+  acteurRole: string;
+}
+
 // What we send for visa chef or signataire reject
 export interface ProcessWorkflowRequest {
   commentaire?: string;
