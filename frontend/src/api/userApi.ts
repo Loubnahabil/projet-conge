@@ -1,6 +1,11 @@
 import { axiosInstance } from "./axiosInstance";
-import type { UserResponseDTO, SpringPageWrapper } from "../types/user.types";
 import type { AxiosResponse } from "axios";
+
+import type {
+  UserResponseDTO,
+  SpringPageWrapper,
+  UserRequestDTO,
+} from "../types/user.types";
 
 export const userApi = {
   getAll: (search = "", page = 0, size = 10) => {
@@ -23,20 +28,20 @@ export const userApi = {
       .get<UserResponseDTO>(`/api/users/${id}`)
       .then((res: AxiosResponse<UserResponseDTO>) => res.data),
 
-  // Fixed: Replaced 'any' with Record<string, unknown>
-  create: (payload: Record<string, unknown>) =>
+  create: (payload: UserRequestDTO) =>
     axiosInstance
       .post<UserResponseDTO>("/api/users", payload)
-      .then((res: AxiosResponse<UserResponseDTO>) => res.data),
+      .then((res) => res.data),
 
-  // Fixed: Replaced 'any' with Record<string, unknown>
-  update: (id: number, payload: Record<string, unknown>) =>
+  update: (id: number, payload: UserRequestDTO) =>
     axiosInstance
       .put<UserResponseDTO>(`/api/users/${id}`, payload)
-      .then((res: AxiosResponse<UserResponseDTO>) => res.data),
+      .then((res) => res.data),
 
   toggleEnabled: (id: number) =>
     axiosInstance
       .patch<UserResponseDTO>(`/api/users/${id}/toggle`)
       .then((res: AxiosResponse<UserResponseDTO>) => res.data),
+
+  delete: (id: number) => axiosInstance.delete(`/api/users/${id}`),
 };

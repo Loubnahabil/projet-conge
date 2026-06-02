@@ -36,6 +36,7 @@ import type {
   DivisionResponseDTO,
   ServiceResponseDTO,
 } from "../../types/structure.types";
+import type { UserRequestDTO } from "../../types/user.types";
 
 interface UserFormInputs {
   nom: string;
@@ -205,7 +206,7 @@ export const FonctionnairePage = () => {
   const onSave = async (data: UserFormInputs) => {
     setActionLoading(true);
 
-    const payload: Record<string, unknown> = {
+    const payload: UserRequestDTO = {
       nom: data.nom,
       prenom: data.prenom,
       email: data.email,
