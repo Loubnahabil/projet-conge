@@ -23,3 +23,15 @@ export interface SpringPageWrapper<T> {
   size: number;
   number: number;
 }
+
+export interface UserRequestDTO {
+  nom: string;
+  prenom: string;
+  email: string;
+  password?: string;
+  ppr: string;
+  grade: string;
+  dateDebutFonction: string;
+  serviceId: number;
+  roleId: number;
+}
