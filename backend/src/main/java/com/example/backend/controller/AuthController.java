@@ -27,7 +27,6 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    // this is outside /api/auth/** so token IS required
     @GetMapping("/api/user/me")
     public ResponseEntity<?> me(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(Map.of("email", userDetails.getUsername()));

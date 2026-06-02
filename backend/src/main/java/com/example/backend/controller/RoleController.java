@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleController {
 
-    // You can swap this with RoleService if you have a service layer set up for Roles!
     private final RoleRepository roleRepository;
 
     @GetMapping

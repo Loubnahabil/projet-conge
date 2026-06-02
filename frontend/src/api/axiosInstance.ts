@@ -21,7 +21,7 @@ axiosInstance.interceptors.request.use((config) => {
   const token =
     store?.getState().auth?.accessToken || localStorage.getItem("accessToken");
 
-  console.log("🚀 TOKEN BEING SENT TO BACKEND:", token);
+  console.log("TOKEN BEING SENT TO BACKEND:", token);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -45,7 +45,7 @@ axiosInstance.interceptors.response.use(
     }
 
     if (error.response?.status === 500) {
-      console.error("❌ CRITICAL BACKEND ERROR DATA:", error.response.data);
+      console.error("CRITICAL BACKEND ERROR DATA:", error.response.data);
     }
 
     return Promise.reject(error);

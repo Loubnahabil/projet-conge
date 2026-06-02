@@ -36,7 +36,7 @@ public class DemandeController {
         return ResponseEntity.ok(demandeService.getUserDemandes(currentUserId));
     }
 
-    // NEW: Handles GET /api/demandes/a-viser for supervisor profiles
+    // Handles GET /api/demandes/a-viser for supervisor profiles
     @GetMapping("/a-viser")
     public ResponseEntity<List<DemandeResponseDTO>> getDemandesAViser(@AuthenticationPrincipal UserDetails userDetails) {
         Long chefId = getAuthenticatedUserId(userDetails);
@@ -102,7 +102,7 @@ public class DemandeController {
         return ResponseEntity.ok(demandeService.annulerDemande(currentUserId, id));
     }
 
-    // NEW: Handles GET /api/demandes/a-signer for Signataire profiles
+    // Handles GET /api/demandes/a-signer for Signataire profiles
     @GetMapping("/a-signer")
     public ResponseEntity<List<DemandeResponseDTO>> getDemandesASigner(@AuthenticationPrincipal UserDetails userDetails) {
         Long signataireId = getAuthenticatedUserId(userDetails);

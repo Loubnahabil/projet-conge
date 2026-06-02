@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
 import type { AuthState, LoginRequest } from "../../types/auth.types";
+import axios from "axios";
 
 // ✅ read from localStorage on page load so refresh doesn't wipe state
 const initialState: AuthState = {
@@ -18,18 +19,14 @@ export const loginThunk = createAsyncThunk(
       const data = await authApi.login(credentials);
       return data;
     } catch (error: unknown) {
-      if (error && typeof error === "object" && "response" in error) {
-        const err = error as {
-          response?: {
-            data?: {
-              error?: string;
-            };
-          };
-        };
+      // ✅ Use Axios type guard to cleanly extract the backend error message
+      if (axios.isAxiosError(error)) {
         return rejectWithValue(
-          err.response?.data?.error || "Erreur de connexion",
+          error.response?.data?.error || "Erreur de connexion",
         );
       }
+
+      // Fallback for generic/network errors
       return rejectWithValue("Erreur de connexion");
     }
   },

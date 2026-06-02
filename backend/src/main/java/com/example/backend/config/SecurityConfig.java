@@ -64,13 +64,11 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
 
-                        // 1. Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
 
-                        // 2. Specific Workflow & Queue Queries
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/soumettre").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/visa-chef").hasAuthority("CHEF_HIERARCHIE")
@@ -79,16 +77,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/demandes/a-signer").hasAuthority("SIGNATAIRE")
                         .requestMatchers("/api/demandes/my-requests").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
 
-                        // ✅ FIX: Explicitly grant access to both profiles for uploads before hitting the catch-all
                         .requestMatchers(HttpMethod.POST, "/api/demandes/*/upload").hasAnyAuthority("FONCTIONNAIRE", "SIGNATAIRE")
 
 
 
-                        // 4. User Profiles & Context boundaries
                         .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
-                        // 5. Structural/Config rules - ADMIN only
                         .requestMatchers("/api/statistiques/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/directions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/divisions/**").hasAuthority("ADMIN")
@@ -103,10 +98,8 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/demandes/traitees-chef").hasAuthority("CHEF_HIERARCHIE")
                         .requestMatchers("/api/demandes/traitees-signataire").hasAuthority("SIGNATAIRE")
-                        // 3. Catch-all for Demandes lifecycle requests - FONCTIONNAIRE only
                         .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
 
-                        // Everything else requires authentication
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

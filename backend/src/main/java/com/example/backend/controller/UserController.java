@@ -33,7 +33,6 @@ public class UserController {
     }
 
     // GET /api/users/colleagues
-    // This literal string route MUST sit above the /{id} route!
     @GetMapping("/colleagues")
     public ResponseEntity<List<UserResponseDTO>> getSameServiceColleagues(
             @AuthenticationPrincipal UserDetails userDetails) {

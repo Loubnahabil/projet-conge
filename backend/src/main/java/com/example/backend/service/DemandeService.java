@@ -42,9 +42,6 @@ public class DemandeService {
         return demandeMapper.toDTOList(demandeRepository.findByUserId(userId));
     }
 
-    // =========================================================================
-    // 🔍 STRATIFIED HIERARCHY FETCH (For Chef Validation Dashboard)
-    // =========================================================================
     @Transactional(readOnly = true)
     public List<DemandeResponseDTO> getDemandesAViserPourChef(Long chefId) {
         User chef = userRepository.findById(chefId)
@@ -330,9 +327,6 @@ public class DemandeService {
         return demandeMapper.toDTO(savedDemande);
     }
 
-    // =========================================================================
-    // 🔒 PRIVATE HIERARCHY BUSINESS VALIDATIONS
-    // =========================================================================
 
     private void verifyChefHierarchy(User employee, User reviewer) {
         ServiceEntity empService = employee.getService();
@@ -381,9 +375,7 @@ public class DemandeService {
                         role.getName().equalsIgnoreCase("ROLE_" + targetRole));
     }
 
-    // =========================================================================
-    // 📧 PRIVATE EMAIL RECIPIENT LOOKUP HELPERS
-    // =========================================================================
+
 
     /**
      * Finds the CHEF_HIERARCHIE in the same service as the applicant.
@@ -419,9 +411,6 @@ public class DemandeService {
                 .findFirst();
     }
 
-    // =========================================================================
-    // 📅 BUSINESS DAYS CALCULATOR
-    // =========================================================================
 
     private int calculateBusinessDays(LocalDate start, LocalDate end) {
         Set<LocalDate> holidayDates = jourFerieRepository.findAll().stream()
@@ -470,9 +459,6 @@ public class DemandeService {
         return demandeMapper.toDTO(demandeRepository.save(demande));
     }
 
-    // =========================================================================
-    // 🔍 DIRECTION TREE FETCH (For Signataire Validation Dashboard)
-    // =========================================================================
     @Transactional(readOnly = true)
     public List<DemandeResponseDTO> getDemandesASignerPourDirecteur(Long signataireId) {
         User signataire = userRepository.findById(signataireId)

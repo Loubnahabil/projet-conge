@@ -15,17 +15,12 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
     // Finds all leave requests belonging to a specific employee
     List<Demande> findByUserId(Long userId);
 
-    // =========================================================================
-    // 🔍 HIERARCHY QUERIES FOR SUPERVISOR DASHBOARDS
-    // =========================================================================
 
-    // Level 1: Fetch pending requests for a specific Service ID
+
     List<Demande> findByUser_Service_IdAndStatut(Long serviceId, StatutDemande statut);
 
-    // Level 2: Fetch pending requests for an entire Division ID branch
     List<Demande> findByUser_Service_Division_IdAndStatut(Long divisionId, StatutDemande statut);
 
-    // ✅ Level 3: FIXED - Explicit JPQL Join path to guarantee precise Direction ID structural matching
     @Query("SELECT d FROM Demande d " +
             "JOIN d.user u " +
             "JOIN u.service s " +
@@ -37,9 +32,6 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
             @Param("statut") StatutDemande statut
     );
 
-    // =========================================================================
-    // 🔒 EXISTING LEAVE VALIDATION GUARD CLAUSES
-    // =========================================================================
 
     // Checks for overlapping leave periods excluding dead states (REJETEE, ANNULEE)
     @Query("SELECT COUNT(d) > 0 FROM Demande d WHERE d.user.id = :userId " +
