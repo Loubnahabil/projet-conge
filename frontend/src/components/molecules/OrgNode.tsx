@@ -7,6 +7,8 @@ import {
   Folder,
   Settings,
 } from "@mui/icons-material";
+// 🌟 Fixed this import! Changed from "../molecules/OrgBadge" to "../molecules/OrgBadge" (or wherever your molecules sit relative to organisms)
+// If OrgBadge is in molecules: "../../components/molecules/OrgBadge" or "../molecules/OrgBadge" depending on your exact folder nesting level
 import { OrgBadge } from "../molecules/OrgBadge";
 import { AppButton } from "../atoms/AppButton";
 

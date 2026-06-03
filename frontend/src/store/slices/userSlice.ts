@@ -1,0 +1,183 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { userApi } from "../../api/userApi";
+import type { UserResponseDTO, UserRequestDTO } from "../../types/user.types";
+
+interface UserState {
+  list: UserResponseDTO[];
+  totalElements: number;
+  page: number;
+  rowsPerPage: number;
+  searchQuery: string;
+  globalLoading: boolean;
+  actionLoading: boolean;
+  error: string | null;
+  popup: {
+    isOpen: boolean;
+    mode: "create" | "edit";
+    targetUser: UserResponseDTO | null;
+  };
+}
+
+const initialState: UserState = {
+  list: [],
+  totalElements: 0,
+  page: 0,
+  rowsPerPage: 10,
+  searchQuery: "",
+  globalLoading: true,
+  actionLoading: false,
+  error: null,
+  popup: {
+    isOpen: false,
+    mode: "create",
+    targetUser: null,
+  },
+};
+
+export const fetchUsersListThunk = createAsyncThunk(
+  "users/fetchList",
+  async (_, { getState, rejectWithValue }) => {
+    const { users } = getState() as { users: UserState };
+    try {
+      const data = await userApi.getAll(
+        users.searchQuery,
+        users.page,
+        users.rowsPerPage,
+      );
+      return data;
+    } catch {
+      return rejectWithValue(
+        "Erreur de chargement de la liste des fonctionnaires.",
+      );
+    }
+  },
+);
+
+export const toggleUserStatusThunk = createAsyncThunk(
+  "users/toggleStatus",
+  async (id: number, { dispatch, rejectWithValue }) => {
+    try {
+      await userApi.toggleEnabled(id);
+      dispatch(fetchUsersListThunk());
+    } catch {
+      return rejectWithValue(
+        "Erreur lors du changement de statut actif/inactif.",
+      );
+    }
+  },
+);
+
+export const saveUserThunk = createAsyncThunk(
+  "users/save",
+  async (
+    { payload, id }: { payload: UserRequestDTO; id?: number },
+    { dispatch, rejectWithValue },
+  ) => {
+    try {
+      if (id) {
+        await userApi.update(id, payload);
+      } else {
+        await userApi.create(payload);
+      }
+      dispatch(fetchUsersListThunk());
+    } catch {
+      return rejectWithValue(
+        "Erreur lors de l'enregistrement du fonctionnaire.",
+      );
+    }
+  },
+);
+
+export const deleteUserThunk = createAsyncThunk(
+  "users/delete",
+  async (id: number, { dispatch, rejectWithValue }) => {
+    try {
+      await userApi.delete(id);
+      dispatch(fetchUsersListThunk());
+    } catch {
+      return rejectWithValue(
+        "Impossible de supprimer ce profil car des dépendances y sont rattachées.",
+      );
+    }
+  },
+);
+
+const userSlice = createSlice({
+  name: "users",
+  initialState,
+  reducers: {
+    setPagination: (
+      state,
+      action: PayloadAction<{ page: number; rowsPerPage: number }>,
+    ) => {
+      state.page = action.payload.page;
+      state.rowsPerPage = action.payload.rowsPerPage;
+    },
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+      state.page = 0;
+    },
+    openPopup: (
+      state,
+      action: PayloadAction<{
+        mode: "create" | "edit";
+        user?: UserResponseDTO;
+      }>,
+    ) => {
+      state.popup.isOpen = true;
+      state.popup.mode = action.payload.mode;
+      state.popup.targetUser = action.payload.user || null;
+    },
+    closePopup: (state) => {
+      state.popup.isOpen = false;
+      state.popup.targetUser = null;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUsersListThunk.pending, (state) => {
+        state.globalLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsersListThunk.fulfilled, (state, action) => {
+        state.globalLoading = false;
+        state.list = action.payload.content || [];
+        state.totalElements = action.payload.totalElements || 0;
+      })
+      .addCase(fetchUsersListThunk.rejected, (state, action) => {
+        state.globalLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(saveUserThunk.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(saveUserThunk.fulfilled, (state) => {
+        state.actionLoading = false;
+        state.popup.isOpen = false;
+        state.popup.targetUser = null;
+      })
+      .addCase(saveUserThunk.rejected, (state, action) => {
+        state.actionLoading = false;
+        alert(action.payload);
+      })
+      .addCase(toggleUserStatusThunk.rejected, (_, action) => {
+        alert(action.payload);
+      })
+      .addCase(deleteUserThunk.rejected, (_, action) => {
+        alert(action.payload);
+      });
+  },
+});
+
+export const {
+  setPagination,
+  setSearchQuery,
+  openPopup,
+  closePopup,
+  clearError,
+} = userSlice.actions;
+export default userSlice.reducer;
