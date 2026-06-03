@@ -10,7 +10,7 @@ import { MainLayout } from "../components/templates/MainLayout";
 import PrivateRoute from "./PrivateRoute";
 import { StructurePage } from "../pages/Admin/StructurePage";
 import { JourFeriePage } from "../pages/Admin/JourFeriePage";
-import { FonctionnairePage } from "../pages/Admin/FonctionnairePage";
+import { UserPage } from "../pages/Admin/UserPage";
 import QuotaManagementPage from "../pages/Admin/QuotaManagementPage";
 import { MesDemandePage } from "../pages/MesDemandePage";
 import ChefDashboardPage from "../pages/Chefdashboardpage";
@@ -122,7 +122,7 @@ const router = createBrowserRouter([
         path: "/admin/fonctionnaires",
         element: (
           <AdminRoute>
-            <FonctionnairePage />
+            <UserPage />
           </AdminRoute>
         ),
       },

@@ -34,7 +34,10 @@ const LoginPage = () => {
       }}
     >
       {/* Paper gives us that nice, clean white card look with shadows */}
-      <Paper elevation={3} sx={{ padding: 4, width: 400 }}>
+      <Paper
+        elevation={3}
+        sx={{ padding: 4, width: 400, borderRadius: "12px" }}
+      >
         {/* Title text */}
         <Typography
           sx={{
