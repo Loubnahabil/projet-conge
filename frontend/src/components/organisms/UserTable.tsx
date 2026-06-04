@@ -14,14 +14,13 @@ import {
   Box,
   TablePagination,
 } from "@mui/material";
-import { Edit, Delete, Person } from "@mui/icons-material";
+import { Edit, Person } from "@mui/icons-material";
 import type { RootState } from "../../store";
 import type { AppDispatch } from "../../store";
 import {
   setPagination,
   fetchUsersListThunk,
   toggleUserStatusThunk,
-  deleteUserThunk,
   openPopup,
 } from "../../store/slices/userSlice";
 import type { UserResponseDTO } from "../../types/user.types";
@@ -29,7 +28,7 @@ import type { UserResponseDTO } from "../../types/user.types";
 export const UserTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // ⚡ Pulling 'searchQuery' straight out of your users slice state
+  // ⚡ Pulling states straight out of your users slice state
   const {
     list: users,
     totalElements,
@@ -49,12 +48,6 @@ export const UserTable: React.FC = () => {
     const updatedSize = parseInt(event.target.value, 10);
     dispatch(setPagination({ page: 0, rowsPerPage: updatedSize }));
     dispatch(fetchUsersListThunk());
-  };
-
-  const handleDelete = (id: number) => {
-    if (window.confirm("Voulez-vous vraiment supprimer ce fonctionnaire ?")) {
-      dispatch(deleteUserThunk(id));
-    }
   };
 
   // ⚡ Filter the original Redux list locally using your search term
@@ -77,6 +70,7 @@ export const UserTable: React.FC = () => {
         borderRadius: "12px",
         boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         border: "1px solid #e2e8f0",
+        bgcolor: "#fff",
       }}
     >
       <Table>
@@ -106,7 +100,6 @@ export const UserTable: React.FC = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* ⚡ Mapping over filteredUsers instead of raw users list */}
           {filteredUsers.length === 0 ? (
             <TableRow>
               <TableCell
@@ -164,20 +157,13 @@ export const UserTable: React.FC = () => {
                     color="primary"
                   />
                 </TableCell>
-                <TableCell align="right" sx={{ pr: 2 }}>
+                <TableCell align="right" sx={{ pr: 3 }}>
                   <IconButton
                     size="small"
                     onClick={() => dispatch(openPopup({ mode: "edit", user }))}
-                    sx={{ color: "#1976d2", mr: 1 }}
+                    sx={{ color: "#1976d2" }}
                   >
                     <Edit fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDelete(user.id)}
-                    sx={{ color: "#d32f2f" }}
-                  >
-                    <Delete fontSize="small" />
                   </IconButton>
                 </TableCell>
               </TableRow>

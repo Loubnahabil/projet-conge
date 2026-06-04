@@ -3,19 +3,19 @@ import { Paper, Typography } from "@mui/material";
 interface StatCardProps {
   label: string;
   value: number | string;
-  accent: string;
   sub?: string;
 }
 
-export const StatCard = ({ label, value, accent, sub }: StatCardProps) => (
+export const StatCard = ({ label, value, sub }: StatCardProps) => (
   <Paper
+    variant="outlined"
     sx={{
-      p: 3,
-      borderRadius: "14px",
-      border: "1px solid #e2e8f0",
-      borderLeft: `4px solid ${accent}`,
-      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      p: 2.5,
+      borderRadius: "8px",
+      borderColor: "#e2e8f0",
+      bgcolor: "#fff",
       height: "100%",
+      boxShadow: "none",
     }}
   >
     <Typography
@@ -25,8 +25,8 @@ export const StatCard = ({ label, value, accent, sub }: StatCardProps) => (
       {label}
     </Typography>
     <Typography
-      variant="h4"
-      sx={{ fontWeight: 800, color: "#0f172a", lineHeight: 1.1 }}
+      variant="h5"
+      sx={{ fontWeight: "700", color: "#0f172a", lineHeight: 1.2 }}
     >
       {value}
     </Typography>
