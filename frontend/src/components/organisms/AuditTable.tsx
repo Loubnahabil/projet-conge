@@ -20,23 +20,31 @@ import {
   InputLabel,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import HistoryIcon from "@mui/icons-material/History";
 import type { RootState } from "../../store";
 
-const STATUT_COLOR: Record<
+// ⚡ Using standard MUI color variants exactly like your Demande configuration setup
+const STATUT_CONFIG: Record<
   string,
-  { bg: string; color: string; label: string }
+  {
+    label: string;
+    color:
+      | "default"
+      | "primary"
+      | "secondary"
+      | "error"
+      | "info"
+      | "success"
+      | "warning";
+  }
 > = {
-  BROUILLON: { bg: "#f1f5f9", color: "#64748b", label: "Brouillon" },
-  SOUMISE: { bg: "#fef3c7", color: "#d97706", label: "Soumise" },
-  VISEE_CHEF: { bg: "#dbeafe", color: "#2563eb", label: "Visée chef" },
-  SIGNEE_DIRECTEUR: { bg: "#d1fae5", color: "#059669", label: "Signée" },
-  REJETEE_CHEF: { bg: "#fee2e2", color: "#dc2626", label: "Rejetée chef" },
-  REJETEE_DIRECTEUR: {
-    bg: "#fee2e2",
-    color: "#dc2626",
-    label: "Rejetée direction",
-  },
-  ANNULEE: { bg: "#f3f4f6", color: "#6b7280", label: "Annulée" },
+  BROUILLON: { label: "Brouillon", color: "default" },
+  SOUMISE: { label: "Soumise", color: "warning" },
+  VISEE_CHEF: { label: "Visée chef", color: "info" },
+  SIGNEE_DIRECTEUR: { label: "Signée", color: "success" },
+  REJETEE_CHEF: { label: "Rejetée chef", color: "error" },
+  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
+  ANNULEE: { label: "Annulée", color: "default" },
 };
 
 const ROLE_LABEL: Record<string, string> = {
@@ -46,7 +54,7 @@ const ROLE_LABEL: Record<string, string> = {
   SIGNATAIRE: "Signataire",
 };
 
-const ALL_STATUTS = Object.keys(STATUT_COLOR);
+const ALL_STATUTS = Object.keys(STATUT_CONFIG);
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
@@ -70,7 +78,7 @@ export const AuditTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(20);
 
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
+    const q = search.toLowerCase().trim();
     return entries.filter((e) => {
       const matchSearch =
         !q ||
@@ -89,6 +97,17 @@ export const AuditTable = () => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage,
   );
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box>
@@ -129,7 +148,7 @@ export const AuditTable = () => {
             <MenuItem value="ALL">Tous les statuts</MenuItem>
             {ALL_STATUTS.map((s) => (
               <MenuItem key={s} value={s}>
-                {STATUT_COLOR[s]?.label ?? s}
+                {STATUT_CONFIG[s]?.label ?? s}
               </MenuItem>
             ))}
           </Select>
@@ -145,6 +164,7 @@ export const AuditTable = () => {
             alignItems: "center",
             gap: 1,
             boxShadow: "none",
+            bgcolor: "#fff",
           }}
         >
           <Typography variant="body2" sx={{ color: "#64748b" }}>
@@ -160,173 +180,141 @@ export const AuditTable = () => {
       </Box>
 
       {/* Main Data Layout */}
-      <Paper
+      <TableContainer
+        component={Paper}
         sx={{
-          borderRadius: "14px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           border: "1px solid #e2e8f0",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-          overflow: "hidden",
         }}
       >
-        <TableContainer>
-          <Table size="small">
-            <TableHead>
-              <TableRow sx={{ bgcolor: "#f8fafc" }}>
-                {[
-                  "Date / Heure",
-                  "Utilisateur",
-                  "Rôle",
-                  "Demande #",
-                  "Action",
-                  "Commentaire",
-                ].map((h) => (
-                  <TableCell
-                    key={h}
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: "0.7rem",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      color: "#64748b",
-                      borderBottom: "2px solid #e2e8f0",
-                      py: 1.5,
-                    }}
-                  >
-                    {h}
-                  </TableCell>
-                ))}
+        <Table>
+          <TableHead sx={{ bgcolor: "#f8fafc" }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Date / Heure
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Utilisateur
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Rôle
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Demande #
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Action
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
+                Commentaire
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginated.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  align="center"
+                  sx={{ py: 6, color: "#64748b" }}
+                >
+                  <HistoryIcon
+                    sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
+                  />
+                  <Typography variant="body2">
+                    Aucune entrée trouvée dans le journal d'audit.
+                  </Typography>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginated.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    align="center"
-                    sx={{ py: 6, color: "#94a3b8" }}
+            ) : (
+              paginated.map((entry) => {
+                // ⚡ Pulling standard config directly
+                const config = STATUT_CONFIG[entry.statutAction];
+
+                return (
+                  <TableRow
+                    key={entry.id}
+                    sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
                   >
-                    Aucune entrée trouvée.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                paginated.map((entry) => {
-                  const statut = STATUT_COLOR[entry.statutAction];
-                  return (
-                    <TableRow
-                      key={entry.id}
+                    <TableCell
                       sx={{
-                        "&:hover": { bgcolor: "#f8fafc" },
-                        borderBottom: "1px solid #f1f5f9",
+                        color: "#475569",
+                        fontFamily: "monospace",
+                        fontSize: "0.8rem",
                       }}
                     >
-                      <TableCell sx={{ py: 1.5, whiteSpace: "nowrap" }}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: "0.78rem",
-                            color: "#475569",
-                            fontFamily: "monospace",
-                          }}
-                        >
-                          {formatDate(entry.dateAction)}
-                        </Typography>
-                      </TableCell>
+                      {formatDate(entry.dateAction)}
+                    </TableCell>
 
-                      <TableCell sx={{ py: 1.5 }}>
+                    <TableCell>
+                      <Box>
                         <Typography
                           variant="body2"
-                          sx={{
-                            fontWeight: 600,
-                            color: "#0f172a",
-                            fontSize: "0.85rem",
-                          }}
+                          sx={{ fontWeight: "600", color: "#1e293b" }}
                         >
-                          {entry.acteurPrenom} {entry.acteurNom}
+                          {entry.acteurNom.toUpperCase()} {entry.acteurPrenom}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: "#94a3b8" }}>
+                        <Typography variant="caption" sx={{ color: "#64748b" }}>
                           {entry.acteurEmail}
                         </Typography>
-                      </TableCell>
+                      </Box>
+                    </TableCell>
 
-                      <TableCell sx={{ py: 1.5 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontSize: "0.78rem", color: "#64748b" }}
-                        >
-                          {ROLE_LABEL[entry.acteurRole] ?? entry.acteurRole}
-                        </Typography>
-                      </TableCell>
+                    <TableCell sx={{ color: "#334155" }}>
+                      {ROLE_LABEL[entry.acteurRole] ?? entry.acteurRole}
+                    </TableCell>
 
-                      <TableCell sx={{ py: 1.5 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontFamily: "monospace",
-                            fontWeight: 700,
-                            color: "#3b82f6",
-                            fontSize: "0.82rem",
-                          }}
-                        >
-                          #{entry.demandeId}
-                        </Typography>
-                      </TableCell>
+                    <TableCell
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#1976d2",
+                        fontFamily: "monospace",
+                      }}
+                    >
+                      #{entry.demandeId}
+                    </TableCell>
 
-                      <TableCell sx={{ py: 1.5 }}>
-                        <Chip
-                          label={statut?.label ?? entry.statutAction}
-                          size="small"
-                          sx={{
-                            bgcolor: statut?.bg ?? "#f1f5f9",
-                            color: statut?.color ?? "#64748b",
-                            fontWeight: 700,
-                            fontSize: "0.7rem",
-                            height: 22,
-                            border: "none",
-                          }}
-                        />
-                      </TableCell>
+                    <TableCell>
+                      {/* ⚡ Replaced custom sx values with your exact clean native chip system */}
+                      <Chip
+                        label={config?.label ?? entry.statutAction}
+                        color={config?.color ?? "default"}
+                        size="small"
+                      />
+                    </TableCell>
 
-                      <TableCell sx={{ py: 1.5, maxWidth: 300 }}>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontSize: "0.78rem",
-                            color: entry.commentaire ? "#475569" : "#cbd5e1",
-                            fontStyle: entry.commentaire ? "normal" : "italic",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {entry.commentaire ?? "—"}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
+                    <TableCell sx={{ maxWidth: 260 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontSize: "0.8rem",
+                          color: entry.commentaire ? "#334155" : "#cbd5e1",
+                          fontStyle: entry.commentaire ? "normal" : "italic",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {entry.commentaire ?? "—"}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
         <TablePagination
           component="div"
           count={filtered.length}
           page={page}
-          onPageChange={(_, p) => setPage(p)}
+          onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage="Lignes par page :"
-          labelDisplayedRows={({ from, to, count }) =>
-            `${from}–${to} sur ${count}`
-          }
-          sx={{ borderTop: "1px solid #f1f5f9" }}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage="Lignes par page:"
         />
-      </Paper>
+      </TableContainer>
     </Box>
   );
 };
