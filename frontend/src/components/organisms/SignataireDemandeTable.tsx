@@ -11,7 +11,7 @@ import {
   Tooltip,
   IconButton,
 } from "@mui/material";
-import { Cancel, UploadFile } from "@mui/icons-material";
+import { Cancel, UploadFile, Download } from "@mui/icons-material";
 import type { DemandeResponse } from "../../types/Demande.types";
 
 const STATUT_LABEL: Record<
@@ -28,6 +28,7 @@ interface SignataireDemandeTableProps {
   showActions?: boolean;
   onSignClick?: (id: number) => void;
   onRejectClick?: (id: number) => void;
+  onDownloadClick?: (id: number) => void;
   emptyMessage?: string;
 }
 
@@ -36,6 +37,7 @@ export const SignataireDemandeTable = ({
   showActions = false,
   onSignClick,
   onRejectClick,
+  onDownloadClick,
   emptyMessage = "Aucune demande trouvée.",
 }: SignataireDemandeTableProps) => {
   return (
@@ -68,6 +70,7 @@ export const SignataireDemandeTable = ({
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
               Durée (j)
             </TableCell>
+
             {showActions ? (
               <TableCell
                 align="right"
@@ -82,6 +85,7 @@ export const SignataireDemandeTable = ({
             )}
           </TableRow>
         </TableHead>
+
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
@@ -97,7 +101,7 @@ export const SignataireDemandeTable = ({
             data.map((d) => {
               const statusConfig = STATUT_LABEL[d.statut] || {
                 label: d.statut,
-                color: "default",
+                color: "default" as const,
               };
 
               return (
@@ -105,9 +109,11 @@ export const SignataireDemandeTable = ({
                   <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
                     {d.userNomComplet}
                   </TableCell>
+
                   <TableCell sx={{ color: "#475569" }}>
                     {d.userServiceNom}
                   </TableCell>
+
                   <TableCell>
                     <Chip
                       label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
@@ -115,6 +121,7 @@ export const SignataireDemandeTable = ({
                       color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
                     />
                   </TableCell>
+
                   <TableCell>{d.dateDebut}</TableCell>
                   <TableCell>{d.dateFin}</TableCell>
                   <TableCell>{d.duree}</TableCell>
@@ -130,6 +137,20 @@ export const SignataireDemandeTable = ({
                           <UploadFile fontSize="small" />
                         </IconButton>
                       </Tooltip>
+
+                      <Tooltip title="Télécharger le PDF">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#16a34a", mr: 1 }}
+                          onClick={() => {
+                            console.log("button clicked, id:", d.id);
+                            onDownloadClick?.(d.id);
+                          }}
+                        >
+                          <Download fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
                       <Tooltip title="Rejeter">
                         <IconButton
                           size="small"

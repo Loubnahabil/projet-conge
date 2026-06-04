@@ -5,12 +5,16 @@ import com.example.backend.dto.request.ProcessWorkflowRequestDTO;
 import com.example.backend.dto.response.DemandeHistoriqueResponseDTO;
 import com.example.backend.dto.response.DemandeResponseDTO;
 import com.example.backend.dto.response.PieceJustificativeResponseDTO;
+import com.example.backend.entity.Demande;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.service.DemandeHistoriqueService;
 import com.example.backend.service.DemandeService;
+import com.example.backend.service.PdfGenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +32,8 @@ public class DemandeController {
     private final DemandeService demandeService;
     private final com.example.backend.repository.UserRepository userRepository;
     private final DemandeHistoriqueService historiqueService;
+    private final PdfGenerationService pdfGenerationService;
+
 
 
     @GetMapping("/my-requests")
@@ -157,6 +163,26 @@ public class DemandeController {
             @AuthenticationPrincipal UserDetails userDetails) {
         Long signataireId = getAuthenticatedUserId(userDetails);
         return ResponseEntity.ok(demandeService.getDemandesTraiteesPourSignataire(signataireId));
+    }
+    @GetMapping("/{id}/generate-pdf")
+    public ResponseEntity<byte[]> generatePdf(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        Long signataireId = getAuthenticatedUserId(userDetails);
+        Demande demande = demandeService.getDemandeForPdf(signataireId, id);
+
+        byte[] pdf = pdfGenerationService.generateDemandePdf(demande);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                org.springframework.http.ContentDisposition.attachment()
+                        .filename("demande-" + id + ".pdf")
+                        .build()
+        );
+
+        return ResponseEntity.ok().headers(headers).body(pdf);
     }
 
 }
