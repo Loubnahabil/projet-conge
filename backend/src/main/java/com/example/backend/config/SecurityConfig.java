@@ -97,6 +97,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/demandes/traitees-chef").hasAuthority("CHEF_HIERARCHIE")
                         .requestMatchers("/api/demandes/traitees-signataire").hasAuthority("SIGNATAIRE")
+                        .requestMatchers("/api/demandes/*/generate-pdf").hasAuthority("SIGNATAIRE")
                         .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
 
                         .anyRequest().authenticated())

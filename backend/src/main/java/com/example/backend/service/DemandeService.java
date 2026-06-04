@@ -590,4 +590,20 @@ public class DemandeService {
         }
         return demandeMapper.toDTOList(demandeRepository.findTraiteesBySignataireId(signataireId));
     }
+    @Transactional(readOnly = true)
+    public Demande getDemandeForPdf(Long signataireId, Long demandeId) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+
+        if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
+            throw new BusinessException("Le PDF ne peut être généré que pour les demandes visées par le chef.");
+        }
+
+        User signataire = userRepository.findById(signataireId)
+                .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
+
+        verifySignatoryDirection(demande.getUser(), signataire);
+
+        return demande;
+    }
 }

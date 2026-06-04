@@ -9,8 +9,11 @@ import {
 } from "@mui/material";
 import { demandeApi } from "../api/demandeApi";
 import { SignataireDemandeTable } from "../components/organisms/SignataireDemandeTable";
+
+// FIX IMPORTS: Changement des imports nommés en imports par défaut pour correspondre aux fichiers
 import { SignataireDecisionModal } from "../components/organisms/SignataireDecisionModal";
 import { SignataireUploadModal } from "../components/organisms/SignataireUploadModal";
+
 import type { DemandeResponse } from "../types/Demande.types";
 
 export const SignatairePage = () => {
@@ -43,14 +46,44 @@ export const SignatairePage = () => {
     targetId: null,
   });
 
-  // Fetch pending validation items on mount
+  // FIX EFFECT: Fetch isolé pour éviter les rendus en cascade synchrones
   useEffect(() => {
-    demandeApi
-      .getDemandesASigner()
-      .then(setDemandes)
-      .catch(() => setError("Erreur lors du chargement des demandes à signer."))
-      .finally(() => setLoadingPending(false));
+    let isMounted = true;
+
+    const loadInitialData = async () => {
+      setLoadingPending(true);
+      try {
+        const data = await demandeApi.getDemandesASigner();
+        if (isMounted) {
+          setDemandes(data);
+        }
+      } catch {
+        if (isMounted) {
+          setError("Erreur lors du chargement des demandes à signer.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingPending(false);
+        }
+      }
+    };
+
+    void loadInitialData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  // Fonction de rechargement manuel après une action (hors useEffect, donc aucun risque de cascade)
+  const reloadPendingDemandes = async () => {
+    try {
+      const data = await demandeApi.getDemandesASigner();
+      setDemandes(data);
+    } catch {
+      setError("Erreur lors du rafraîchissement des demandes.");
+    }
+  };
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
@@ -58,13 +91,15 @@ export const SignatairePage = () => {
       setLoadingTraitees(true);
       demandeApi
         .getDemandesTraiteesSignataire()
-        .then(setTraitees)
+        .then((data) => {
+          setTraitees(data);
+          setTraiteesFetched(true);
+        })
         .catch(() =>
           setError("Erreur lors du chargement des demandes traitées."),
         )
         .finally(() => {
           setLoadingTraitees(false);
-          setTraiteesFetched(true);
         });
     }
   };
@@ -79,18 +114,25 @@ export const SignatairePage = () => {
     setUploadDialog({ open: true, targetId: id });
   };
 
+  const handleDownloadPdf = async (id: number) => {
+    console.log("clicking download for id:", id);
+    try {
+      await demandeApi.generatePdf(id);
+    } catch (err) {
+      console.error("PDF error:", err);
+      setError("Erreur lors du téléchargement du PDF.");
+    }
+  };
+
   const handleExecuteReject = async (commentaire: string) => {
     if (!rejectDialog.targetId) return;
     setActionLoading(true);
     setError(null);
     try {
       await demandeApi.rejetSignataire(rejectDialog.targetId, { commentaire });
-
-      // Sync list
-      const updated = await demandeApi.getDemandesASigner();
-      setDemandes(updated);
-      setTraiteesFetched(false);
       setRejectDialog({ open: false, targetId: null });
+      setTraiteesFetched(false);
+      await reloadPendingDemandes();
     } catch (err: unknown) {
       const e = err as {
         response?: { data?: { error?: string; message?: string } };
@@ -110,18 +152,14 @@ export const SignatairePage = () => {
     setActionLoading(true);
     setError(null);
     try {
-      // FIXED: Using your exact API method and payload configurations here
       await demandeApi.uploadDocument(
         uploadDialog.targetId,
         file,
         "DECISION_SIGNEE",
       );
-
-      // Sync list seamlessly
-      const updated = await demandeApi.getDemandesASigner();
-      setDemandes(updated);
-      setTraiteesFetched(false);
       setUploadDialog({ open: false, targetId: null });
+      setTraiteesFetched(false);
+      await reloadPendingDemandes();
     } catch (err: unknown) {
       const e = err as {
         response?: { data?: { error?: string; message?: string } };
@@ -136,7 +174,6 @@ export const SignatairePage = () => {
     }
   };
 
-  // Only render matching requests
   const pendingDemandes = demandes.filter((d) => d.statut === "VISEE_CHEF");
 
   if (loadingPending) {
@@ -154,6 +191,8 @@ export const SignatairePage = () => {
     );
   }
 
+  console.log("pendingDemandes:", pendingDemandes);
+  console.log("all demandes:", demandes);
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
       <Typography
@@ -178,18 +217,17 @@ export const SignatairePage = () => {
         <Tab label="Demandes traitées" />
       </Tabs>
 
-      {/* Tab 0: Queue */}
       {tab === 0 && (
         <SignataireDemandeTable
           data={pendingDemandes}
           showActions
           onSignClick={handleOpenSign}
           onRejectClick={handleOpenReject}
+          onDownloadClick={handleDownloadPdf} // ← add this
           emptyMessage="Aucune demande en attente de signature."
         />
       )}
 
-      {/* Tab 1: History logs */}
       {tab === 1 &&
         (loadingTraitees ? (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 6 }}>
@@ -202,7 +240,6 @@ export const SignatairePage = () => {
           />
         ))}
 
-      {/* Rejection Comment Modal */}
       <SignataireDecisionModal
         open={rejectDialog.open}
         error={error}
@@ -211,9 +248,9 @@ export const SignatairePage = () => {
         onConfirm={handleExecuteReject}
       />
 
-      {/* Document Arrêté Upload Modal */}
       <SignataireUploadModal
         open={uploadDialog.open}
+        // targetId={uploadDialog.targetId}  <-- supprime cette ligne
         error={error}
         actionLoading={actionLoading}
         onCancel={() => setUploadDialog({ open: false, targetId: null })}
