@@ -81,10 +81,15 @@ export const saveUserThunk = createAsyncThunk(
         await userApi.create(payload);
       }
       dispatch(fetchUsersListThunk());
-    } catch {
-      return rejectWithValue(
-        "Erreur lors de l'enregistrement du fonctionnaire.",
-      );
+    } catch (err: unknown) {
+      const e = err as {
+        response?: { data?: { message?: string; error?: string } };
+      };
+      const message =
+        e.response?.data?.message ||
+        e.response?.data?.error ||
+        "Erreur lors de l'enregistrement du fonctionnaire.";
+      return rejectWithValue(message);
     }
   },
 );
@@ -118,20 +123,16 @@ const userSlice = createSlice({
       state.searchQuery = action.payload;
       state.page = 0;
     },
-    openPopup: (
-      state,
-      action: PayloadAction<{
-        mode: "create" | "edit";
-        user?: UserResponseDTO;
-      }>,
-    ) => {
+    openPopup: (state, action) => {
       state.popup.isOpen = true;
       state.popup.mode = action.payload.mode;
       state.popup.targetUser = action.payload.user || null;
+      state.error = null; // ← add this
     },
     closePopup: (state) => {
       state.popup.isOpen = false;
       state.popup.targetUser = null;
+      state.error = null; // ← add this
     },
     clearError: (state) => {
       state.error = null;
@@ -162,13 +163,14 @@ const userSlice = createSlice({
       })
       .addCase(saveUserThunk.rejected, (state, action) => {
         state.actionLoading = false;
-        alert(action.payload);
+        state.error = action.payload as string;
+        // NO alert()
       })
-      .addCase(toggleUserStatusThunk.rejected, (_, action) => {
-        alert(action.payload);
+      .addCase(toggleUserStatusThunk.rejected, (state, action) => {
+        state.error = action.payload as string;
       })
-      .addCase(deleteUserThunk.rejected, (_, action) => {
-        alert(action.payload);
+      .addCase(deleteUserThunk.rejected, (state, action) => {
+        state.error = action.payload as string;
       });
   },
 });
