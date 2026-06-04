@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
+import { Box, Typography, CircularProgress } from "@mui/material";
 import { AppButton } from "../../components/atoms/AppButton";
 import { SearchBar } from "../../components/molecules/SearchBar";
 import { UserTable } from "../../components/organisms/UserTable";
@@ -15,7 +15,7 @@ import { fetchStructureDependenciesThunk } from "../../store/slices/structureSli
 
 export const UserPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { globalLoading, error, searchQuery } = useSelector(
+  const { globalLoading, searchQuery } = useSelector(
     (state: RootState) => state.users,
   );
 
@@ -62,12 +62,6 @@ export const UserPage = () => {
           onClick={() => dispatch(openPopup({ mode: "create" }))}
         />
       </Box>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
 
       {/* 🧪 Reusable Search Molecule */}
       <Box sx={{ mb: 3, display: "flex", gap: 2 }}>

@@ -10,6 +10,7 @@ import {
   Box,
   MenuItem,
   TextField,
+  Alert,
   Typography,
 } from "@mui/material";
 import { FormInput } from "../molecules/FormInput";
@@ -45,6 +46,7 @@ export const UserFormModal: React.FC = () => {
   const { directions, divisions, services, roles } = useSelector(
     (state: RootState) => state.structure,
   );
+  const formError = useSelector((state: RootState) => state.users.error);
 
   const {
     register,
@@ -270,6 +272,11 @@ export const UserFormModal: React.FC = () => {
               </MenuItem>
             ))}
           </TextField>
+          {formError && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              {formError}
+            </Alert>
+          )}
         </Box>
       </DialogContent>
       <DialogActions sx={{ p: 2.5, gap: 1 }}>

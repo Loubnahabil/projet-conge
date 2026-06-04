@@ -3,29 +3,31 @@ package com.example.backend.service;
 import com.example.backend.dto.request.CreateUserRequestDTO;
 import com.example.backend.dto.request.UpdateUserRequestDTO;
 import com.example.backend.dto.response.UserResponseDTO;
+import com.example.backend.entity.Quota;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.ServiceEntity;
 import com.example.backend.entity.User;
-import com.example.backend.entity.Quota;
+import com.example.backend.exception.BusinessException;
 import com.example.backend.exception.DuplicateResourceException;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.UserMapper;
-import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.QuotaRepository;
 import com.example.backend.repository.RoleRepository;
 import com.example.backend.repository.ServiceRepository;
-import com.example.backend.repository.QuotaRepository;
+import com.example.backend.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.List;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +98,33 @@ public class UserService {
         Role role = roleRepository.findById(request.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Rôle non trouvé"));
 
+        // 1 CHEF per service
+        if (role.getName().equalsIgnoreCase("CHEF_HIERARCHIE") || role.getName().equalsIgnoreCase("ROLE_CHEF_HIERARCHIE")) {
+            boolean chefExists = userRepository.findByService_Id(service.getId()).stream()
+                    .anyMatch(u -> u.getRoles().stream()
+                            .anyMatch(r -> r.getName().equalsIgnoreCase("CHEF_HIERARCHIE") || r.getName().equalsIgnoreCase("ROLE_CHEF_HIERARCHIE")));
+            if (chefExists) {
+                throw new DuplicateResourceException("Ce service a déjà un chef hiérarchique assigné.");
+            }
+        }
+
+        // 1 SIGNATAIRE per direction
+        if (role.getName().equalsIgnoreCase("SIGNATAIRE") || role.getName().equalsIgnoreCase("ROLE_SIGNATAIRE")) {
+            if (service.getDivision() == null || service.getDivision().getDirection() == null) {
+                throw new BusinessException("Ce service n'est pas rattaché à une direction.");
+            }
+            Long directionId = service.getDivision().getDirection().getId();
+            boolean signataireExists = userRepository.findAll().stream()
+                    .filter(u -> u.getService() != null && u.getService().getDivision() != null
+                            && u.getService().getDivision().getDirection() != null)
+                    .filter(u -> u.getService().getDivision().getDirection().getId().equals(directionId))
+                    .anyMatch(u -> u.getRoles().stream()
+                            .anyMatch(r -> r.getName().equalsIgnoreCase("SIGNATAIRE") || r.getName().equalsIgnoreCase("ROLE_SIGNATAIRE")));
+            if (signataireExists) {
+                throw new DuplicateResourceException("Cette direction a déjà un signataire assigné.");
+            }
+        }
+
         User user = User.builder()
                 .nom(request.getNom())
                 .prenom(request.getPrenom())
@@ -145,6 +174,41 @@ public class UserService {
         if (request.getRoleId() != null) {
             Role role = roleRepository.findById(request.getRoleId())
                     .orElseThrow(() -> new ResourceNotFoundException("Rôle non trouvé"));
+
+            ServiceEntity serviceToCheck = request.getServiceId() != null
+                    ? serviceRepository.findById(request.getServiceId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Service non trouvé"))
+                    : user.getService();
+
+            // 1 CHEF per service
+            if (role.getName().equalsIgnoreCase("CHEF_HIERARCHIE") || role.getName().equalsIgnoreCase("ROLE_CHEF_HIERARCHIE")) {
+                boolean chefExists = userRepository.findByService_Id(serviceToCheck.getId()).stream()
+                        .filter(u -> !u.getId().equals(id)) // exclude current user
+                        .anyMatch(u -> u.getRoles().stream()
+                                .anyMatch(r -> r.getName().equalsIgnoreCase("CHEF_HIERARCHIE") || r.getName().equalsIgnoreCase("ROLE_CHEF_HIERARCHIE")));
+                if (chefExists) {
+                    throw new DuplicateResourceException("Ce service a déjà un chef hiérarchique assigné.");
+                }
+            }
+
+            // 1 SIGNATAIRE per direction
+            if (role.getName().equalsIgnoreCase("SIGNATAIRE") || role.getName().equalsIgnoreCase("ROLE_SIGNATAIRE")) {
+                if (serviceToCheck.getDivision() == null || serviceToCheck.getDivision().getDirection() == null) {
+                    throw new BusinessException("Ce service n'est pas rattaché à une direction.");
+                }
+                Long directionId = serviceToCheck.getDivision().getDirection().getId();
+                boolean signataireExists = userRepository.findAll().stream()
+                        .filter(u -> !u.getId().equals(id)) // exclude current user
+                        .filter(u -> u.getService() != null && u.getService().getDivision() != null
+                                && u.getService().getDivision().getDirection() != null)
+                        .filter(u -> u.getService().getDivision().getDirection().getId().equals(directionId))
+                        .anyMatch(u -> u.getRoles().stream()
+                                .anyMatch(r -> r.getName().equalsIgnoreCase("SIGNATAIRE") || r.getName().equalsIgnoreCase("ROLE_SIGNATAIRE")));
+                if (signataireExists) {
+                    throw new DuplicateResourceException("Cette direction a déjà un signataire assigné.");
+                }
+            }
+
             user.setRoles(new HashSet<>(Set.of(role)));
         }
 
