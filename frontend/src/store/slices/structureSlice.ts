@@ -203,7 +203,7 @@ const structureSlice = createSlice({
           !action.type.includes("fetchDependencies"),
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
-          alert(action.payload || "Opération impossible.");
+          state.error = action.payload || "Opération impossible.";
         },
       );
   },

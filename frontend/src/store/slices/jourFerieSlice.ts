@@ -173,7 +173,8 @@ const jourFerieSlice = createSlice({
           !action.type.includes("fetchAll"),
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
-          alert(action.payload || "Une erreur opérationnelle est survenue.");
+          state.error =
+            action.payload || "Une erreur opérationnelle est survenue.";
         },
       );
   },

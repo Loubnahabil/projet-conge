@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import authApi from "../../api/authApi";
 import type { AuthState, LoginRequest } from "../../types/auth.types";
 import axios from "axios";
@@ -50,6 +54,13 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    updateTokens: (
+      state,
+      action: PayloadAction<{ accessToken: string; refreshToken: string }>,
+    ) => {
+      state.accessToken = action.payload.accessToken; // ← lowercase a
+      state.refreshToken = action.payload.refreshToken;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -87,5 +98,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, updateTokens } = authSlice.actions;
 export default authSlice.reducer;
