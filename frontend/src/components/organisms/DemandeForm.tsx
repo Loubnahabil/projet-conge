@@ -10,7 +10,7 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
-import { ArrowBack, CloudUpload } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AppButton } from "../atoms/AppButton";
@@ -18,6 +18,7 @@ import { FormInput } from "../molecules/FormInput";
 import { demandeValidationSchema } from "../../validations/demandeSchema";
 import type { DemandeResponse } from "../../types/Demande.types";
 import type { UserResponseDTO } from "../../types/user.types";
+import { FileUploadField } from "../atoms/FileUploadField";
 
 interface FormInputs {
   dateDebut: string;
@@ -34,7 +35,7 @@ interface DemandeFormProps {
   onSaveWorkflow: (data: FormInputs, submitInstantly: boolean) => void;
   selectedFile: File | null;
   fileError: string | null;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileChange: (file: File | null) => void;
 }
 
 const MOROCCAN_HOLIDAYS = [
@@ -54,7 +55,6 @@ export const DemandeForm = ({
   actionLoading,
   onCancel,
   onSaveWorkflow,
-  selectedFile,
   fileError,
   onFileChange,
 }: DemandeFormProps) => {
@@ -76,7 +76,6 @@ export const DemandeForm = ({
   const watchTypeConge = useWatch({ control, name: "typeConge" });
   const watchDateDebut = useWatch({ control, name: "dateDebut" });
   const watchDateFin = useWatch({ control, name: "dateFin" });
-  const watchInterimId = useWatch({ control, name: "interimId" });
 
   // Compute live local durations
   let calculatedDuree = 0;
@@ -134,7 +133,7 @@ export const DemandeForm = ({
             label="Type de congé *"
             size="small"
             fullWidth
-            value={watchTypeConge || ""}
+            defaultValue=""
             {...register("typeConge")}
             error={!!errors.typeConge}
             helperText={errors.typeConge?.message}
@@ -177,7 +176,7 @@ export const DemandeForm = ({
             label="Intérimaire (Collègues du même service) *"
             size="small"
             fullWidth
-            value={watchInterimId || ""}
+            defaultValue=""
             {...register("interimId")}
             error={!!errors.interimId}
             helperText={errors.interimId?.message}
@@ -196,43 +195,13 @@ export const DemandeForm = ({
           >
             Pièces Justificatives{" "}
             {watchTypeConge === "MALADIE" && (
-              <span style={{ color: "#ef4444" }}>*</span>
+              <span style={{ color: "#ef4444" }}>
+                * (obligatoire pour congé maladie)
+              </span>
             )}
           </Typography>
-          <Box
-            sx={{
-              border: fileError ? "2px dashed #ef4444" : "2px dashed #cbd5e1",
-              borderRadius: "12px",
-              p: 3,
-              textAlign: "center",
-              bgcolor: "#f8fafc",
-              cursor: "pointer",
-              "&:hover": { bgcolor: "#f1f5f9" },
-            }}
-            component="label"
-          >
-            <input
-              type="file"
-              hidden
-              onChange={onFileChange}
-              accept=".pdf,image/*"
-            />
-            <CloudUpload sx={{ fontSize: 32, color: "#64748b", mb: 1 }} />
-            <Typography variant="body2" sx={{ color: "#475569" }}>
-              {selectedFile
-                ? `Fichier prêt : ${selectedFile.name}`
-                : "Sélectionner ou glisser un justificatif officiel (PDF, PNG, JPG)"}
-            </Typography>
-          </Box>
-          {fileError && (
-            <Typography
-              variant="caption"
-              color="error"
-              sx={{ mt: 1, display: "block" }}
-            >
-              {fileError}
-            </Typography>
-          )}
+
+          <FileUploadField error={fileError} onChange={onFileChange} />
         </Grid>
       </Grid>
 

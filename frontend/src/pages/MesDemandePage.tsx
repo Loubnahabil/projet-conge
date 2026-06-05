@@ -117,11 +117,9 @@ export const MesDemandePage = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      setSelectedFile(e.target.files[0]);
-      setFileError(null);
-    }
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
+    setFileError(null);
   };
 
   const saveDemandeWorkflow = async (

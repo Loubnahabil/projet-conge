@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,10 +6,9 @@ import {
   DialogActions,
   Box,
   Alert,
-  Typography,
 } from "@mui/material";
-
 import { AppButton } from "../atoms/AppButton";
+import { FileUploadField } from "../atoms/FileUploadField";
 
 interface SignataireUploadModalProps {
   open: boolean;
@@ -27,18 +26,13 @@ export const SignataireUploadModal = ({
   onUpload,
 }: SignataireUploadModalProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      setSelectedFile(e.target.files[0]);
-    }
+  const handleFileChange = (file: File | null) => {
+    setSelectedFile(file);
   };
 
   const handleSubmit = () => {
-    if (selectedFile) {
-      onUpload(selectedFile);
-    }
+    if (selectedFile) onUpload(selectedFile);
   };
 
   return (
@@ -48,50 +42,11 @@ export const SignataireUploadModal = ({
       </DialogTitle>
 
       <DialogContent>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            pt: 1,
-            alignItems: "center",
-          }}
-        >
-          {error && (
-            <Alert severity="error" sx={{ width: "100%" }}>
-              {error}
-            </Alert>
-          )}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+          {error && <Alert severity="error">{error}</Alert>}
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
-          />
-
-          <Box
-            sx={{
-              border: "2px dashed #cbd5e1",
-              borderRadius: "8px",
-              p: 3,
-              width: "100%",
-              textAlign: "center",
-              bgcolor: "#f8fafc",
-            }}
-          >
-            <Typography variant="body2" sx={{ color: "#64748b", mb: 2 }}>
-              Sélectionnez l'arrêté de congé signé au format PDF ou Image.
-            </Typography>
-
-            <AppButton
-              text={selectedFile ? selectedFile.name : "Choisir un fichier"}
-              variant="outlined"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={actionLoading}
-            />
-          </Box>
+          {/* Validation + prévisualisation intégrées dans FileUploadField */}
+          <FileUploadField onChange={handleFileChange} />
         </Box>
       </DialogContent>
 
@@ -102,7 +57,6 @@ export const SignataireUploadModal = ({
           onClick={onCancel}
           disabled={actionLoading}
         />
-
         <AppButton
           text="Déposer"
           onClick={handleSubmit}

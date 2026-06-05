@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, CircularProgress } from "@mui/material";
+import { FileDownload } from "@mui/icons-material"; // 👈 Ajout de l'icône d'export
+
 import { AppButton } from "../../components/atoms/AppButton";
 import { SearchBar } from "../../components/molecules/SearchBar";
 import { UserTable } from "../../components/organisms/UserTable";
 import { UserFormModal } from "../../components/organisms/UserFormModal";
+import { useExportUsers } from "../../hooks/useExportUsers"; // 👈 Ajout du hook d'export
 import type { RootState, AppDispatch } from "../../store";
 import {
   fetchUsersListThunk,
@@ -15,9 +18,16 @@ import { fetchStructureDependenciesThunk } from "../../store/slices/structureSli
 
 export const UserPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { globalLoading, searchQuery } = useSelector(
-    (state: RootState) => state.users,
-  );
+
+  // ⚡ Récupération de globalLoading, searchQuery et list (users) depuis Redux
+  const {
+    globalLoading,
+    searchQuery,
+    list: users,
+  } = useSelector((state: RootState) => state.users);
+
+  // ⚡ Hook d'export — reçoit la liste des utilisateurs
+  const { exportExcel, exportPDF } = useExportUsers(users);
 
   useEffect(() => {
     dispatch(fetchUsersListThunk());
@@ -57,10 +67,28 @@ export const UserPage = () => {
         <Typography variant="h5" sx={{ fontWeight: "700", color: "#1e293b" }}>
           Gestion des Fonctionnaires
         </Typography>
-        <AppButton
-          text="+ Ajouter un Fonctionnaire"
-          onClick={() => dispatch(openPopup({ mode: "create" }))}
-        />
+
+        {/* 📦 Groupe de boutons d'action (Export + Ajout) */}
+        <Box sx={{ display: "flex", gap: 1.5 }}>
+          <AppButton
+            text="Excel"
+            onClick={exportExcel}
+            startIcon={<FileDownload />}
+            variant="outlined"
+            color="success"
+          />
+          <AppButton
+            text="PDF"
+            onClick={exportPDF}
+            startIcon={<FileDownload />}
+            variant="outlined"
+            color="error"
+          />
+          <AppButton
+            text="+ Ajouter un Fonctionnaire"
+            onClick={() => dispatch(openPopup({ mode: "create" }))}
+          />
+        </Box>
       </Box>
 
       {/* 🧪 Reusable Search Molecule */}
