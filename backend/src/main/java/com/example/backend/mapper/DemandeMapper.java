@@ -18,6 +18,8 @@ public interface DemandeMapper {
     @Mapping(target = "userServiceNom", source = "user.service.nom")
     @Mapping(target = "interimId", source = "interim.id")
     @Mapping(target = "interimNomComplet", expression = "java(demande.getInterim().getPrenom() + \" \" + demande.getInterim().getNom())")
+    @Mapping(target = "piecesJustificatives", source = "piecesJustificatives")  // ADD THIS
+
     DemandeResponseDTO toDTO(Demande demande);
 
     List<DemandeResponseDTO> toDTOList(List<Demande> demandes);

@@ -10,6 +10,7 @@ import {
 import { demandeApi } from "../api/demandeApi";
 import { ChefDemandeTable } from "../components/organisms/ChefDemandeTable";
 import { ChefDecisionModal } from "../components/organisms/ChefDecisionModal";
+import { DemandeDetailDrawer } from "../components/organisms/DemandeDetailDrawer";
 import type { DemandeResponse } from "../types/Demande.types";
 
 export const ChefDashboardPage = () => {
@@ -32,6 +33,11 @@ export const ChefDashboardPage = () => {
     mode: "approve" | "reject" | null;
     targetId: number | null;
   }>({ open: false, mode: null, targetId: null });
+
+  // Detail Drawer Target State
+  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(
+    null,
+  );
 
   // Initial fetch for pending workspace demands
   useEffect(() => {
@@ -145,6 +151,7 @@ export const ChefDashboardPage = () => {
           data={pendingDemandes}
           showActions
           onActionClick={handleOpenDecisionWorkflow}
+          onViewClick={(d) => setDrawerDemande(d)}
           emptyMessage="Aucune demande en attente de visa."
         />
       )}
@@ -158,6 +165,7 @@ export const ChefDashboardPage = () => {
         ) : (
           <ChefDemandeTable
             data={traitees}
+            onViewClick={(d) => setDrawerDemande(d)}
             emptyMessage="Aucune demande traitée pour l'instant."
           />
         ))}
@@ -170,6 +178,13 @@ export const ChefDashboardPage = () => {
         actionLoading={actionLoading}
         onCancel={() => setDialog({ open: false, mode: null, targetId: null })}
         onConfirm={handleExecuteWorkflowAction}
+      />
+
+      {/* Detail Right Side Drawer */}
+      <DemandeDetailDrawer
+        open={!!drawerDemande}
+        demande={drawerDemande}
+        onClose={() => setDrawerDemande(null)}
       />
     </Box>
   );

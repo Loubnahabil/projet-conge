@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.request.CreateUserRequestDTO;
+import com.example.backend.dto.request.UpdateProfileRequestDTO;
 import com.example.backend.dto.request.UpdateUserRequestDTO;
 import com.example.backend.dto.response.UserResponseDTO;
 import com.example.backend.service.UserService;
@@ -77,5 +78,19 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    @PutMapping("/me")
+    public ResponseEntity<UserResponseDTO> updateMyProfile(
+            @RequestBody UpdateProfileRequestDTO request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        return ResponseEntity.ok(userService.updateMyProfile(email, request));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getMyProfile(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        return ResponseEntity.ok(userService.getByEmail(email));
     }
 }

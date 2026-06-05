@@ -67,6 +67,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
+
 
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*/soumettre").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers(HttpMethod.PUT, "/api/demandes/*").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
@@ -79,7 +81,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/demandes/*/upload").hasAnyAuthority("FONCTIONNAIRE", "SIGNATAIRE")
 
 
-
+                        .requestMatchers(HttpMethod.GET,  "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT,  "/api/users/me").authenticated()
                         .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
@@ -91,13 +94,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/quotas/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/demandes/audit").hasAuthority("ADMIN")
                         .requestMatchers("/api/demandes/all").hasAuthority("ADMIN")
-                        .requestMatchers("/api/demandes/audit").hasAuthority("ADMIN")
-                        .requestMatchers("/api/demandes/all").hasAuthority("ADMIN")
                         .requestMatchers("/api/demandes/*/historique").hasAnyAuthority("ADMIN", "FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
 
                         .requestMatchers("/api/demandes/traitees-chef").hasAuthority("CHEF_HIERARCHIE")
                         .requestMatchers("/api/demandes/traitees-signataire").hasAuthority("SIGNATAIRE")
                         .requestMatchers("/api/demandes/*/generate-pdf").hasAuthority("SIGNATAIRE")
+
+                        // Rule added right before the catch-all to allow authorized profiles to download documents
+                        .requestMatchers(HttpMethod.GET, "/api/demandes/*/pieces/**").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE", "ADMIN")
+
                         .requestMatchers("/api/demandes/**").hasAuthority("FONCTIONNAIRE")
 
                         .anyRequest().authenticated())

@@ -33,7 +33,14 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/logout")
-    public ResponseEntity<Map<String, String>> logout() {
+    public ResponseEntity<Map<String, String>> logout(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        authService.logout(userDetails.getUsername());
         return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
     }
+    @PostMapping("/api/auth/refresh")
+    public ResponseEntity<LoginResponseDTO> refresh(@RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(authService.refresh(body.get("refreshToken")));
+    }
+
 }

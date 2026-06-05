@@ -184,5 +184,30 @@ public class DemandeController {
 
         return ResponseEntity.ok().headers(headers).body(pdf);
     }
+    @GetMapping("/{id}/pieces/{pieceId}")
+    public ResponseEntity<byte[]> downloadPiece(
+            @PathVariable Long id,
+            @PathVariable Long pieceId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        byte[] fileBytes = demandeService.getPieceFile(pieceId);
+        String filename = demandeService.getPieceFilename(pieceId);
+
+        MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        if (filename.toLowerCase().endsWith(".pdf")) mediaType = MediaType.APPLICATION_PDF;
+        else if (filename.toLowerCase().endsWith(".png")) mediaType = MediaType.IMAGE_PNG;
+        else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) mediaType = MediaType.IMAGE_JPEG;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(mediaType);
+        headers.setContentDisposition(
+                org.springframework.http.ContentDisposition.inline()
+                        .filename(filename)
+                        .build()
+        );
+
+        return ResponseEntity.ok().headers(headers).body(fileBytes);
+    }
+
 
 }

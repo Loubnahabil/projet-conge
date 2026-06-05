@@ -4,6 +4,7 @@ import com.example.backend.entity.StatutDemande;
 import com.example.backend.entity.TypeConge;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class DemandeResponseDTO {
@@ -19,4 +20,5 @@ public class DemandeResponseDTO {
     private int duree;
     private TypeConge typeConge;
     private StatutDemande statut;
+    private List<PieceJustificativeResponseDTO> piecesJustificatives;
 }

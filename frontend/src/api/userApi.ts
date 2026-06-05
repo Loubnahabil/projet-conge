@@ -44,4 +44,18 @@ export const userApi = {
       .then((res: AxiosResponse<UserResponseDTO>) => res.data),
 
   delete: (id: number) => axiosInstance.delete(`/api/users/${id}`),
+
+  getMyProfile: () =>
+    axiosInstance.get<UserResponseDTO>("/api/users/me").then((res) => res.data),
+
+  updateMyProfile: (payload: {
+    nom?: string;
+    prenom?: string;
+    email?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }) =>
+    axiosInstance
+      .put<UserResponseDTO>("/api/users/me", payload)
+      .then((res) => res.data),
 };

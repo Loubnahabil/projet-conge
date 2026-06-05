@@ -5,6 +5,7 @@ import com.example.backend.dto.response.LoginResponseDTO;
 import com.example.backend.entity.RefreshToken;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
+import com.example.backend.exception.BusinessException;
 import com.example.backend.repository.RefreshTokenRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
@@ -69,5 +70,46 @@ public class AuthService {
                 .prenom(user.getPrenom())
                 .role(role)
                 .build();
+    }
+
+    @Transactional
+    public LoginResponseDTO refresh(String refreshTokenStr) {
+        RefreshToken stored = refreshTokenRepository.findByToken(refreshTokenStr)
+                .orElseThrow(() -> new BusinessException("Refresh token invalide"));
+
+        if (stored.getExpiresAt().isBefore(Instant.now())) {
+            refreshTokenRepository.delete(stored);
+            throw new BusinessException("Refresh token expiré");
+        }
+
+        User user = stored.getUser();
+        String newAccessToken = jwtUtils.generateAccessToken(user.getEmail());
+        String newRefreshToken = jwtUtils.generateRefreshToken(user.getEmail());
+
+        // rotate: delete old, save new
+        refreshTokenRepository.delete(stored);
+        RefreshToken newStored = RefreshToken.builder()
+                .token(newRefreshToken)
+                .user(user)
+                .expiresAt(Instant.now().plusMillis(refreshExpiration))
+                .build();
+        refreshTokenRepository.save(newStored);
+
+        String role = user.getRoles().stream().findFirst().map(Role::getName).orElse("");
+
+        return LoginResponseDTO.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .email(user.getEmail())
+                .nom(user.getNom())
+                .prenom(user.getPrenom())
+                .role(role)
+                .build();
+    }
+    @Transactional
+    public void logout(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        refreshTokenRepository.deleteByUser(user);
     }
 }

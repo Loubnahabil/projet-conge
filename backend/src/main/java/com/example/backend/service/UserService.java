@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.dto.request.CreateUserRequestDTO;
 import com.example.backend.dto.request.UpdateUserRequestDTO;
+import com.example.backend.dto.request.UpdateProfileRequestDTO; // Added import for profile update DTO
 import com.example.backend.dto.response.UserResponseDTO;
 import com.example.backend.entity.Quota;
 import com.example.backend.entity.Role;
@@ -79,6 +80,37 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Fonctionnaire non trouvé avec l'id: " + id));
         return userMapper.toDTO(user);
+    }
+
+    // GET one by email
+    public UserResponseDTO getByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+        return userMapper.toDTO(user);
+    }
+
+    // UPDATE own profile
+    @Transactional
+    public UserResponseDTO updateMyProfile(String email, UpdateProfileRequestDTO request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        if (request.getNom() != null) user.setNom(request.getNom());
+        if (request.getPrenom() != null) user.setPrenom(request.getPrenom());
+
+        if (request.getEmail() != null && !request.getEmail().equals(email)) {
+            if (userRepository.existsByEmail(request.getEmail()))
+                throw new BusinessException("Cet email est déjà utilisé.");
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getNewPassword() != null && !request.getNewPassword().isBlank()) {
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword()))
+                throw new BusinessException("Mot de passe actuel incorrect.");
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        }
+
+        return userMapper.toDTO(userRepository.save(user));
     }
 
     // CREATE

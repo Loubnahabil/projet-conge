@@ -10,8 +10,9 @@ import {
   Chip,
   Tooltip,
   IconButton,
+  Stack,
 } from "@mui/material";
-import { CheckCircle, Cancel } from "@mui/icons-material";
+import { CheckCircle, Cancel, Visibility } from "@mui/icons-material";
 import type { DemandeResponse } from "../../types/Demande.types";
 
 const STATUT_LABEL: Record<
@@ -28,6 +29,7 @@ interface ChefDemandeTableProps {
   data: DemandeResponse[];
   showActions?: boolean;
   onActionClick?: (mode: "approve" | "reject", id: number) => void;
+  onViewClick?: (demande: DemandeResponse) => void;
   emptyMessage?: string;
 }
 
@@ -35,6 +37,7 @@ export const ChefDemandeTable = ({
   data,
   showActions = false,
   onActionClick,
+  onViewClick,
   emptyMessage = "Aucune demande trouvée.",
 }: ChefDemandeTableProps) => {
   return (
@@ -85,7 +88,7 @@ export const ChefDemandeTable = ({
           {data.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={showActions ? 7 : 7}
+                colSpan={7}
                 align="center"
                 sx={{ py: 6, color: "#64748b" }}
               >
@@ -120,6 +123,15 @@ export const ChefDemandeTable = ({
 
                   {showActions ? (
                     <TableCell align="right" sx={{ pr: 2 }}>
+                      <Tooltip title="Voir détails">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#2563eb", mr: 1 }}
+                          onClick={() => onViewClick?.(d)}
+                        >
+                          <Visibility fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="Approuver">
                         <IconButton
                           size="small"
@@ -141,11 +153,25 @@ export const ChefDemandeTable = ({
                     </TableCell>
                   ) : (
                     <TableCell>
-                      <Chip
-                        label={statusConfig.label}
-                        size="small"
-                        color={statusConfig.color}
-                      />
+                      <Stack
+                        direction="row"
+                        sx={{ alignItems: "center", gap: 1 }}
+                      >
+                        <Chip
+                          label={statusConfig.label}
+                          size="small"
+                          color={statusConfig.color}
+                        />
+                        <Tooltip title="Voir détails">
+                          <IconButton
+                            size="small"
+                            sx={{ color: "#94a3b8" }}
+                            onClick={() => onViewClick?.(d)}
+                          >
+                            <Visibility fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
                   )}
                 </TableRow>

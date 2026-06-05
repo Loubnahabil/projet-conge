@@ -9,6 +9,13 @@ export type StatutDemande =
   | "REJETEE_DIRECTEUR"
   | "ANNULEE";
 
+export interface PieceJustificative {
+  id: number;
+  nomFichier: string;
+  urlFichier: string;
+  dateUpload: string;
+}
+
 // What we send to POST /api/demandes
 export interface DemandeRequest {
   dateDebut: string; // YYYY-MM-DD
@@ -31,6 +38,7 @@ export interface DemandeResponse {
   duree: number;
   typeConge: TypeConge;
   statut: StatutDemande;
+  piecesJustificatives?: PieceJustificative[];
 }
 
 export interface HistoryRecord {

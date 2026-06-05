@@ -10,8 +10,9 @@ import {
   Chip,
   Tooltip,
   IconButton,
+  Stack,
 } from "@mui/material";
-import { Cancel, UploadFile, Download } from "@mui/icons-material";
+import { Cancel, UploadFile, Download, Visibility } from "@mui/icons-material";
 import type { DemandeResponse } from "../../types/Demande.types";
 
 const STATUT_LABEL: Record<
@@ -29,6 +30,7 @@ interface SignataireDemandeTableProps {
   onSignClick?: (id: number) => void;
   onRejectClick?: (id: number) => void;
   onDownloadClick?: (id: number) => void;
+  onViewClick?: (demande: DemandeResponse) => void;
   emptyMessage?: string;
 }
 
@@ -38,6 +40,7 @@ export const SignataireDemandeTable = ({
   onSignClick,
   onRejectClick,
   onDownloadClick,
+  onViewClick,
   emptyMessage = "Aucune demande trouvée.",
 }: SignataireDemandeTableProps) => {
   return (
@@ -128,6 +131,16 @@ export const SignataireDemandeTable = ({
 
                   {showActions ? (
                     <TableCell align="right" sx={{ pr: 2 }}>
+                      <Tooltip title="Voir détails">
+                        <IconButton
+                          size="small"
+                          sx={{ color: "#2563eb", mr: 1 }}
+                          onClick={() => onViewClick?.(d)}
+                        >
+                          <Visibility fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
                       <Tooltip title="Signer et déposer le document">
                         <IconButton
                           size="small"
@@ -163,11 +176,25 @@ export const SignataireDemandeTable = ({
                     </TableCell>
                   ) : (
                     <TableCell>
-                      <Chip
-                        label={statusConfig.label}
-                        size="small"
-                        color={statusConfig.color}
-                      />
+                      <Stack
+                        direction="row"
+                        sx={{ alignItems: "center", gap: 1 }}
+                      >
+                        <Chip
+                          label={statusConfig.label}
+                          size="small"
+                          color={statusConfig.color}
+                        />
+                        <Tooltip title="Voir détails">
+                          <IconButton
+                            size="small"
+                            sx={{ color: "#94a3b8" }}
+                            onClick={() => onViewClick?.(d)}
+                          >
+                            <Visibility fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
                   )}
                 </TableRow>
