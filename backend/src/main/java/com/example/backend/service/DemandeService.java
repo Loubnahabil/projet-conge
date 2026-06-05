@@ -606,4 +606,16 @@ public class DemandeService {
 
         return demande;
     }
+    public byte[] getPieceFile(Long pieceId) {
+        PieceJustificative piece = pieceJustificativeRepository.findById(pieceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Pièce justificative introuvable"));
+        return documentStorageService.loadFile(piece.getUrlFichier());
+    }
+
+    public String getPieceFilename(Long pieceId) {
+        return pieceJustificativeRepository.findById(pieceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Pièce justificative introuvable"))
+                .getNomFichier();
+    }
+
 }

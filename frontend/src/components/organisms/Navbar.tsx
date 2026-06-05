@@ -1,4 +1,13 @@
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import { AccountCircle } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/authSlice";
@@ -37,8 +46,8 @@ export const Navbar = () => {
           Gestion des Congés
         </Typography>
 
-        {/* Right Side: Welcome message and Logout Button */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
+        {/* Right Side: Welcome message, Profile Icon, and Logout Button */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {user && (
             <Typography
               variant="body1"
@@ -48,6 +57,17 @@ export const Navbar = () => {
             </Typography>
           )}
 
+          {/* Profile Icon Button */}
+          <Tooltip title="Mon profil">
+            <IconButton
+              onClick={() => navigate("/profile")}
+              sx={{ color: "#fff" }}
+            >
+              <AccountCircle />
+            </IconButton>
+          </Tooltip>
+
+          {/* Logout Button */}
           <Button
             color="inherit"
             onClick={handleLogout}

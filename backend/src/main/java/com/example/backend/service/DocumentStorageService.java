@@ -51,4 +51,14 @@ public class DocumentStorageService {
             throw new BusinessException("Échec du stockage du fichier sur le disque serveur.");
         }
     }
+    public byte[] loadFile(String urlFichier) {
+        try {
+            // urlFichier is like "/uploads/uuid.pdf", strip the leading "/uploads/"
+            String filename = Paths.get(urlFichier).getFileName().toString();
+            Path filePath = rootLocation.resolve(filename).normalize();
+            return Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new BusinessException("Fichier introuvable ou illisible.");
+        }
+    }
 }

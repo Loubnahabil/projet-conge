@@ -17,6 +17,7 @@ import ChefDashboardPage from "../pages/Chefdashboardpage";
 import SignatairePage from "../pages/Signatairepage";
 import AdminDashboardPage from "../pages/Admin/Admindashboardpage";
 import AuditPage from "../pages/Admin/Auditpage";
+import { ProfilePage } from "../pages/ProfilePage";
 
 // ── Role guards ───────────────────────────────────────────────────────────────
 
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "/mes-demandes",
         element: <MesDemandePage />,
+      },
+      {
+        path: "/profile",
+        element: <ProfilePage />,
       },
       // ── Chef ──────────────────────────────────────────────────────────────
       {
