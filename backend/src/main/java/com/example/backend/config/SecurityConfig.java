@@ -86,7 +86,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/colleagues").hasAuthority("FONCTIONNAIRE")
                         .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
-                        .requestMatchers("/api/statistiques/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/statistiques/dashboard").hasAuthority("ADMIN")
+                        .requestMatchers("/api/statistiques/fonctionnaire-dashboard").hasAuthority("FONCTIONNAIRE")
+                        .requestMatchers("/api/statistiques/chef-dashboard").hasAuthority("CHEF_HIERARCHIE")
+                        .requestMatchers("/api/statistiques/signataire-dashboard").hasAuthority("SIGNATAIRE")
                         .requestMatchers("/api/directions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/divisions/**").hasAuthority("ADMIN")
                         .requestMatchers("/api/services/**").hasAuthority("ADMIN")

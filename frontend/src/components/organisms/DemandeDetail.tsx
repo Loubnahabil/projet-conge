@@ -2,14 +2,17 @@ import {
   Box,
   Typography,
   Paper,
-  Chip,
-  CircularProgress,
   IconButton,
   Button,
   Grid,
   Stack,
 } from "@mui/material";
 import { ArrowBack, Cancel } from "@mui/icons-material";
+import { StatusChip } from "../atoms/StatusChip";
+import { LoadingSpinner } from "../atoms/LoadingSpinner";
+import { EmptyState } from "../atoms/EmptyState";
+import { DocumentFileLink } from "../atoms/DocumentFileLink";
+import { axiosInstance } from "../../api/axiosInstance";
 import type { DemandeResponse, HistoryRecord } from "../../types/Demande.types";
 
 interface DemandeDetailProps {
@@ -50,6 +53,15 @@ export const DemandeDetail = ({
     selectedDemande.statut === "BROUILLON" ||
     selectedDemande.statut === "SOUMISE";
 
+  const handleOpenPiece = async (pieceId: number) => {
+    const response = await axiosInstance.get(
+      `/api/demandes/${selectedDemande.id}/pieces/${pieceId}`,
+      { responseType: "blob" },
+    );
+    const url = window.URL.createObjectURL(response.data);
+    window.open(url, "_blank");
+  };
+
   return (
     <Box>
       <Box
@@ -82,15 +94,7 @@ export const DemandeDetail = ({
               spacing={1}
               sx={{ mt: 0.5, alignItems: "center" }}
             >
-              <Chip
-                label={
-                  statutConfig[selectedDemande.statut]?.label ||
-                  selectedDemande.statut
-                }
-                color={statutConfig[selectedDemande.statut]?.color || "default"}
-                size="small"
-                sx={{ fontWeight: 700 }}
-              />
+              <StatusChip statut={selectedDemande.statut} sx={{ fontWeight: 700 }} />
               <Typography variant="caption" color="textSecondary">
                 En attente de traitement par le circuit administratif
               </Typography>
@@ -115,6 +119,28 @@ export const DemandeDetail = ({
       <Grid container spacing={4}>
         {/* Left Card: Summary */}
         <Grid size={{ xs: 12, md: 7 }}>
+          {selectedDemande.piecesJustificatives && selectedDemande.piecesJustificatives.length > 0 && (
+            <Paper
+              variant="outlined"
+              sx={{ p: 3, borderRadius: "12px", mb: 3 }}
+            >
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
+              >
+                DOCUMENTS SIGNÉS
+              </Typography>
+              <Stack spacing={1}>
+                {selectedDemande.piecesJustificatives.map((piece) => (
+                  <DocumentFileLink
+                    key={piece.id}
+                    nomFichier={piece.nomFichier}
+                    onClick={() => handleOpenPiece(piece.id)}
+                  />
+                ))}
+              </Stack>
+            </Paper>
+          )}
           <Paper
             variant="outlined"
             sx={{ p: 3, borderRadius: "12px", bgcolor: "#f8fafc" }}
@@ -190,17 +216,9 @@ export const DemandeDetail = ({
             </Typography>
 
             {actionLoading ? (
-              <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                <CircularProgress size={24} />
-              </Box>
+              <LoadingSpinner />
             ) : demandeHistory.length === 0 ? (
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                sx={{ fontStyle: "italic" }}
-              >
-                Aucun historique de suivi enregistré.
-              </Typography>
+              <EmptyState message="Aucun historique de suivi enregistré." />
             ) : (
               <Stack
                 spacing={3}
@@ -254,6 +272,41 @@ export const DemandeDetail = ({
                       {statutConfig[log.statutAction]?.label ||
                         log.statutAction}
                     </Typography>
+                    {log.acteurNom && (
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "#64748b", display: "block" }}
+                      >
+                        par {log.acteurPrenom} {log.acteurNom}
+                        {log.acteurRole ? ` (${log.acteurRole})` : ""}
+                      </Typography>
+                    )}
+                    {log.commentaire && (
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          mt: 0.5,
+                          p: 1,
+                          bgcolor:
+                            log.statutAction?.startsWith("REJETEE")
+                              ? "#fef2f2"
+                              : "#f8fafc",
+                          borderRadius: "6px",
+                          border: "1px solid",
+                          borderColor:
+                            log.statutAction?.startsWith("REJETEE")
+                              ? "#fecaca"
+                              : "#e2e8f0",
+                          color:
+                            log.statutAction?.startsWith("REJETEE")
+                              ? "#991b1b"
+                              : "#475569",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        "{log.commentaire}"
+                      </Typography>
+                    )}
                   </Box>
                 ))}
               </Stack>

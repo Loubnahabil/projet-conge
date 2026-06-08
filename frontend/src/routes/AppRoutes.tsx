@@ -16,6 +16,7 @@ import { MesDemandePage } from "../pages/MesDemandePage";
 import ChefDashboardPage from "../pages/Chefdashboardpage";
 import SignatairePage from "../pages/Signatairepage";
 import AdminDashboardPage from "../pages/Admin/Admindashboardpage";
+import FonctionnaireDashboardPage from "../pages/FonctionnaireDashboardPage";
 import AuditPage from "../pages/Admin/Auditpage";
 import { ProfilePage } from "../pages/ProfilePage";
 
@@ -42,6 +43,14 @@ const ChefRoute = ({ children }: { children: React.ReactNode }) => {
   ];
   if (!role || !chefRoles.includes(role))
     return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+};
+
+const FonctionnaireRoute = ({ children }: { children: React.ReactNode }) => {
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+  const accessToken = useSelector((state: RootState) => state.auth.accessToken);
+  if (!accessToken) return <Navigate to="/login" replace />;
+  if (role !== "FONCTIONNAIRE") return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
@@ -80,6 +89,14 @@ const router = createBrowserRouter([
         ),
       },
       // ── Fonctionnaire ──────────────────────────────────────────────────────
+      {
+        path: "/fonctionnaire/dashboard",
+        element: (
+          <FonctionnaireRoute>
+            <FonctionnaireDashboardPage />
+          </FonctionnaireRoute>
+        ),
+      },
       {
         path: "/mes-demandes",
         element: <MesDemandePage />,

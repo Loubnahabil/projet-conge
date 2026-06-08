@@ -7,23 +7,15 @@ import {
   TableRow,
   TableCell,
   Paper,
-  Chip,
   Tooltip,
   IconButton,
   Stack,
 } from "@mui/material";
 import { CheckCircle, Cancel, Visibility } from "@mui/icons-material";
+import { StatusChip } from "../atoms/StatusChip";
+import { TypeCongeChip } from "../atoms/TypeCongeChip";
+import { EmptyState } from "../atoms/EmptyState";
 import type { DemandeResponse } from "../../types/Demande.types";
-
-const STATUT_LABEL: Record<
-  string,
-  { label: string; color: "success" | "error" | "info" | "default" }
-> = {
-  VISEE_CHEF: { label: "Visée", color: "success" },
-  REJETEE_CHEF: { label: "Rejetée", color: "error" },
-  SIGNEE_DIRECTEUR: { label: "Signée directeur", color: "info" },
-  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
-};
 
 interface ChefDemandeTableProps {
   data: DemandeResponse[];
@@ -87,21 +79,12 @@ export const ChefDemandeTable = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={7}
-                align="center"
-                sx={{ py: 6, color: "#64748b" }}
-              >
-                {emptyMessage}
+              <TableCell colSpan={7} sx={{ py: 3 }}>
+                <EmptyState message={emptyMessage} />
               </TableCell>
             </TableRow>
           ) : (
             data.map((d) => {
-              const statusConfig = STATUT_LABEL[d.statut] || {
-                label: d.statut,
-                color: "default",
-              };
-
               return (
                 <TableRow key={d.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
                   <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
@@ -111,11 +94,7 @@ export const ChefDemandeTable = ({
                     {d.userServiceNom}
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
-                      size="small"
-                      color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
-                    />
+                    <TypeCongeChip typeConge={d.typeConge} />
                   </TableCell>
                   <TableCell>{d.dateDebut}</TableCell>
                   <TableCell>{d.dateFin}</TableCell>
@@ -157,11 +136,7 @@ export const ChefDemandeTable = ({
                         direction="row"
                         sx={{ alignItems: "center", gap: 1 }}
                       >
-                        <Chip
-                          label={statusConfig.label}
-                          size="small"
-                          color={statusConfig.color}
-                        />
+                        <StatusChip statut={d.statut} />
                         <Tooltip title="Voir détails">
                           <IconButton
                             size="small"

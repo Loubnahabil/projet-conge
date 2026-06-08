@@ -13,8 +13,14 @@ interface DemandeState {
   demandes: DemandeResponse[];
   interims: UserResponseDTO[];
   selectedHistory: HistoryRecord[];
+  pendingChefVisas: DemandeResponse[];
+  traiteesChef: DemandeResponse[];
+  pendingSignatures: DemandeResponse[];
+  traiteesSignataire: DemandeResponse[];
   loading: boolean;
   actionLoading: boolean;
+  chefLoading: boolean;
+  signataireLoading: boolean;
   error: string | null;
 }
 
@@ -22,8 +28,14 @@ const initialState: DemandeState = {
   demandes: [],
   interims: [],
   selectedHistory: [],
+  pendingChefVisas: [],
+  traiteesChef: [],
+  pendingSignatures: [],
+  traiteesSignataire: [],
   loading: false,
   actionLoading: false,
+  chefLoading: false,
+  signataireLoading: false,
   error: null,
 };
 
@@ -136,6 +148,110 @@ export const fetchDemandeHistoryThunk = createAsyncThunk(
   },
 );
 
+// ── Chef Thunks ──────────────────────────────────────────────────────────────
+
+export const fetchPendingChefVisasThunk = createAsyncThunk(
+  "demande/fetchPendingChefVisas",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await demandeApi.getDemandesAViser();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du chargement.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const fetchTraiteesChefThunk = createAsyncThunk(
+  "demande/fetchTraiteesChef",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await demandeApi.getDemandesTraiteesChef();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du chargement.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const visaChefThunk = createAsyncThunk(
+  "demande/visaChef",
+  async (
+    { id, approve, commentaire }: { id: number; approve: boolean; commentaire?: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await demandeApi.visaChef(id, approve, { commentaire });
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du visa.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+// ── Signataire Thunks ─────────────────────────────────────────────────────────
+
+export const fetchPendingSignaturesThunk = createAsyncThunk(
+  "demande/fetchPendingSignatures",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await demandeApi.getDemandesASigner();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du chargement.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const fetchTraiteesSignataireThunk = createAsyncThunk(
+  "demande/fetchTraiteesSignataire",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await demandeApi.getDemandesTraiteesSignataire();
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du chargement.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const signataireApproveThunk = createAsyncThunk(
+  "demande/signataireApprove",
+  async (
+    { id, file }: { id: number; file: File },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await demandeApi.uploadDocument(id, file, "DECISION_SIGNEE");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors de la signature.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
+export const signataireRejectThunk = createAsyncThunk(
+  "demande/signataireReject",
+  async (
+    { id, commentaire }: { id: number; commentaire: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await demandeApi.rejetSignataire(id, { commentaire });
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Erreur lors du rejet.";
+      return rejectWithValue(message);
+    }
+  },
+);
+
 // ── Slice Definition ─────────────────────────────────────────────────────────
 
 const demandeSlice = createSlice({
@@ -242,7 +358,83 @@ const demandeSlice = createSlice({
         (state, action: PayloadAction<HistoryRecord[]>) => {
           state.selectedHistory = action.payload;
         },
-      );
+      )
+
+      // ── Chef ────────────────────────────────────────────────
+      .addCase(fetchPendingChefVisasThunk.pending, (state) => {
+        state.chefLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingChefVisasThunk.fulfilled, (state, action) => {
+        state.chefLoading = false;
+        state.pendingChefVisas = action.payload;
+      })
+      .addCase(fetchPendingChefVisasThunk.rejected, (state, action) => {
+        state.chefLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchTraiteesChefThunk.fulfilled, (state, action) => {
+        state.traiteesChef = action.payload;
+      })
+      .addCase(visaChefThunk.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(visaChefThunk.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.pendingChefVisas = state.pendingChefVisas.filter(
+          (d) => d.id !== action.payload.id,
+        );
+      })
+      .addCase(visaChefThunk.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload as string;
+      })
+
+      // ── Signataire ───────────────────────────────────────────
+      .addCase(fetchPendingSignaturesThunk.pending, (state) => {
+        state.signataireLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchPendingSignaturesThunk.fulfilled, (state, action) => {
+        state.signataireLoading = false;
+        state.pendingSignatures = action.payload;
+      })
+      .addCase(fetchPendingSignaturesThunk.rejected, (state, action) => {
+        state.signataireLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchTraiteesSignataireThunk.fulfilled, (state, action) => {
+        state.traiteesSignataire = action.payload;
+      })
+      .addCase(signataireApproveThunk.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(signataireApproveThunk.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.pendingSignatures = state.pendingSignatures.filter(
+          (d) => d.id !== action.payload.demandeId,
+        );
+      })
+      .addCase(signataireApproveThunk.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(signataireRejectThunk.pending, (state) => {
+        state.actionLoading = true;
+        state.error = null;
+      })
+      .addCase(signataireRejectThunk.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.pendingSignatures = state.pendingSignatures.filter(
+          (d) => d.id !== action.payload.id,
+        );
+      })
+      .addCase(signataireRejectThunk.rejected, (state, action) => {
+        state.actionLoading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 

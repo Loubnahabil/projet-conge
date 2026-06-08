@@ -1,182 +1,96 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Typography,
   Alert,
-  CircularProgress,
   Tabs,
   Tab,
+  Grid,
 } from "@mui/material";
-import { demandeApi } from "../api/demandeApi";
+import { LoadingSpinner } from "../components/atoms/LoadingSpinner";
+import { statsApi } from "../api/Statsapi";
 import { SignataireDemandeTable } from "../components/organisms/SignataireDemandeTable";
-
-// FIX IMPORTS: Changement des imports nommés en imports par défaut pour correspondre aux fichiers
 import { SignataireDecisionModal } from "../components/organisms/SignataireDecisionModal";
 import { SignataireUploadModal } from "../components/organisms/SignataireUploadModal";
-
+import { DemandeDetailDrawer } from "../components/organisms/DemandeDetailDrawer";
+import { demandeApi } from "../api/demandeApi";
+import { StatCard } from "../components/molecules/StatCard";
+import {
+  fetchPendingSignaturesThunk,
+  fetchTraiteesSignataireThunk,
+  signataireApproveThunk,
+  signataireRejectThunk,
+} from "../store/slices/demandeSlice";
+import type { AppDispatch, RootState } from "../store";
 import type { DemandeResponse } from "../types/Demande.types";
+import type { SignataireDashboardStats } from "../types/Stats.types";
 
 export const SignatairePage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { pendingSignatures, traiteesSignataire, signataireLoading, actionLoading, error } =
+    useSelector((state: RootState) => state.demande);
+
   const [tab, setTab] = useState(0);
-
-  // Data Collections
-  const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
-  const [traitees, setTraitees] = useState<DemandeResponse[]>([]);
-
-  // Status flags
-  const [loadingPending, setLoadingPending] = useState(true);
   const [loadingTraitees, setLoadingTraitees] = useState(false);
   const [traiteesFetched, setTraiteesFetched] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Modal contexts
+  const [dashboardStats, setDashboardStats] =
+    useState<SignataireDashboardStats | null>(null);
+  const [uploadTargetId, setUploadTargetId] = useState<number | null>(null);
   const [rejectDialog, setRejectDialog] = useState<{
     open: boolean;
     targetId: number | null;
-  }>({
-    open: false,
-    targetId: null,
-  });
-  const [uploadDialog, setUploadDialog] = useState<{
-    open: boolean;
-    targetId: number | null;
-  }>({
-    open: false,
-    targetId: null,
-  });
+  }>({ open: false, targetId: null });
+  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(null);
 
-  // FIX EFFECT: Fetch isolé pour éviter les rendus en cascade synchrones
   useEffect(() => {
-    let isMounted = true;
-
-    const loadInitialData = async () => {
-      setLoadingPending(true);
-      try {
-        const data = await demandeApi.getDemandesASigner();
-        if (isMounted) {
-          setDemandes(data);
-        }
-      } catch {
-        if (isMounted) {
-          setError("Erreur lors du chargement des demandes à signer.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoadingPending(false);
-        }
-      }
-    };
-
-    void loadInitialData();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  // Fonction de rechargement manuel après une action (hors useEffect, donc aucun risque de cascade)
-  const reloadPendingDemandes = async () => {
-    try {
-      const data = await demandeApi.getDemandesASigner();
-      setDemandes(data);
-    } catch {
-      setError("Erreur lors du rafraîchissement des demandes.");
-    }
-  };
+    dispatch(fetchPendingSignaturesThunk());
+    statsApi
+      .getSignataireDashboard()
+      .then(setDashboardStats)
+      .catch(() => {});
+  }, [dispatch]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
     if (newValue === 1 && !traiteesFetched) {
       setLoadingTraitees(true);
-      demandeApi
-        .getDemandesTraiteesSignataire()
-        .then((data) => {
-          setTraitees(data);
-          setTraiteesFetched(true);
-        })
-        .catch(() =>
-          setError("Erreur lors du chargement des demandes traitées."),
-        )
-        .finally(() => {
-          setLoadingTraitees(false);
-        });
+      dispatch(fetchTraiteesSignataireThunk()).finally(() => {
+        setLoadingTraitees(false);
+        setTraiteesFetched(true);
+      });
     }
   };
 
-  const handleOpenReject = (id: number) => {
-    setError(null);
-    setRejectDialog({ open: true, targetId: id });
-  };
-
-  const handleOpenSign = (id: number) => {
-    setError(null);
-    setUploadDialog({ open: true, targetId: id });
-  };
-
-  const handleDownloadPdf = async (id: number) => {
-    console.log("clicking download for id:", id);
+  const handleUpload = async (file: File) => {
+    if (!uploadTargetId) return;
     try {
-      await demandeApi.generatePdf(id);
-    } catch (err) {
-      console.error("PDF error:", err);
-      setError("Erreur lors du téléchargement du PDF.");
+      await dispatch(signataireApproveThunk({ id: uploadTargetId, file })).unwrap();
+      setUploadTargetId(null);
+      setTraiteesFetched(false);
+    } catch {
+      // error in Redux
     }
   };
 
-  const handleExecuteReject = async (commentaire: string) => {
+  const handleReject = async (commentaire: string) => {
     if (!rejectDialog.targetId) return;
-    setActionLoading(true);
-    setError(null);
     try {
-      await demandeApi.rejetSignataire(rejectDialog.targetId, { commentaire });
+      await dispatch(
+        signataireRejectThunk({ id: rejectDialog.targetId, commentaire }),
+      ).unwrap();
+      setTraiteesFetched(false);
       setRejectDialog({ open: false, targetId: null });
-      setTraiteesFetched(false);
-      await reloadPendingDemandes();
-    } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { error?: string; message?: string } };
-      };
-      setError(
-        e.response?.data?.error ||
-          e.response?.data?.message ||
-          "Erreur lors du traitement.",
-      );
-    } finally {
-      setActionLoading(false);
+    } catch {
+      // error in Redux
     }
   };
 
-  const handleExecuteUpload = async (file: File) => {
-    if (!uploadDialog.targetId) return;
-    setActionLoading(true);
-    setError(null);
-    try {
-      await demandeApi.uploadDocument(
-        uploadDialog.targetId,
-        file,
-        "DECISION_SIGNEE",
-      );
-      setUploadDialog({ open: false, targetId: null });
-      setTraiteesFetched(false);
-      await reloadPendingDemandes();
-    } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { error?: string; message?: string } };
-      };
-      setError(
-        e.response?.data?.error ||
-          e.response?.data?.message ||
-          "Erreur lors du dépôt.",
-      );
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  const pendingDemandes = pendingSignatures.filter(
+    (d) => d.statut === "VISEE_CHEF",
+  );
 
-  const pendingDemandes = demandes.filter((d) => d.statut === "VISEE_CHEF");
-
-  if (loadingPending) {
+  if (signataireLoading && pendingSignatures.length === 0) {
     return (
       <Box
         sx={{
@@ -186,13 +100,11 @@ export const SignatairePage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }
 
-  console.log("pendingDemandes:", pendingDemandes);
-  console.log("all demandes:", demandes);
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
       <Typography
@@ -201,6 +113,39 @@ export const SignatairePage = () => {
       >
         Tableau de bord — Signataire
       </Typography>
+
+      {dashboardStats && (
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="En attente de signature"
+              value={dashboardStats.enAttenteSignature}
+              sub="Demandes à traiter"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Signées"
+              value={dashboardStats.signees}
+              sub="Total"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Rejetées"
+              value={dashboardStats.rejetees}
+              sub="Total"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Total traitées"
+              value={dashboardStats.totalTraitees}
+              sub="Toutes périodes"
+            />
+          </Grid>
+        </Grid>
+      )}
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -221,9 +166,10 @@ export const SignatairePage = () => {
         <SignataireDemandeTable
           data={pendingDemandes}
           showActions
-          onSignClick={handleOpenSign}
-          onRejectClick={handleOpenReject}
-          onDownloadClick={handleDownloadPdf} // ← add this
+          onSignClick={(id) => setUploadTargetId(id)}
+          onDownloadClick={(id) => demandeApi.generatePdf(id)}
+          onRejectClick={(id) => setRejectDialog({ open: true, targetId: id })}
+          onViewClick={(d) => setDrawerDemande(d)}
           emptyMessage="Aucune demande en attente de signature."
         />
       )}
@@ -231,30 +177,36 @@ export const SignatairePage = () => {
       {tab === 1 &&
         (loadingTraitees ? (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 6 }}>
-            <CircularProgress />
+            <LoadingSpinner />
           </Box>
         ) : (
           <SignataireDemandeTable
-            data={traitees}
+            data={traiteesSignataire}
+            onViewClick={(d) => setDrawerDemande(d)}
             emptyMessage="Aucune demande traitée pour l'instant."
           />
         ))}
 
-      <SignataireDecisionModal
-        open={rejectDialog.open}
+      <SignataireUploadModal
+        open={uploadTargetId !== null}
         error={error}
         actionLoading={actionLoading}
-        onCancel={() => setRejectDialog({ open: false, targetId: null })}
-        onConfirm={handleExecuteReject}
+        onCancel={() => setUploadTargetId(null)}
+        onUpload={handleUpload}
       />
 
-      <SignataireUploadModal
-        open={uploadDialog.open}
-        // targetId={uploadDialog.targetId}  <-- supprime cette ligne
-        error={error}
+      <SignataireDecisionModal
+        open={rejectDialog.open}
         actionLoading={actionLoading}
-        onCancel={() => setUploadDialog({ open: false, targetId: null })}
-        onUpload={handleExecuteUpload}
+        error={error}
+        onClose={() => setRejectDialog({ open: false, targetId: null })}
+        onConfirm={handleReject}
+      />
+
+      <DemandeDetailDrawer
+        open={!!drawerDemande}
+        demande={drawerDemande}
+        onClose={() => setDrawerDemande(null)}
       />
     </Box>
   );

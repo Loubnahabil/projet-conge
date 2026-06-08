@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
+import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
 import { AuditTable } from "../../components/organisms/AuditTable";
 import { fetchJournalAuditThunk } from "../../store/slices/auditSlice";
 import type { RootState, AppDispatch } from "../../store";
@@ -23,7 +24,7 @@ export const AuditPage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }

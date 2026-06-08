@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, CircularProgress } from "@mui/material";
-import { FileDownload } from "@mui/icons-material"; // 👈 Ajout de l'icône d'export
+import { Box, Typography } from "@mui/material";
+import { FileDownload } from "@mui/icons-material";
+import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
 
 import { AppButton } from "../../components/atoms/AppButton";
 import { SearchBar } from "../../components/molecules/SearchBar";
@@ -48,7 +49,7 @@ export const UserPage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }

@@ -7,22 +7,15 @@ import {
   TableRow,
   TableCell,
   Paper,
-  Chip,
   Tooltip,
   IconButton,
   Stack,
 } from "@mui/material";
 import { Cancel, UploadFile, Download, Visibility } from "@mui/icons-material";
+import { StatusChip } from "../atoms/StatusChip";
+import { TypeCongeChip } from "../atoms/TypeCongeChip";
+import { EmptyState } from "../atoms/EmptyState";
 import type { DemandeResponse } from "../../types/Demande.types";
-
-const STATUT_LABEL: Record<
-  string,
-  { label: string; color: "success" | "error" | "info" | "default" }
-> = {
-  SIGNEE_DIRECTEUR: { label: "Signée", color: "success" },
-  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
-  VISEE_CHEF: { label: "Visée chef", color: "info" },
-};
 
 interface SignataireDemandeTableProps {
   data: DemandeResponse[];
@@ -92,20 +85,12 @@ export const SignataireDemandeTable = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={7}
-                align="center"
-                sx={{ py: 6, color: "#64748b" }}
-              >
-                {emptyMessage}
+              <TableCell colSpan={7} sx={{ py: 3 }}>
+                <EmptyState message={emptyMessage} />
               </TableCell>
             </TableRow>
           ) : (
             data.map((d) => {
-              const statusConfig = STATUT_LABEL[d.statut] || {
-                label: d.statut,
-                color: "default" as const,
-              };
 
               return (
                 <TableRow key={d.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
@@ -118,11 +103,7 @@ export const SignataireDemandeTable = ({
                   </TableCell>
 
                   <TableCell>
-                    <Chip
-                      label={d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
-                      size="small"
-                      color={d.typeConge === "ANNUEL" ? "primary" : "warning"}
-                    />
+                    <TypeCongeChip typeConge={d.typeConge} />
                   </TableCell>
 
                   <TableCell>{d.dateDebut}</TableCell>
@@ -180,11 +161,7 @@ export const SignataireDemandeTable = ({
                         direction="row"
                         sx={{ alignItems: "center", gap: 1 }}
                       >
-                        <Chip
-                          label={statusConfig.label}
-                          size="small"
-                          color={statusConfig.color}
-                        />
+                        <StatusChip statut={d.statut} />
                         <Tooltip title="Voir détails">
                           <IconButton
                             size="small"

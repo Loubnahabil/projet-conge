@@ -76,6 +76,7 @@ export const UserFormModal: React.FC = () => {
         setValue("directionId", targetUser.directionId?.toString() || "");
         setValue("divisionId", targetUser.divisionId?.toString() || "");
         setValue("serviceId", targetUser.serviceId?.toString() || "");
+        console.log(targetUser.serviceId);
 
         const matchingRole = roles.find((r) => r.name === targetUser.role);
         setValue("roleId", matchingRole ? matchingRole.id.toString() : "");

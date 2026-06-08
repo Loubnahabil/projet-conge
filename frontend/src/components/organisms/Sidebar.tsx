@@ -22,22 +22,22 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   // ── Admin Dashboard ────────────────────────────────────────────────────────
-  // FIXED: Changed from "all" to ["ADMIN"] to perfectly match Spring Security
   { text: "Tableau de Bord", path: "/dashboard", roles: ["ADMIN"] },
 
   // ── Fonctionnaire Roles ────────────────────────────────────────────────────
+  { text: "Tableau de Bord", path: "/fonctionnaire/dashboard", roles: ["FONCTIONNAIRE"] },
   { text: "Mes Demandes", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
 
   // ── Chef roles ────────────────────────────────────────────────────────────
   {
-    text: "Demandes à viser",
+    text: "Tableau de Bord",
     path: "/chef/demandes",
     roles: ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"],
   },
 
   // ── Signataire ────────────────────────────────────────────────────────────
   {
-    text: "Demandes à signer",
+    text: "Tableau de Bord",
     path: "/signataire/demandes",
     roles: ["SIGNATAIRE"],
   },
