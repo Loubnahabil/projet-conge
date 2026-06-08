@@ -94,7 +94,10 @@ export const DemandeDetail = ({
               spacing={1}
               sx={{ mt: 0.5, alignItems: "center" }}
             >
-              <StatusChip statut={selectedDemande.statut} sx={{ fontWeight: 700 }} />
+              <StatusChip
+                statut={selectedDemande.statut}
+                sx={{ fontWeight: 700 }}
+              />
               <Typography variant="caption" color="textSecondary">
                 En attente de traitement par le circuit administratif
               </Typography>
@@ -119,28 +122,29 @@ export const DemandeDetail = ({
       <Grid container spacing={4}>
         {/* Left Card: Summary */}
         <Grid size={{ xs: 12, md: 7 }}>
-          {selectedDemande.piecesJustificatives && selectedDemande.piecesJustificatives.length > 0 && (
-            <Paper
-              variant="outlined"
-              sx={{ p: 3, borderRadius: "12px", mb: 3 }}
-            >
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
+          {selectedDemande.piecesJustificatives &&
+            selectedDemande.piecesJustificatives.length > 0 && (
+              <Paper
+                variant="outlined"
+                sx={{ p: 3, borderRadius: "12px", mb: 3 }}
               >
-                DOCUMENTS SIGNÉS
-              </Typography>
-              <Stack spacing={1}>
-                {selectedDemande.piecesJustificatives.map((piece) => (
-                  <DocumentFileLink
-                    key={piece.id}
-                    nomFichier={piece.nomFichier}
-                    onClick={() => handleOpenPiece(piece.id)}
-                  />
-                ))}
-              </Stack>
-            </Paper>
-          )}
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
+                >
+                  DOCUMENTS SIGNÉS
+                </Typography>
+                <Stack spacing={1}>
+                  {selectedDemande.piecesJustificatives.map((piece) => (
+                    <DocumentFileLink
+                      key={piece.id}
+                      nomFichier={piece.nomFichier}
+                      onClick={() => handleOpenPiece(piece.id)}
+                    />
+                  ))}
+                </Stack>
+              </Paper>
+            )}
           <Paper
             variant="outlined"
             sx={{ p: 3, borderRadius: "12px", bgcolor: "#f8fafc" }}
@@ -287,20 +291,17 @@ export const DemandeDetail = ({
                         sx={{
                           mt: 0.5,
                           p: 1,
-                          bgcolor:
-                            log.statutAction?.startsWith("REJETEE")
-                              ? "#fef2f2"
-                              : "#f8fafc",
+                          bgcolor: log.statutAction?.startsWith("REJETEE")
+                            ? "#fef2f2"
+                            : "#f8fafc",
                           borderRadius: "6px",
                           border: "1px solid",
-                          borderColor:
-                            log.statutAction?.startsWith("REJETEE")
-                              ? "#fecaca"
-                              : "#e2e8f0",
-                          color:
-                            log.statutAction?.startsWith("REJETEE")
-                              ? "#991b1b"
-                              : "#475569",
+                          borderColor: log.statutAction?.startsWith("REJETEE")
+                            ? "#fecaca"
+                            : "#e2e8f0",
+                          color: log.statutAction?.startsWith("REJETEE")
+                            ? "#991b1b"
+                            : "#475569",
                           fontSize: "0.8rem",
                         }}
                       >

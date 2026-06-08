@@ -1,4 +1,4 @@
-import { Chip, type ChipProps } from "@mui/material";
+import { Chip, type ChipProps, type SxProps, type Theme } from "@mui/material";
 
 export const STATUT_CONFIG: Record<
   string,
@@ -16,12 +16,13 @@ export const STATUT_CONFIG: Record<
 interface StatusChipProps {
   statut: string;
   size?: "small" | "medium";
+  sx?: SxProps<Theme>;
 }
 
-export const StatusChip = ({ statut, size = "small" }: StatusChipProps) => {
+export const StatusChip = ({ statut, size = "small", sx }: StatusChipProps) => {
   const config = STATUT_CONFIG[statut] || {
     label: statut,
     color: "default" as const,
   };
-  return <Chip label={config.label} color={config.color} size={size} />;
+  return <Chip label={config.label} color={config.color} size={size} sx={sx} />;
 };
