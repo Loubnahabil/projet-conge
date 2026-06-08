@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
-import { PerformanceOverview } from "../../components/organisms/PerformanceOverview";
-import { AnalyticsCharts } from "../../components/organisms/AnalyticsCharts";
-import { fetchDashboardStatsThunk } from "../../store/slices/statsSlice";
-import type { RootState, AppDispatch } from "../../store";
+import { PerformanceOverview } from "@/components/organisms/PerformanceOverview";
+import { AnalyticsCharts } from "@/components/organisms/AnalyticsCharts";
+import { fetchDashboardStatsThunk } from "@/store/slices/statsSlice";
+import type { RootState, AppDispatch } from "@/store";
 
 export const AdminDashboardPage = () => {
   const dispatch = useDispatch<AppDispatch>();

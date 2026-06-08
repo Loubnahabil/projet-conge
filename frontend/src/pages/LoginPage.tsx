@@ -1,10 +1,10 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginThunk } from "../store/slices/authSlice";
-import { LoginForm } from "../components/organisms/LoginForm"; // Importing our complete organism!
-import type { AppDispatch, RootState } from "../store/index";
-import type { LoginRequest } from "../types/auth.types";
+import { loginThunk } from "@/store/slices/authSlice";
+import { LoginForm } from "@/components/organisms/LoginForm"; // Importing our complete organism!
+import type { AppDispatch, RootState } from "@/store/index";
+import type { LoginRequest } from "@/types/auth.types";
 
 const LoginPage = () => {
   // Grab the global loading/error state from our Redux store

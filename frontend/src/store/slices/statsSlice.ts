@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { statsApi } from "../../api/Statsapi";
-import type { DashboardStatsResponse } from "../../types/Stats.types";
+import { statsApi } from "@/api/Statsapi";
+import type { DashboardStatsResponse } from "@/types/Stats.types";
 
 interface StatsState {
   data: DashboardStatsResponse | null;

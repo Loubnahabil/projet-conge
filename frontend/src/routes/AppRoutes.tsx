@@ -4,21 +4,21 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
-import type { RootState } from "../store/index";
-import LoginPage from "../pages/LoginPage";
-import { MainLayout } from "../components/templates/MainLayout";
-import PrivateRoute from "./PrivateRoute";
-import { StructurePage } from "../pages/Admin/StructurePage";
-import { JourFeriePage } from "../pages/Admin/JourFeriePage";
-import { UserPage } from "../pages/Admin/UserPage";
-import QuotaManagementPage from "../pages/Admin/QuotaManagementPage";
-import { MesDemandePage } from "../pages/MesDemandePage";
-import ChefDashboardPage from "../pages/Chefdashboardpage";
-import SignatairePage from "../pages/Signatairepage";
-import AdminDashboardPage from "../pages/Admin/Admindashboardpage";
-import FonctionnaireDashboardPage from "../pages/FonctionnaireDashboardPage";
-import AuditPage from "../pages/Admin/Auditpage";
-import { ProfilePage } from "../pages/ProfilePage";
+import type { RootState } from "@/store/index";
+import LoginPage from "@/pages/LoginPage";
+import { MainLayout } from "@/components/templates/MainLayout";
+import PrivateRoute from "@/routes/PrivateRoute";
+import { StructurePage } from "@/pages/Admin/StructurePage";
+import { JourFeriePage } from "@/pages/Admin/JourFeriePage";
+import { UserPage } from "@/pages/Admin/UserPage";
+import QuotaManagementPage from "@/pages/Admin/QuotaManagementPage";
+import { MesDemandePage } from "@/pages/MesDemandePage";
+import ChefDashboardPage from "@/pages/Chefdashboardpage";
+import SignatairePage from "@/pages/Signatairepage";
+import AdminDashboardPage from "@/pages/Admin/Admindashboardpage";
+import FonctionnaireDashboardPage from "@/pages/FonctionnaireDashboardPage";
+import AuditPage from "@/pages/Admin/Auditpage";
+import { ProfilePage } from "@/pages/ProfilePage";
 
 // ── Role guards ───────────────────────────────────────────────────────────────
 

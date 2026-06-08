@@ -1,10 +1,10 @@
-import { axiosInstance } from "./axiosInstance";
+import { axiosInstance } from "@/api/axiosInstance";
 import type {
   DashboardStatsResponse,
   FonctionnaireDashboardStats,
   ChefDashboardStats,
   SignataireDashboardStats,
-} from "../types/Stats.types";
+} from "@/types/Stats.types";
 
 export const statsApi = {
   getDashboard: async (): Promise<DashboardStatsResponse> => {

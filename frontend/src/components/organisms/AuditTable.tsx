@@ -20,8 +20,8 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import HistoryIcon from "@mui/icons-material/History";
-import { StatusChip } from "../atoms/StatusChip";
-import type { RootState } from "../../store";
+import { StatusChip } from "@/components/atoms/StatusChip";
+import type { RootState } from "@/store";
 
 // ⚡ Using standard MUI color variants exactly like your Demande configuration setup
 const STATUT_CONFIG: Record<

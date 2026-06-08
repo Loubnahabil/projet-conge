@@ -1,60 +1,95 @@
 package com.example.backend.service;
 
 import com.example.backend.entity.Demande;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.properties.UnitValue;
+import com.example.backend.entity.StatutDemande;
+import com.example.backend.entity.TypeConge;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class PdfGenerationService {
 
+    private static final Logger log = LoggerFactory.getLogger(PdfGenerationService.class);
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    private final Configuration freemarkerConfig;
+
     public byte[] generateDemandePdf(Demande demande) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            Template template = freemarkerConfig.getTemplate("decision-conge.ftl");
 
-        PdfWriter writer = new PdfWriter(out);
-        PdfDocument pdf = new PdfDocument(writer);
-        Document document = new Document(pdf);
+            Map<String, Object> model = new HashMap<>();
+            model.put("demande", demande);
+            model.put("typeCongeLibelle", getTypeCongeLibelle(demande.getTypeConge()));
+            model.put("dateDemande", safeFormat(demande.getDateDemande()));
+            model.put("dateDebut", safeFormat(demande.getDateDebut()));
+            model.put("dateFin", safeFormat(demande.getDateFin()));
 
-        // Title
-        document.add(new Paragraph("DÉCISION DE CONGÉ")
-                .setBold().setFontSize(18).setMarginBottom(20));
+            LocalDateTime visaChef = getDateVisaChef(demande);
+            model.put("dateVisaChef", visaChef != null ? visaChef.format(DATE_FMT) : "__/__/____");
+            model.put("today", LocalDate.now().format(DATE_FMT));
 
-        // Info table
-        Table table = new Table(UnitValue.createPercentArray(new float[]{40, 60}))
-                .useAllAvailableWidth();
+            String directionNom = null;
+            if (demande.getUser().getService() != null
+                    && demande.getUser().getService().getDivision() != null
+                    && demande.getUser().getService().getDivision().getDirection() != null) {
+                directionNom = demande.getUser().getService().getDivision().getDirection().getNom();
+            }
+            model.put("directionNom", directionNom);
 
-        addRow(table, "N° Demande", String.valueOf(demande.getId()));
-        addRow(table, "Fonctionnaire", demande.getUser().getNom() + " " + demande.getUser().getPrenom());
-        addRow(table, "Service", demande.getUser().getService() != null ? demande.getUser().getService().getNom() : "-");
-        addRow(table, "Intérimaire", demande.getInterim().getNom() + " " + demande.getInterim().getPrenom());
-        addRow(table, "Type de congé", demande.getTypeConge().name());
-        addRow(table, "Date début", demande.getDateDebut().toString());
-        addRow(table, "Date fin", demande.getDateFin().toString());
-        addRow(table, "Durée (jours ouvrables)", String.valueOf(demande.getDuree()));
-        addRow(table, "Date de demande", demande.getDateDemande().toString());
-        addRow(table, "Statut", demande.getStatut().name());
+            String userService = demande.getUser().getService() != null
+                    ? demande.getUser().getService().getNom() : "-";
+            model.put("userService", userService);
 
-        document.add(table);
+            StringWriter sw = new StringWriter();
+            template.process(model, sw);
+            String html = sw.toString();
 
-        // Signature zone
-        document.add(new Paragraph("\n\n"));
-        document.add(new Paragraph("Signature du Directeur :").setMarginTop(40));
-        document.add(new Paragraph("_______________________________"));
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(html);
+            renderer.layout();
+            renderer.createPDF(baos);
 
-        document.close();
-
-        return out.toByteArray();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            log.error("Erreur lors de la génération du PDF pour la demande {}", demande.getId(), e);
+            throw new RuntimeException("Erreur lors de la génération du PDF", e);
+        }
     }
 
-    private void addRow(Table table, String label, String value) {
-        table.addCell(new Cell().add(new Paragraph(label).setBold()));
-        table.addCell(new Cell().add(new Paragraph(value)));
+    private String safeFormat(LocalDate date) {
+        return date != null ? date.format(DATE_FMT) : "__/__/____";
+    }
+
+    private String getTypeCongeLibelle(TypeConge typeConge) {
+        return switch (typeConge) {
+            case ANNUEL -> "Annuel";
+            case MALADIE -> "Maladie";
+        };
+    }
+
+    private LocalDateTime getDateVisaChef(Demande demande) {
+        if (demande.getHistoriques() == null) return null;
+        return demande.getHistoriques().stream()
+                .filter(h -> h.getStatutAction() == StatutDemande.VISEE_CHEF)
+                .findFirst()
+                .map(h -> h.getDateAction())
+                .orElse(null);
     }
 }

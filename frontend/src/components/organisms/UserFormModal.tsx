@@ -13,12 +13,12 @@ import {
   Alert,
   Typography,
 } from "@mui/material";
-import { FormInput } from "../molecules/FormInput";
-import { AppButton } from "../atoms/AppButton";
-import type { RootState, AppDispatch } from "../../store";
-import { closePopup, saveUserThunk } from "../../store/slices/userSlice";
-import { userValidationSchema } from "../../validations/userSchema";
-import type { UserRequestDTO } from "../../types/user.types";
+import { FormInput } from "@/components/molecules/FormInput";
+import { AppButton } from "@/components/atoms/AppButton";
+import type { RootState, AppDispatch } from "@/store";
+import { closePopup, saveUserThunk } from "@/store/slices/userSlice";
+import { userValidationSchema } from "@/validations/userSchema";
+import type { UserRequestDTO } from "@/types/user.types";
 
 interface UserFormInputs {
   nom: string;

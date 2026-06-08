@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { jourFerieApi } from "../../api/jourFerieApi";
-import type { JourFerieResponseDTO } from "../../types/jourFerie.types";
+import { jourFerieApi } from "@/api/jourFerieApi";
+import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
 
 interface JourFerieState {
   list: JourFerieResponseDTO[];

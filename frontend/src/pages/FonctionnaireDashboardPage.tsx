@@ -8,11 +8,11 @@ import {
   Alert,
   Paper,
 } from "@mui/material";
-import { LoadingSpinner } from "../components/atoms/LoadingSpinner";
-import { EmptyState } from "../components/atoms/EmptyState";
-import { statsApi } from "../api/Statsapi";
-import { StatCard } from "../components/molecules/StatCard";
-import type { FonctionnaireDashboardStats } from "../types/Stats.types";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { EmptyState } from "@/components/atoms/EmptyState";
+import { statsApi } from "@/api/Statsapi";
+import { StatCard } from "@/components/molecules/StatCard";
+import type { FonctionnaireDashboardStats } from "@/types/Stats.types";
 
 const FonctionnaireDashboardPage = () => {
   const navigate = useNavigate();

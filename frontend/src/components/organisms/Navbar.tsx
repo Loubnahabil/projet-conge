@@ -10,9 +10,9 @@ import {
 import { AccountCircle } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../../store/slices/authSlice";
-import authApi from "../../api/authApi";
-import type { RootState, AppDispatch } from "../../store";
+import { logout } from "@/store/slices/authSlice";
+import authApi from "@/api/authApi";
+import type { RootState, AppDispatch } from "@/store";
 
 export const Navbar = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -12,9 +12,9 @@ import {
   Button,
 } from "@mui/material";
 
-import { DemandeTable } from "../components/organisms/DemandeTable";
-import { DemandeForm } from "../components/organisms/DemandeForm";
-import { DemandeDetail } from "../components/organisms/DemandeDetail";
+import { DemandeTable } from "@/components/organisms/DemandeTable";
+import { DemandeForm } from "@/components/organisms/DemandeForm";
+import { DemandeDetail } from "@/components/organisms/DemandeDetail";
 import {
   fetchMyDemandesThunk,
   fetchEligibleInterimsThunk,
@@ -25,14 +25,14 @@ import {
   fetchDemandeHistoryThunk,
   clearDemandeError,
   clearSelectedHistory,
-} from "../store/slices/demandeSlice";
-import { demandeApi } from "../api/demandeApi";
-import type { AppDispatch, RootState } from "../store";
+} from "@/store/slices/demandeSlice";
+import { demandeApi } from "@/api/demandeApi";
+import type { AppDispatch, RootState } from "@/store";
 import type {
   DemandeResponse,
   DemandeRequest,
   TypeConge,
-} from "../types/Demande.types";
+} from "@/types/Demande.types";
 
 interface FormInputs {
   dateDebut: string;
@@ -56,17 +56,21 @@ const statutConfig: Record<
 
 export const MesDemandePage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { demandes, interims, loading, actionLoading, error, selectedHistory } =
+  const { demandes, interims, actionLoading, error, selectedHistory } =
     useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
-  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(null);
+  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(
+    null,
+  );
   const [selectedDemande, setSelectedDemande] =
     useState<DemandeResponse | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(null);
+  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     dispatch(fetchMyDemandesThunk());
@@ -142,7 +146,7 @@ export const MesDemandePage = () => {
 
       dispatch(fetchMyDemandesThunk());
       setView("LIST");
-    } catch (err: unknown) {
+    } catch {
       // error already in Redux state
     }
   };

@@ -1,9 +1,9 @@
-import { axiosInstance } from "./axiosInstance";
+import { axiosInstance } from "@/api/axiosInstance";
 import type {
   DirectionResponseDTO,
   DivisionResponseDTO,
   ServiceResponseDTO,
-} from "../types/structure.types";
+} from "@/types/structure.types";
 import type { AxiosResponse } from "axios";
 
 export const structureApi = {

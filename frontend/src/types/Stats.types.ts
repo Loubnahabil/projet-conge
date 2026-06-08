@@ -55,4 +55,4 @@ export interface SignataireDashboardStats {
   demandesRecentes: DemandeResponse[];
 }
 
-import type { DemandeResponse } from "./Demande.types";
+import type { DemandeResponse } from "@/types/Demande.types";

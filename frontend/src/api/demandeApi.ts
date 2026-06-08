@@ -1,7 +1,7 @@
-import { axiosInstance } from "./axiosInstance";
-import type { DemandeResponse, DemandeRequest } from "../types/Demande.types";
-import type { UserResponseDTO } from "../types/user.types";
-import type { HistoryRecord } from "../types/Demande.types";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { DemandeResponse, DemandeRequest } from "@/types/Demande.types";
+import type { UserResponseDTO } from "@/types/user.types";
+import type { HistoryRecord } from "@/types/Demande.types";
 
 export type UploadResponse = {
   id: number;

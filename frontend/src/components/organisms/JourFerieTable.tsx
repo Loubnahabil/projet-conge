@@ -18,12 +18,12 @@ import {
   Button,
 } from "@mui/material";
 import { Edit, Delete, EventNote } from "@mui/icons-material";
-import type { RootState, AppDispatch } from "../../store";
+import type { RootState, AppDispatch } from "@/store";
 import {
   deleteHolidayThunk,
   openHolidayPopup,
-} from "../../store/slices/jourFerieSlice";
-import type { JourFerieResponseDTO } from "../../types/jourFerie.types";
+} from "@/store/slices/jourFerieSlice";
+import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
 
 export const JourFerieTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,6 +1,6 @@
 // src/api/AuditApi.ts
-import { axiosInstance } from "./axiosInstance"; // use whatever your axios file is called
-import type { DemandeHistoriqueDTO } from "../types/Audit.types";
+import { axiosInstance } from "@/api/axiosInstance"; // use whatever your axios file is called
+import type { DemandeHistoriqueDTO } from "@/types/Audit.types";
 
 export const auditApi = {
   getJournalAudit: (): Promise<DemandeHistoriqueDTO[]> =>

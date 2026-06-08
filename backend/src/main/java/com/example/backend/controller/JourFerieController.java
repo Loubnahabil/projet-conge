@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/jours-feries")
+@RequestMapping("/jours-feries")
 @RequiredArgsConstructor
 public class JourFerieController {
 

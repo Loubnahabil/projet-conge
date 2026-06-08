@@ -13,12 +13,12 @@ import {
 import { ArrowBack } from "@mui/icons-material";
 import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { AppButton } from "../atoms/AppButton";
-import { FormInput } from "../molecules/FormInput";
-import { demandeValidationSchema } from "../../validations/demandeSchema";
-import type { DemandeResponse } from "../../types/Demande.types";
-import type { UserResponseDTO } from "../../types/user.types";
-import { FileUploadField } from "../molecules/FileUploadField";
+import { AppButton } from "@/components/atoms/AppButton";
+import { FormInput } from "@/components/molecules/FormInput";
+import { demandeValidationSchema } from "@/validations/demandeSchema";
+import type { DemandeResponse } from "@/types/Demande.types";
+import type { UserResponseDTO } from "@/types/user.types";
+import { FileUploadField } from "@/components/molecules/FileUploadField";
 
 interface FormInputs {
   dateDebut: string;

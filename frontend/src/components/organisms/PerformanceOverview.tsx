@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Grid, Skeleton } from "@mui/material";
-import { StatCard } from "../molecules/StatCard";
-import type { RootState } from "../../store";
+import { StatCard } from "@/components/molecules/StatCard";
+import type { RootState } from "@/store";
 
 export const PerformanceOverview = () => {
   const { data: stats, loading } = useSelector(

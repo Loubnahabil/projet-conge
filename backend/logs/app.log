@@ -1,0 +1,51 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.example:backend >-------------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.6:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] Copying 14 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 95 source files with javac [debug parameters release 17] to target\classes
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/entity/User.java:[47,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/entity/User.java:[59,23] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/entity/User.java:[62,35] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/ServiceMapper.java:[18,19] Unmapped target properties: "id, division".
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/DivisionMapper.java:[18,14] Unmapped target properties: "id, direction, services".
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/JourFerieMapper.java:[16,15] Unmapped target property: "id".
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/DirectionMapper.java:[14,15] Unmapped target properties: "id, divisions".
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/DemandeMapper.java:[14,13] Unmapped target properties: "id, user, dateDemande, duree, statut, piecesJustificatives, historiques".
+[WARNING] /C:/Users/Lenovo/Desktop/Projet_conge/backend/src/main/java/com/example/backend/mapper/DemandeMapper.java:[23,24] Unmapped target property: "demandeId". Mapping from Collection element "PieceJustificative piecesJustificatives" to "PieceJustificativeResponseDTO piecesJustificatives".
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Lenovo\Desktop\Projet_conge\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ backend ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:4.0.6:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.6:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.6)
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------

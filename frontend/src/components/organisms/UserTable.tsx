@@ -15,15 +15,15 @@ import {
   TablePagination,
 } from "@mui/material";
 import { Edit, Person } from "@mui/icons-material";
-import type { RootState } from "../../store";
-import type { AppDispatch } from "../../store";
+import type { RootState } from "@/store";
+import type { AppDispatch } from "@/store";
 import {
   setPagination,
   fetchUsersListThunk,
   toggleUserStatusThunk,
   openPopup,
-} from "../../store/slices/userSlice";
-import type { UserResponseDTO } from "../../types/user.types";
+} from "@/store/slices/userSlice";
+import type { UserResponseDTO } from "@/types/user.types";
 
 export const UserTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

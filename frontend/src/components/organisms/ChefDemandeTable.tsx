@@ -12,10 +12,10 @@ import {
   Stack,
 } from "@mui/material";
 import { CheckCircle, Cancel, Visibility } from "@mui/icons-material";
-import { StatusChip } from "../atoms/StatusChip";
-import { TypeCongeChip } from "../atoms/TypeCongeChip";
-import { EmptyState } from "../atoms/EmptyState";
-import type { DemandeResponse } from "../../types/Demande.types";
+import { StatusChip } from "@/components/atoms/StatusChip";
+import { TypeCongeChip } from "@/components/atoms/TypeCongeChip";
+import { EmptyState } from "@/components/atoms/EmptyState";
+import type { DemandeResponse } from "@/types/Demande.types";
 
 interface ChefDemandeTableProps {
   data: DemandeResponse[];

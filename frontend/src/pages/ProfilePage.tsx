@@ -12,12 +12,12 @@ import {
 } from "@mui/material";
 import { Person, Lock, Badge } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
-import type { RootState, AppDispatch } from "../store";
-import { userApi } from "../api/userApi";
-import { AppButton } from "../components/atoms/AppButton";
-import { logout } from "../store/slices/authSlice";
+import type { RootState, AppDispatch } from "@/store";
+import { userApi } from "@/api/userApi";
+import { AppButton } from "@/components/atoms/AppButton";
+import { logout } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import type { UserResponseDTO } from "../types/user.types";
+import type { UserResponseDTO } from "@/types/user.types";
 
 export const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();

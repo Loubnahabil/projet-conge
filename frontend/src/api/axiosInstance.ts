@@ -1,6 +1,6 @@
 import axios from "axios";
-import { logout, updateTokens } from "../store/slices/authSlice";
-import type { AppStore } from "../store/index";
+import { logout, updateTokens } from "@/store/slices/authSlice";
+import type { AppStore } from "@/store/index";
 
 let store: AppStore | undefined;
 

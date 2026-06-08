@@ -9,13 +9,13 @@ import {
   Alert,
 } from "@mui/material";
 
-import { AppButton } from "../atoms/AppButton";
+import { AppButton } from "@/components/atoms/AppButton";
 
 interface SignataireDecisionModalProps {
   open: boolean;
   error: string | null;
   actionLoading: boolean;
-  onCancel: () => void;
+  onClose: () => void;
   onConfirm: (commentaire: string) => void;
 }
 
@@ -23,7 +23,7 @@ export const SignataireDecisionModal = ({
   open,
   error: externalError,
   actionLoading,
-  onCancel,
+  onClose,
   onConfirm,
 }: SignataireDecisionModalProps) => {
   const [commentaire, setCommentaire] = useState("");
@@ -41,7 +41,7 @@ export const SignataireDecisionModal = ({
   };
 
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
         Confirmer le rejet — Direction
       </DialogTitle>
@@ -69,7 +69,7 @@ export const SignataireDecisionModal = ({
         <AppButton
           text="Annuler"
           variant="outlined"
-          onClick={onCancel}
+          onClick={onClose}
           disabled={actionLoading}
         />
 
