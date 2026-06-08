@@ -6,7 +6,6 @@ import {
   Paper,
   TextField,
   InputAdornment,
-  Chip,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +20,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import HistoryIcon from "@mui/icons-material/History";
+import { StatusChip } from "../atoms/StatusChip";
 import type { RootState } from "../../store";
 
 // ⚡ Using standard MUI color variants exactly like your Demande configuration setup
@@ -229,9 +229,6 @@ export const AuditTable = () => {
               </TableRow>
             ) : (
               paginated.map((entry) => {
-                // ⚡ Pulling standard config directly
-                const config = STATUT_CONFIG[entry.statutAction];
-
                 return (
                   <TableRow
                     key={entry.id}
@@ -276,12 +273,7 @@ export const AuditTable = () => {
                     </TableCell>
 
                     <TableCell>
-                      {/* ⚡ Replaced custom sx values with your exact clean native chip system */}
-                      <Chip
-                        label={config?.label ?? entry.statutAction}
-                        color={config?.color ?? "default"}
-                        size="small"
-                      />
+                      <StatusChip statut={entry.statutAction} />
                     </TableCell>
 
                     <TableCell sx={{ maxWidth: 260 }}>

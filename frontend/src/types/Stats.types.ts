@@ -27,3 +27,32 @@ export interface DashboardStatsResponse {
   parDirection: DirectionStatDTO[];
   parMois: MoisStatDTO[];
 }
+
+export interface FonctionnaireDashboardStats {
+  quotaAlloue: number;
+  quotaUtilise: number;
+  quotaRestant: number;
+  totalDemandes: number;
+  enAttenteVisa: number;
+  approuvees: number;
+  rejetees: number;
+  demandesRecentes: DemandeResponse[];
+}
+
+export interface ChefDashboardStats {
+  enAttenteVisa: number;
+  totalTraitees: number;
+  approuvees: number;
+  rejetees: number;
+  demandesRecentes: DemandeResponse[];
+}
+
+export interface SignataireDashboardStats {
+  enAttenteSignature: number;
+  totalTraitees: number;
+  signees: number;
+  rejetees: number;
+  demandesRecentes: DemandeResponse[];
+}
+
+import type { DemandeResponse } from "./Demande.types";

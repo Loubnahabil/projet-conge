@@ -4,9 +4,12 @@ import type { UserResponseDTO } from "../types/user.types";
 import type { HistoryRecord } from "../types/Demande.types";
 
 export type UploadResponse = {
-  message: string;
-  success: boolean;
-  fileUrl?: string;
+  id: number;
+  demandeId: number;
+  nomFichier: string;
+  urlFichier: string;
+  typeDocument: string;
+  dateUpload: string;
 };
 
 export const demandeApi = {

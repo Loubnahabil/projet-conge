@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
+import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
 import { AppButton } from "../../components/atoms/AppButton";
 import { JourFerieTable } from "../../components/organisms/JourFerieTable";
 import { JourFerieFormModal } from "../../components/organisms/JourFerieFormModal";
@@ -30,7 +31,7 @@ export const JourFeriePage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }

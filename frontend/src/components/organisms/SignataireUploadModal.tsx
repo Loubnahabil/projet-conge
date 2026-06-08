@@ -8,7 +8,7 @@ import {
   Alert,
 } from "@mui/material";
 import { AppButton } from "../atoms/AppButton";
-import { FileUploadField } from "../atoms/FileUploadField";
+import { FileUploadField } from "../molecules/FileUploadField";
 
 interface SignataireUploadModalProps {
   open: boolean;

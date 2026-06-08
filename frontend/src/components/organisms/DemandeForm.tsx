@@ -18,7 +18,7 @@ import { FormInput } from "../molecules/FormInput";
 import { demandeValidationSchema } from "../../validations/demandeSchema";
 import type { DemandeResponse } from "../../types/Demande.types";
 import type { UserResponseDTO } from "../../types/user.types";
-import { FileUploadField } from "../atoms/FileUploadField";
+import { FileUploadField } from "../molecules/FileUploadField";
 
 interface FormInputs {
   dateDebut: string;
@@ -58,6 +58,7 @@ export const DemandeForm = ({
   fileError,
   onFileChange,
 }: DemandeFormProps) => {
+  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
   const {
     register,
     handleSubmit,
@@ -133,7 +134,6 @@ export const DemandeForm = ({
             label="Type de congé *"
             size="small"
             fullWidth
-            defaultValue=""
             {...register("typeConge")}
             error={!!errors.typeConge}
             helperText={errors.typeConge?.message}
@@ -176,7 +176,6 @@ export const DemandeForm = ({
             label="Intérimaire (Collègues du même service) *"
             size="small"
             fullWidth
-            defaultValue=""
             {...register("interimId")}
             error={!!errors.interimId}
             helperText={errors.interimId?.message}
@@ -201,7 +200,7 @@ export const DemandeForm = ({
             )}
           </Typography>
 
-          <FileUploadField error={fileError} onChange={onFileChange} />
+          <FileUploadField error={fileError} existingFileName={existingFileName} onChange={onFileChange} />
         </Grid>
       </Grid>
 

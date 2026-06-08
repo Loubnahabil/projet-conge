@@ -11,6 +11,7 @@ interface FileUploadFieldProps {
   accept?: string;
   error?: string | null;
   required?: boolean;
+  existingFileName?: string | null;
   onChange: (file: File | null) => void;
 }
 
@@ -20,6 +21,7 @@ const ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
 export const FileUploadField = ({
   accept = ".pdf,.jpg,.jpeg,.png",
   error,
+  existingFileName,
   onChange,
 }: FileUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -95,7 +97,7 @@ export const FileUploadField = ({
       />
 
       {/* Zone de drop / sélection */}
-      {!file && (
+      {!file && !existingFileName && (
         <Box
           onClick={() => inputRef.current?.click()}
           sx={{
@@ -116,6 +118,35 @@ export const FileUploadField = ({
           <Typography variant="caption" sx={{ color: "#94a3b8" }}>
             PDF, PNG, JPG — max 5 Mo
           </Typography>
+        </Box>
+      )}
+
+      {/* Fichier existant (mode édition) */}
+      {!file && existingFileName && (
+        <Box
+          onClick={() => inputRef.current?.click()}
+          sx={{
+            border: "2px dashed #22c55e",
+            borderRadius: "12px",
+            p: 2,
+            bgcolor: "#f0fdf4",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 1.5,
+            transition: "all 0.2s",
+            "&:hover": { bgcolor: "#dcfce7", borderColor: "#16a34a" },
+          }}
+        >
+          <InsertDriveFile sx={{ color: "#22c55e", fontSize: 28 }} />
+          <Box>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: "#166534" }}>
+              {existingFileName}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "#16a34a" }}>
+              Cliquez pour remplacer ce fichier
+            </Typography>
+          </Box>
         </Box>
       )}
 

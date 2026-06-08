@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Paper,
@@ -14,16 +15,24 @@ import {
 import { DemandeTable } from "../components/organisms/DemandeTable";
 import { DemandeForm } from "../components/organisms/DemandeForm";
 import { DemandeDetail } from "../components/organisms/DemandeDetail";
+import {
+  fetchMyDemandesThunk,
+  fetchEligibleInterimsThunk,
+  createDemandeThunk,
+  updateDemandeThunk,
+  soumettreDemandeThunk,
+  annulerDemandeThunk,
+  fetchDemandeHistoryThunk,
+  clearDemandeError,
+  clearSelectedHistory,
+} from "../store/slices/demandeSlice";
 import { demandeApi } from "../api/demandeApi";
-
+import type { AppDispatch, RootState } from "../store";
 import type {
   DemandeResponse,
   DemandeRequest,
-  HistoryRecord,
   TypeConge,
 } from "../types/Demande.types";
-
-import type { UserResponseDTO } from "../types/user.types";
 
 interface FormInputs {
   dateDebut: string;
@@ -46,50 +55,28 @@ const statutConfig: Record<
 };
 
 export const MesDemandePage = () => {
-  const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
-  const [colleagues, setColleagues] = useState<UserResponseDTO[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { demandes, interims, loading, actionLoading, error, selectedHistory } =
+    useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
-  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(
-    null,
-  );
+  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(null);
   const [selectedDemande, setSelectedDemande] =
     useState<DemandeResponse | null>(null);
-  const [demandeHistory, setDemandeHistory] = useState<HistoryRecord[]>([]);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
-
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(
-    null,
-  );
+  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(null);
 
-  // ✅ FIXED useEffect (no useCallback)
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [myDemandes, users] = await Promise.all([
-          demandeApi.getMyDemandes(),
-          demandeApi.getSameServiceColleagues(),
-        ]);
-        setDemandes(myDemandes);
-        setColleagues(users);
-      } catch {
-        setError("Erreur lors du chargement des données.");
-      }
-    };
-
-    load();
-  }, []);
+    dispatch(fetchMyDemandesThunk());
+    dispatch(fetchEligibleInterimsThunk());
+  }, [dispatch]);
 
   const handleOpenCreateForm = () => {
     setEditingDemande(null);
     setSelectedFile(null);
     setFileError(null);
-    setError(null);
     setView("FORM");
   };
 
@@ -97,24 +84,14 @@ export const MesDemandePage = () => {
     setEditingDemande(d);
     setSelectedFile(null);
     setFileError(null);
-    setError(null);
     setView("FORM");
   };
 
   const handleOpenDetailView = async (d: DemandeResponse) => {
     setSelectedDemande(d);
-    setDemandeHistory([]);
-    setActionLoading(true);
     setView("DETAIL");
-
-    try {
-      const history = await demandeApi.getDemandeHistory(d.id);
-      setDemandeHistory(history);
-    } catch {
-      setError("Impossible de charger l'historique de l'état.");
-    } finally {
-      setActionLoading(false);
-    }
+    dispatch(clearSelectedHistory());
+    dispatch(fetchDemandeHistoryThunk(d.id));
   };
 
   const handleFileChange = (file: File | null) => {
@@ -133,24 +110,26 @@ export const MesDemandePage = () => {
       return;
     }
 
-    setActionLoading(true);
-    setError(null);
+    const payload: DemandeRequest = {
+      dateDebut: data.dateDebut,
+      dateFin: data.dateFin,
+      typeConge: data.typeConge as TypeConge,
+      interimId: Number(data.interimId),
+    };
 
     try {
-      const payload: DemandeRequest = {
-        dateDebut: data.dateDebut,
-        dateFin: data.dateFin,
-        typeConge: data.typeConge as TypeConge, // ✅ FIXED
-        interimId: Number(data.interimId),
-      };
-
-      let activeDemandeId = editingDemande?.id || null;
+      let activeDemandeId: number | null = null;
 
       if (editingDemande) {
-        await demandeApi.update(editingDemande.id, payload);
+        const result = await dispatch(
+          updateDemandeThunk({ id: editingDemande.id, payload }),
+        ).unwrap();
+        activeDemandeId = result.id;
       } else {
-        const created = await demandeApi.create(payload, submitInstantly);
-        if (created?.id) activeDemandeId = created.id;
+        const result = await dispatch(
+          createDemandeThunk({ payload, submit: submitInstantly }),
+        ).unwrap();
+        activeDemandeId = result.id;
       }
 
       if (selectedFile && activeDemandeId) {
@@ -161,39 +140,24 @@ export const MesDemandePage = () => {
         );
       }
 
-      setDemandes(await demandeApi.getMyDemandes());
+      dispatch(fetchMyDemandesThunk());
       setView("LIST");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Erreur lors du traitement du congé.";
-      setError(message);
-    } finally {
-      setActionLoading(false);
+      // error already in Redux state
     }
   };
 
   const handleDirectSubmitFromTable = async (demande: DemandeResponse) => {
-    setActionLoading(true);
-    setError(null);
+    if (!demande.interimId) {
+      dispatch(clearDemandeError());
+      return;
+    }
 
     try {
-      if (!demande.interimId) {
-        setError("Un intérimaire valide doit être désigné avant de soumettre.");
-        return;
-      }
-
-      await demandeApi.soumettre(demande.id);
-      setDemandes(await demandeApi.getMyDemandes());
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Impossible de soumettre la demande.";
-      setError(message);
-    } finally {
-      setActionLoading(false);
+      await dispatch(soumettreDemandeThunk(demande.id)).unwrap();
+      dispatch(fetchMyDemandesThunk());
+    } catch {
+      // error in Redux
     }
   };
 
@@ -206,36 +170,30 @@ export const MesDemandePage = () => {
     if (selectedDemandeId === null) return;
 
     setCancelDialogOpen(false);
-    setActionLoading(true);
-    setError(null);
 
     try {
-      await demandeApi.annulerDemande(selectedDemandeId);
-      setDemandes(await demandeApi.getMyDemandes());
-
+      await dispatch(annulerDemandeThunk(selectedDemandeId)).unwrap();
+      dispatch(fetchMyDemandesThunk());
       if (view === "DETAIL") setView("LIST");
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Erreur lors de l'annulation de la demande.";
-      setError(message);
+    } catch {
+      // error in Redux
     } finally {
-      setActionLoading(false);
       setSelectedDemandeId(null);
     }
   };
 
-  const getInterimName = (id?: number) => {
-    if (!id) return "Aucun";
-    const found = colleagues.find((c) => c.id === id);
-    return found ? `${found.nom} ${found.prenom}` : `ID: ${id}`;
-  };
+  const getInterimName = useCallback(
+    (id?: number) => {
+      if (!id) return "Aucun";
+      const found = interims.find((c) => c.id === id);
+      return found ? `${found.nom} ${found.prenom}` : `ID: ${id}`;
+    },
+    [interims],
+  );
 
   const formatDate = (iso: string) => {
     if (!iso) return "—";
     const d = new Date(iso);
-
     return (
       d.toLocaleDateString("fr-MA", {
         day: "2-digit",
@@ -250,11 +208,13 @@ export const MesDemandePage = () => {
     );
   };
 
+  const displayError = error;
+
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
-      {error && (
+      {displayError && (
         <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
+          {displayError}
         </Alert>
       )}
 
@@ -284,7 +244,7 @@ export const MesDemandePage = () => {
           <Box sx={{ p: 4 }}>
             <DemandeForm
               editingDemande={editingDemande}
-              colleagues={colleagues}
+              colleagues={interims}
               actionLoading={actionLoading}
               onCancel={() => setView("LIST")}
               onSaveWorkflow={saveDemandeWorkflow}
@@ -299,7 +259,7 @@ export const MesDemandePage = () => {
           <Box sx={{ p: 4 }}>
             <DemandeDetail
               selectedDemande={selectedDemande}
-              demandeHistory={demandeHistory}
+              demandeHistory={selectedHistory}
               actionLoading={actionLoading}
               statutConfig={statutConfig}
               onBack={() => setView("LIST")}

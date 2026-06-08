@@ -12,13 +12,19 @@ const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // This handles sending the valid credentials to Redux
   const handleLoginSubmit = async (data: LoginRequest) => {
     const result = await dispatch(loginThunk(data));
 
-    // If the server validates the user successfully, push them to the internal system
     if (loginThunk.fulfilled.match(result)) {
-      navigate("/dashboard");
+      const role = result.payload.role;
+      if (role === "ADMIN") navigate("/dashboard");
+      else if (role === "FONCTIONNAIRE") navigate("/fonctionnaire/dashboard");
+      else if (
+        ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"].includes(role)
+      )
+        navigate("/chef/demandes");
+      else if (role === "SIGNATAIRE") navigate("/signataire/demandes");
+      else navigate("/dashboard");
     }
   };
 

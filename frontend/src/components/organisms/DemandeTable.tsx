@@ -7,13 +7,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Chip,
   IconButton,
   Button,
   Stack,
   Tooltip,
 } from "@mui/material";
 import { Edit, Visibility, Cancel, Send } from "@mui/icons-material";
+import { StatusChip } from "../atoms/StatusChip";
+import { EmptyState } from "../atoms/EmptyState";
 import type { DemandeResponse } from "../../types/Demande.types";
 
 interface DemandeTableProps {
@@ -83,12 +84,8 @@ export const DemandeTable = ({
           <TableBody>
             {demandes.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={7}
-                  align="center"
-                  sx={{ py: 3, color: "text.secondary" }}
-                >
-                  Aucune demande trouvée.
+                <TableCell colSpan={7} sx={{ py: 3 }}>
+                  <EmptyState message="Aucune demande trouvée." />
                 </TableCell>
               </TableRow>
             ) : (
@@ -107,11 +104,7 @@ export const DemandeTable = ({
                     <TableCell>{d.dateFin}</TableCell>
                     <TableCell>{d.duree} j</TableCell>
                     <TableCell>
-                      <Chip
-                        label={statutConfig[d.statut]?.label || d.statut}
-                        color={statutConfig[d.statut]?.color || "default"}
-                        size="small"
-                      />
+                      <StatusChip statut={d.statut} />
                     </TableCell>
                     <TableCell align="right" sx={{ pr: 2 }}>
                       <Stack

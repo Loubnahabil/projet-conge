@@ -99,5 +99,36 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
 
     List<Demande> findByDateDebutAndStatut(LocalDate dateDebut, StatutDemande statut);
 
+    List<Demande> findTop5ByUserIdOrderByDateDemandeDesc(Long userId);
+
+    long countByUserIdAndStatut(Long userId, StatutDemande statut);
+
+    @Query("SELECT COUNT(d) FROM Demande d " +
+            "JOIN d.historiques h " +
+            "WHERE h.modifiePar.id = :chefId " +
+            "AND d.statut = :statut")
+    long countByChefIdAndStatut(@Param("chefId") Long chefId, @Param("statut") StatutDemande statut);
+
+    @Query("SELECT d FROM Demande d " +
+            "JOIN d.historiques h " +
+            "WHERE h.modifiePar.id = :chefId " +
+            "AND d.statut IN (" +
+            "  com.example.backend.entity.StatutDemande.VISEE_CHEF, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_CHEF, " +
+            "  com.example.backend.entity.StatutDemande.SIGNEE_DIRECTEUR, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_DIRECTEUR) " +
+            "ORDER BY h.dateAction DESC")
+    List<Demande> findTop5RecentByChefId(@Param("chefId") Long chefId);
+
+    @Query("SELECT d FROM Demande d " +
+            "JOIN d.historiques h " +
+            "WHERE h.modifiePar.id = :signataireId " +
+            "AND d.statut IN (" +
+            "  com.example.backend.entity.StatutDemande.SIGNEE_DIRECTEUR, " +
+            "  com.example.backend.entity.StatutDemande.REJETEE_DIRECTEUR) " +
+            "ORDER BY h.dateAction DESC")
+    List<Demande> findTop5RecentBySignataireId(@Param("signataireId") Long signataireId);
+
+    long countByUserIdAndStatutIn(Long userId, List<StatutDemande> statuts);
 
 }

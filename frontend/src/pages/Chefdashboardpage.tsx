@@ -1,67 +1,61 @@
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Typography,
   Alert,
-  CircularProgress,
   Tabs,
   Tab,
+  Grid,
 } from "@mui/material";
-import { demandeApi } from "../api/demandeApi";
+import { LoadingSpinner } from "../components/atoms/LoadingSpinner";
+import { statsApi } from "../api/Statsapi";
 import { ChefDemandeTable } from "../components/organisms/ChefDemandeTable";
 import { ChefDecisionModal } from "../components/organisms/ChefDecisionModal";
 import { DemandeDetailDrawer } from "../components/organisms/DemandeDetailDrawer";
+import { StatCard } from "../components/molecules/StatCard";
+import {
+  fetchPendingChefVisasThunk,
+  fetchTraiteesChefThunk,
+  visaChefThunk,
+} from "../store/slices/demandeSlice";
+import type { AppDispatch, RootState } from "../store";
 import type { DemandeResponse } from "../types/Demande.types";
+import type { ChefDashboardStats } from "../types/Stats.types";
 
 export const ChefDashboardPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { pendingChefVisas, traiteesChef, chefLoading, actionLoading, error } =
+    useSelector((state: RootState) => state.demande);
+
   const [tab, setTab] = useState(0);
-
-  // Data Store Lists
-  const [demandes, setDemandes] = useState<DemandeResponse[]>([]);
-  const [traitees, setTraitees] = useState<DemandeResponse[]>([]);
-
-  // Loaders
-  const [loadingPending, setLoadingPending] = useState(true);
   const [loadingTraitees, setLoadingTraitees] = useState(false);
   const [traiteesFetched, setTraiteesFetched] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
-
-  // Error States & Interactive Modal Configuration
-  const [error, setError] = useState<string | null>(null);
+  const [dashboardStats, setDashboardStats] =
+    useState<ChefDashboardStats | null>(null);
   const [dialog, setDialog] = useState<{
     open: boolean;
     mode: "approve" | "reject" | null;
     targetId: number | null;
   }>({ open: false, mode: null, targetId: null });
+  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(null);
 
-  // Detail Drawer Target State
-  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(
-    null,
-  );
-
-  // Initial fetch for pending workspace demands
   useEffect(() => {
-    demandeApi
-      .getDemandesAViser()
-      .then(setDemandes)
-      .catch(() => setError("Erreur lors du chargement des demandes à viser."))
-      .finally(() => setLoadingPending(false));
-  }, []);
+    dispatch(fetchPendingChefVisasThunk());
+    statsApi
+      .getChefDashboard()
+      .then(setDashboardStats)
+      .catch(() => {});
+  }, [dispatch]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);
     if (newValue === 1 && !traiteesFetched) {
       setLoadingTraitees(true);
-      demandeApi
-        .getDemandesTraiteesChef()
-        .then(setTraitees)
-        .catch(() =>
-          setError("Erreur lors du chargement des demandes traitées."),
-        )
-        .finally(() => {
-          setLoadingTraitees(false);
-          setTraiteesFetched(true);
-        });
+      dispatch(fetchTraiteesChefThunk()).finally(() => {
+        setLoadingTraitees(false);
+        setTraiteesFetched(true);
+      });
     }
   };
 
@@ -69,44 +63,29 @@ export const ChefDashboardPage = () => {
     mode: "approve" | "reject",
     id: number,
   ) => {
-    setError(null);
     setDialog({ open: true, mode, targetId: id });
   };
 
   const handleExecuteWorkflowAction = async (commentText: string) => {
     if (!dialog.targetId || !dialog.mode) return;
-
-    setActionLoading(true);
-    setError(null);
     try {
-      await demandeApi.visaChef(dialog.targetId, dialog.mode === "approve", {
-        commentaire: commentText || undefined,
-      });
-
-      // Refresh data models seamlessly
-      const updatedPending = await demandeApi.getDemandesAViser();
-      setDemandes(updatedPending);
-
-      // Invalidate the cache of the treated list so it refreshes next time it mounts
+      await dispatch(
+        visaChefThunk({
+          id: dialog.targetId,
+          approve: dialog.mode === "approve",
+          commentaire: commentText || undefined,
+        }),
+      ).unwrap();
       setTraiteesFetched(false);
       setDialog({ open: false, mode: null, targetId: null });
-    } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { error?: string; message?: string } };
-      };
-      setError(
-        e.response?.data?.error ||
-          e.response?.data?.message ||
-          "Erreur lors du traitement.",
-      );
-    } finally {
-      setActionLoading(false);
+    } catch {
+      // error in Redux
     }
   };
 
-  const pendingDemandes = demandes.filter((d) => d.statut === "SOUMISE");
+  const pendingDemandes = pendingChefVisas.filter((d) => d.statut === "SOUMISE");
 
-  if (loadingPending) {
+  if (chefLoading && pendingChefVisas.length === 0) {
     return (
       <Box
         sx={{
@@ -116,7 +95,7 @@ export const ChefDashboardPage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }
@@ -129,6 +108,39 @@ export const ChefDashboardPage = () => {
       >
         Tableau de bord — Chef hiérarchique
       </Typography>
+
+      {dashboardStats && (
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="En attente de visa"
+              value={dashboardStats.enAttenteVisa}
+              sub="Demandes à traiter"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Approuvées"
+              value={dashboardStats.approuvees}
+              sub="Total"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Rejetées"
+              value={dashboardStats.rejetees}
+              sub="Total"
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            <StatCard
+              label="Total traitées"
+              value={dashboardStats.totalTraitees}
+              sub="Toutes périodes"
+            />
+          </Grid>
+        </Grid>
+      )}
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -145,7 +157,6 @@ export const ChefDashboardPage = () => {
         <Tab label="Demandes traitées" />
       </Tabs>
 
-      {/* Tab 0: Pending */}
       {tab === 0 && (
         <ChefDemandeTable
           data={pendingDemandes}
@@ -156,21 +167,19 @@ export const ChefDashboardPage = () => {
         />
       )}
 
-      {/* Tab 1: Treated */}
       {tab === 1 &&
         (loadingTraitees ? (
           <Box sx={{ display: "flex", justifyContent: "center", pt: 6 }}>
-            <CircularProgress />
+            <LoadingSpinner />
           </Box>
         ) : (
           <ChefDemandeTable
-            data={traitees}
+            data={traiteesChef}
             onViewClick={(d) => setDrawerDemande(d)}
             emptyMessage="Aucune demande traitée pour l'instant."
           />
         ))}
 
-      {/* Workflow Execution Decision Popup (Organism) */}
       <ChefDecisionModal
         open={dialog.open}
         mode={dialog.mode}
@@ -180,7 +189,6 @@ export const ChefDashboardPage = () => {
         onConfirm={handleExecuteWorkflowAction}
       />
 
-      {/* Detail Right Side Drawer */}
       <DemandeDetailDrawer
         open={!!drawerDemande}
         demande={drawerDemande}

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, Alert, CircularProgress } from "@mui/material";
+import { Box, Typography, Alert } from "@mui/material";
+import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
 import { OrgNode } from "../../components/molecules/OrgNode";
 import { AppButton } from "../../components/atoms/AppButton";
 import { StructureFormModal } from "../../components/organisms/StructureFormModal";
@@ -45,7 +46,7 @@ export const StructurePage = () => {
           minHeight: "60vh",
         }}
       >
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }
