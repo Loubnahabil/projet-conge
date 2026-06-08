@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { auditApi } from "../../api/AuditApi";
-import type { DemandeHistoriqueDTO } from "../../types/Audit.types";
+import { auditApi } from "@/api/AuditApi";
+import type { DemandeHistoriqueDTO } from "@/types/Audit.types";
 
 interface AuditState {
   entries: DemandeHistoriqueDTO[];

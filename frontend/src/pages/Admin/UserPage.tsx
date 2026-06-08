@@ -2,20 +2,20 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { FileDownload } from "@mui/icons-material";
-import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 
-import { AppButton } from "../../components/atoms/AppButton";
-import { SearchBar } from "../../components/molecules/SearchBar";
-import { UserTable } from "../../components/organisms/UserTable";
-import { UserFormModal } from "../../components/organisms/UserFormModal";
-import { useExportUsers } from "../../hooks/useExportUsers"; // 👈 Ajout du hook d'export
-import type { RootState, AppDispatch } from "../../store";
+import { AppButton } from "@/components/atoms/AppButton";
+import { SearchBar } from "@/components/molecules/SearchBar";
+import { UserTable } from "@/components/organisms/UserTable";
+import { UserFormModal } from "@/components/organisms/UserFormModal";
+import { useExportUsers } from "@/hooks/useExportUsers"; // 👈 Ajout du hook d'export
+import type { RootState, AppDispatch } from "@/store";
 import {
   fetchUsersListThunk,
   setSearchQuery,
   openPopup,
-} from "../../store/slices/userSlice";
-import { fetchStructureDependenciesThunk } from "../../store/slices/structureSlice";
+} from "@/store/slices/userSlice";
+import { fetchStructureDependenciesThunk } from "@/store/slices/structureSlice";
 
 export const UserPage = () => {
   const dispatch = useDispatch<AppDispatch>();

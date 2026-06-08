@@ -8,12 +8,12 @@ import {
   Stack,
 } from "@mui/material";
 import { ArrowBack, Cancel } from "@mui/icons-material";
-import { StatusChip } from "../atoms/StatusChip";
-import { LoadingSpinner } from "../atoms/LoadingSpinner";
-import { EmptyState } from "../atoms/EmptyState";
-import { DocumentFileLink } from "../atoms/DocumentFileLink";
-import { axiosInstance } from "../../api/axiosInstance";
-import type { DemandeResponse, HistoryRecord } from "../../types/Demande.types";
+import { StatusChip } from "@/components/atoms/StatusChip";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { EmptyState } from "@/components/atoms/EmptyState";
+import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { DemandeResponse, HistoryRecord } from "@/types/Demande.types";
 
 interface DemandeDetailProps {
   selectedDemande: DemandeResponse;

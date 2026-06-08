@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { userApi } from "../../api/userApi";
-import type { UserResponseDTO, UserRequestDTO } from "../../types/user.types";
+import { userApi } from "@/api/userApi";
+import type { UserResponseDTO, UserRequestDTO } from "@/types/user.types";
 
 interface UserState {
   list: UserResponseDTO[];

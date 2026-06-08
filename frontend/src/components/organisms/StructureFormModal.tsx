@@ -9,14 +9,14 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FormInput } from "../molecules/FormInput";
-import { AppButton } from "../atoms/AppButton";
-import type { RootState, AppDispatch } from "../../store";
+import { FormInput } from "@/components/molecules/FormInput";
+import { AppButton } from "@/components/atoms/AppButton";
+import type { RootState, AppDispatch } from "@/store";
 import {
   closeStructurePopup,
   saveStructureNodeThunk,
-} from "../../store/slices/structureSlice";
-import { structureValidationSchema } from "../../validations/structureSchema";
+} from "@/store/slices/structureSlice";
+import { structureValidationSchema } from "@/validations/structureSchema";
 
 interface FormInputs {
   nom: string;

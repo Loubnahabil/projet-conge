@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { quotaApi } from "../../api/quotaApi";
-import type { QuotaResponseDTO } from "../../api/quotaApi";
+import { quotaApi } from "@/api/quotaApi";
+import type { QuotaResponseDTO } from "@/api/quotaApi";
 
-import { axiosInstance } from "../../api/axiosInstance";
+import { axiosInstance } from "@/api/axiosInstance";
 
 // 1. Extend the baseline type to handle user info and UI states
 export interface ExtendedQuota extends QuotaResponseDTO {

@@ -1,5 +1,5 @@
-import { axiosInstance } from "./axiosInstance";
-import type { JourFerieResponseDTO } from "../types/jourFerie.types";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
 import type { AxiosResponse } from "axios";
 
 export const jourFerieApi = {

@@ -7,10 +7,10 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
-import { DocumentFileLink } from "../atoms/DocumentFileLink";
-import { EmptyState } from "../atoms/EmptyState";
-import { axiosInstance } from "../../api/axiosInstance";
-import type { DemandeResponse } from "../../types/Demande.types";
+import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
+import { EmptyState } from "@/components/atoms/EmptyState";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { DemandeResponse } from "@/types/Demande.types";
 
 interface Props {
   open: boolean;

@@ -9,15 +9,15 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FormInput } from "../molecules/FormInput";
-import { AppButton } from "../atoms/AppButton";
-import type { RootState, AppDispatch } from "../../store";
+import { FormInput } from "@/components/molecules/FormInput";
+import { AppButton } from "@/components/atoms/AppButton";
+import type { RootState, AppDispatch } from "@/store";
 import {
   createHolidayThunk,
   updateHolidayThunk,
   closeHolidayPopup,
-} from "../../store/slices/jourFerieSlice";
-import { jourFerieValidationSchema } from "../../validations/jourFerieSchema";
+} from "@/store/slices/jourFerieSlice";
+import { jourFerieValidationSchema } from "@/validations/jourFerieSchema";
 
 interface FormInputs {
   date: string;

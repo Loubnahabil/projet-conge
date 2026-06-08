@@ -13,9 +13,9 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Edit, Visibility, Cancel, Send } from "@mui/icons-material";
-import { StatusChip } from "../atoms/StatusChip";
-import { EmptyState } from "../atoms/EmptyState";
-import type { DemandeResponse } from "../../types/Demande.types";
+import { StatusChip } from "@/components/atoms/StatusChip";
+import { EmptyState } from "@/components/atoms/EmptyState";
+import type { DemandeResponse } from "@/types/Demande.types";
 
 interface DemandeTableProps {
   demandes: DemandeResponse[];

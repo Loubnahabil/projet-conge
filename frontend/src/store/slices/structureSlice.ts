@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { structureApi } from "../../api/structureApi";
+import { structureApi } from "@/api/structureApi";
 import type {
   DirectionResponseDTO,
   DivisionResponseDTO,
@@ -8,7 +8,7 @@ import type {
   FullDirection,
   FullDivision,
   FullService,
-} from "../../types/structure.types";
+} from "@/types/structure.types";
 
 interface StructureState {
   directions: DirectionResponseDTO[];

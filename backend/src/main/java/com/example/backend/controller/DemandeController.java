@@ -25,7 +25,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/demandes")
+@RequestMapping("/demandes")
 @RequiredArgsConstructor
 public class DemandeController {
 

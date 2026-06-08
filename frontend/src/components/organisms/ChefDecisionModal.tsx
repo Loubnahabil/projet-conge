@@ -9,7 +9,7 @@ import {
   Alert,
 } from "@mui/material";
 
-import { AppButton } from "../atoms/AppButton";
+import { AppButton } from "@/components/atoms/AppButton";
 
 interface ChefDecisionModalProps {
   open: boolean;

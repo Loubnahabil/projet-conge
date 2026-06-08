@@ -11,8 +11,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { DashboardSection } from "../molecules/DashboardSection";
-import type { RootState } from "../../store";
+import { DashboardSection } from "@/components/molecules/DashboardSection";
+import type { RootState } from "@/store";
 
 export const AnalyticsCharts = () => {
   const { data: stats, loading } = useSelector(

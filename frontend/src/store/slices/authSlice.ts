@@ -3,8 +3,8 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from "@reduxjs/toolkit";
-import authApi from "../../api/authApi";
-import type { AuthState, LoginRequest } from "../../types/auth.types";
+import authApi from "@/api/authApi";
+import type { AuthState, LoginRequest } from "@/types/auth.types";
 import axios from "axios";
 
 // ✅ read from localStorage on page load so refresh doesn't wipe state

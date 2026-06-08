@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
-import { YearSelector } from "../../components/molecules/YearSelector";
-import { QuotaTable } from "../../components/organisms/QuotaTable";
-import type { RootState, AppDispatch } from "../../store";
+import { YearSelector } from "@/components/molecules/YearSelector";
+import { QuotaTable } from "@/components/organisms/QuotaTable";
+import type { RootState, AppDispatch } from "@/store";
 import {
   fetchQuotasMatrixThunk,
   clearFeedback,
-} from "../../store/slices/quotaSlice";
+} from "@/store/slices/quotaSlice";
 
 export default function QuotaManagementPage() {
   const dispatch = useDispatch<AppDispatch>();

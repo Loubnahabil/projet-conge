@@ -8,23 +8,23 @@ import {
   Tab,
   Grid,
 } from "@mui/material";
-import { LoadingSpinner } from "../components/atoms/LoadingSpinner";
-import { statsApi } from "../api/Statsapi";
-import { SignataireDemandeTable } from "../components/organisms/SignataireDemandeTable";
-import { SignataireDecisionModal } from "../components/organisms/SignataireDecisionModal";
-import { SignataireUploadModal } from "../components/organisms/SignataireUploadModal";
-import { DemandeDetailDrawer } from "../components/organisms/DemandeDetailDrawer";
-import { demandeApi } from "../api/demandeApi";
-import { StatCard } from "../components/molecules/StatCard";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { statsApi } from "@/api/Statsapi";
+import { SignataireDemandeTable } from "@/components/organisms/SignataireDemandeTable";
+import { SignataireDecisionModal } from "@/components/organisms/SignataireDecisionModal";
+import { SignataireUploadModal } from "@/components/organisms/SignataireUploadModal";
+import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer";
+import { demandeApi } from "@/api/demandeApi";
+import { StatCard } from "@/components/molecules/StatCard";
 import {
   fetchPendingSignaturesThunk,
   fetchTraiteesSignataireThunk,
   signataireApproveThunk,
   signataireRejectThunk,
-} from "../store/slices/demandeSlice";
-import type { AppDispatch, RootState } from "../store";
-import type { DemandeResponse } from "../types/Demande.types";
-import type { SignataireDashboardStats } from "../types/Stats.types";
+} from "@/store/slices/demandeSlice";
+import type { AppDispatch, RootState } from "@/store";
+import type { DemandeResponse } from "@/types/Demande.types";
+import type { SignataireDashboardStats } from "@/types/Stats.types";
 
 export const SignatairePage = () => {
   const dispatch = useDispatch<AppDispatch>();

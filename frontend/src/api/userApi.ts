@@ -1,11 +1,11 @@
-import { axiosInstance } from "./axiosInstance";
+import { axiosInstance } from "@/api/axiosInstance";
 import type { AxiosResponse } from "axios";
 
 import type {
   UserResponseDTO,
   SpringPageWrapper,
   UserRequestDTO,
-} from "../types/user.types";
+} from "@/types/user.types";
 
 export const userApi = {
   getAll: (search = "", page = 0, size = 10) => {

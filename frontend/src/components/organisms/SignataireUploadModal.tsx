@@ -7,8 +7,8 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { AppButton } from "../atoms/AppButton";
-import { FileUploadField } from "../molecules/FileUploadField";
+import { AppButton } from "@/components/atoms/AppButton";
+import { FileUploadField } from "@/components/molecules/FileUploadField";
 
 interface SignataireUploadModalProps {
   open: boolean;

@@ -2,7 +2,7 @@
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { UserResponseDTO } from "../types/user.types";
+import type { UserResponseDTO } from "@/types/user.types";
 
 // Colonnes à exporter
 const COLUMNS = [

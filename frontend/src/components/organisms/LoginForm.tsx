@@ -1,9 +1,9 @@
 import { Box, Button, CircularProgress, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FormInput } from "../molecules/FormInput"; // Importing our molecule!
-import { loginSchema } from "../../validations/auth.validation";
-import type { LoginRequest } from "../../types/auth.types";
+import { FormInput } from "@/components/molecules/FormInput"; // Importing our molecule!
+import { loginSchema } from "@/validations/auth.validation";
+import type { LoginRequest } from "@/types/auth.types";
 
 interface LoginFormProps {
   onSubmit: (data: LoginRequest) => void; // What to do when validation passes

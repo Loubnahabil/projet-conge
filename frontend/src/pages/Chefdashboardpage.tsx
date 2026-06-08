@@ -8,20 +8,20 @@ import {
   Tab,
   Grid,
 } from "@mui/material";
-import { LoadingSpinner } from "../components/atoms/LoadingSpinner";
-import { statsApi } from "../api/Statsapi";
-import { ChefDemandeTable } from "../components/organisms/ChefDemandeTable";
-import { ChefDecisionModal } from "../components/organisms/ChefDecisionModal";
-import { DemandeDetailDrawer } from "../components/organisms/DemandeDetailDrawer";
-import { StatCard } from "../components/molecules/StatCard";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { statsApi } from "@/api/Statsapi";
+import { ChefDemandeTable } from "@/components/organisms/ChefDemandeTable";
+import { ChefDecisionModal } from "@/components/organisms/ChefDecisionModal";
+import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer";
+import { StatCard } from "@/components/molecules/StatCard";
 import {
   fetchPendingChefVisasThunk,
   fetchTraiteesChefThunk,
   visaChefThunk,
-} from "../store/slices/demandeSlice";
-import type { AppDispatch, RootState } from "../store";
-import type { DemandeResponse } from "../types/Demande.types";
-import type { ChefDashboardStats } from "../types/Stats.types";
+} from "@/store/slices/demandeSlice";
+import type { AppDispatch, RootState } from "@/store";
+import type { DemandeResponse } from "@/types/Demande.types";
+import type { ChefDashboardStats } from "@/types/Stats.types";
 
 export const ChefDashboardPage = () => {
   const dispatch = useDispatch<AppDispatch>();

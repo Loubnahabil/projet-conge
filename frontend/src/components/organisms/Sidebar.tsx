@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import type { RootState } from "../../store";
+import type { RootState } from "@/store";
 
 const DRAWER_WIDTH = 240;
 

@@ -1,21 +1,21 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
-import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
-import { OrgNode } from "../../components/molecules/OrgNode";
-import { AppButton } from "../../components/atoms/AppButton";
-import { StructureFormModal } from "../../components/organisms/StructureFormModal";
-import type { RootState, AppDispatch } from "../../store";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { OrgNode } from "@/components/molecules/OrgNode";
+import { AppButton } from "@/components/atoms/AppButton";
+import { StructureFormModal } from "@/components/organisms/StructureFormModal";
+import type { RootState, AppDispatch } from "@/store";
 import {
   fetchStructureDependenciesThunk,
   deleteStructureNodeThunk,
   openStructurePopup,
-} from "../../store/slices/structureSlice";
+} from "@/store/slices/structureSlice";
 import type {
   FullDirection,
   FullDivision,
   FullService,
-} from "../../types/structure.types";
+} from "@/types/structure.types";
 
 export const StructurePage = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axiosInstance";
+import { axiosInstance } from "@/api/axiosInstance";
 
 export interface QuotaResponseDTO {
   id: number;

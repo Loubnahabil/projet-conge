@@ -17,9 +17,9 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import type { RootState, AppDispatch } from "../../store";
-import { updateQuotaThunk } from "../../store/slices/quotaSlice";
-import type { ExtendedQuota } from "../../store/slices/quotaSlice";
+import type { RootState, AppDispatch } from "@/store";
+import { updateQuotaThunk } from "@/store/slices/quotaSlice";
+import type { ExtendedQuota } from "@/store/slices/quotaSlice";
 
 export const QuotaTable: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

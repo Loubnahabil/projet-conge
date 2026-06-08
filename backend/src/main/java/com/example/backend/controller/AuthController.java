@@ -21,24 +21,24 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<LoginResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @GetMapping("/api/user/me")
+    @GetMapping("/user/me")
     public ResponseEntity<?> me(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(Map.of("email", userDetails.getUsername()));
     }
 
-    @PostMapping("/api/auth/logout")
+    @PostMapping("/auth/logout")
     public ResponseEntity<Map<String, String>> logout(
             @AuthenticationPrincipal UserDetails userDetails) {
         authService.logout(userDetails.getUsername());
         return ResponseEntity.ok(Map.of("message", "Déconnexion réussie"));
     }
-    @PostMapping("/api/auth/refresh")
+    @PostMapping("/auth/refresh")
     public ResponseEntity<LoginResponseDTO> refresh(@RequestBody Map<String, String> body) {
         return ResponseEntity.ok(authService.refresh(body.get("refreshToken")));
     }

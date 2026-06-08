@@ -1,5 +1,5 @@
-import { axiosInstance } from "./axiosInstance";
-import type { LoginRequest, LoginResponse } from "../types/auth.types";
+import { axiosInstance } from "@/api/axiosInstance";
+import type { LoginRequest, LoginResponse } from "@/types/auth.types";
 
 const authApi = {
   // makes POST /api/auth/login

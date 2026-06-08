@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
-import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
-import { AppButton } from "../../components/atoms/AppButton";
-import { JourFerieTable } from "../../components/organisms/JourFerieTable";
-import { JourFerieFormModal } from "../../components/organisms/JourFerieFormModal";
-import type { RootState, AppDispatch } from "../../store";
+import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
+import { AppButton } from "@/components/atoms/AppButton";
+import { JourFerieTable } from "@/components/organisms/JourFerieTable";
+import { JourFerieFormModal } from "@/components/organisms/JourFerieFormModal";
+import type { RootState, AppDispatch } from "@/store";
 import {
   fetchHolidaysThunk,
   openHolidayPopup,
-} from "../../store/slices/jourFerieSlice";
+} from "@/store/slices/jourFerieSlice";
 
 export const JourFeriePage = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { demandeApi } from "../../api/demandeApi";
+import { demandeApi } from "@/api/demandeApi";
 import type {
   DemandeResponse,
   DemandeRequest,
   HistoryRecord,
-} from "../../types/Demande.types";
-import type { UserResponseDTO } from "../../types/user.types";
+} from "@/types/Demande.types";
+import type { UserResponseDTO } from "@/types/user.types";
 
 interface DemandeState {
   demandes: DemandeResponse[];
