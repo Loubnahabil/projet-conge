@@ -10,10 +10,10 @@ interface UserFormInputs {
   ppr: string;
   grade: string;
   dateDebutFonction: string;
-  directionId: string;
-  divisionId: string;
-  serviceId: string;
-  roleId: string;
+  directionId: number;
+  divisionId: number;
+  serviceId: number;
+  roleId: number;
 }
 
 // Added <UserFormInputs> here to align TypeScript types perfectly
@@ -30,10 +30,10 @@ export const userValidationSchema: yup.ObjectSchema<UserFormInputs> =
     dateDebutFonction: yup
       .string()
       .required("La date de début de fonction est obligatoire"),
-    directionId: yup.string().required("La direction est obligatoire"),
-    divisionId: yup.string().required("La division est obligatoire"),
-    serviceId: yup.string().required("Le service est obligatoire"),
-    roleId: yup.string().required("Le rôle système est obligatoire"),
+    directionId: yup.number().typeError("Veuillez sélectionner une direction").required("La direction est obligatoire"),
+    divisionId: yup.number().typeError("Veuillez sélectionner une division").required("La division est obligatoire"),
+    serviceId: yup.number().typeError("Veuillez sélectionner un service").required("Le service est obligatoire"),
+    roleId: yup.number().typeError("Veuillez sélectionner un rôle").required("Le rôle système est obligatoire"),
 
     password: yup.string().when("$isCreate", {
       is: true,
