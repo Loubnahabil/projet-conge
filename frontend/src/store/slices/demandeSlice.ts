@@ -8,11 +8,11 @@ import type {
   DemandeRequest,
   HistoryRecord,
 } from "@/types/Demande.types";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse } from "@/types/user.types";
 
 interface DemandeState {
   demandes: DemandeResponse[];
-  interims: UserResponseDTO[];
+  interims: UserResponse[];
   selectedHistory: HistoryRecord[];
   pendingChefVisas: DemandeResponse[];
   traiteesChef: DemandeResponse[];
@@ -23,6 +23,10 @@ interface DemandeState {
   chefLoading: boolean;
   signataireLoading: boolean;
   error: string | null;
+  page: number;
+  rowsPerPage: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 const initialState: DemandeState = {
@@ -38,15 +42,22 @@ const initialState: DemandeState = {
   chefLoading: false,
   signataireLoading: false,
   error: null,
+  page: 0,
+  rowsPerPage: 10,
+  totalElements: 0,
+  totalPages: 0,
 };
 
 // ── Async Thunks ─────────────────────────────────────────────────────────────
 
 export const fetchMyDemandesThunk = createAsyncThunk(
   "demande/fetchMyDemandes",
-  async (_, { rejectWithValue }) => {
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
-      return await demandeApi.getMyDemandes();
+      return await demandeApi.getMyDemandes(page, size);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -265,6 +276,13 @@ const demandeSlice = createSlice({
     clearSelectedHistory: (state) => {
       state.selectedHistory = [];
     },
+    setDemandePage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload;
+    },
+    setDemandeRowsPerPage: (state, action: PayloadAction<number>) => {
+      state.rowsPerPage = action.payload;
+      state.page = 0;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -275,9 +293,22 @@ const demandeSlice = createSlice({
       })
       .addCase(
         fetchMyDemandesThunk.fulfilled,
-        (state, action: PayloadAction<DemandeResponse[]>) => {
+        (
+          state,
+          action: PayloadAction<{
+            content: DemandeResponse[];
+            totalElements: number;
+            totalPages: number;
+            size: number;
+            number: number;
+          }>,
+        ) => {
           state.loading = false;
-          state.demandes = action.payload;
+          state.demandes = action.payload.content;
+          state.totalElements = action.payload.totalElements;
+          state.totalPages = action.payload.totalPages;
+          state.rowsPerPage = action.payload.size;
+          state.page = action.payload.number;
         },
       )
       .addCase(fetchMyDemandesThunk.rejected, (state, action) => {
@@ -288,7 +319,7 @@ const demandeSlice = createSlice({
       // Fetch Interims
       .addCase(
         fetchEligibleInterimsThunk.fulfilled,
-        (state, action: PayloadAction<UserResponseDTO[]>) => {
+        (state, action: PayloadAction<UserResponse[]>) => {
           state.interims = action.payload;
         },
       )
@@ -439,5 +470,5 @@ const demandeSlice = createSlice({
   },
 });
 
-export const { clearDemandeError, clearSelectedHistory } = demandeSlice.actions;
+export const { clearDemandeError, clearSelectedHistory, setDemandePage, setDemandeRowsPerPage } = demandeSlice.actions;
 export default demandeSlice.reducer;

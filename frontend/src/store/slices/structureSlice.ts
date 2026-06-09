@@ -3,23 +3,25 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { structureApi } from "@/api/structureApi";
 import type {
-  DirectionResponseDTO,
-  DivisionResponseDTO,
-  ServiceResponseDTO,
+  DirectionResponse,
+  DivisionResponse,
+  ServiceResponse,
   FullDirection,
   FullDivision,
   FullService,
 } from "@/types/structure.types";
 
 interface StructureState {
-  directions: DirectionResponseDTO[];
-  divisions: DivisionResponseDTO[];
-  services: ServiceResponseDTO[];
+  directions: DirectionResponse[];
+  divisions: DirectionResponse[];  // kept for StructurePage (full tree)
+  services: ServiceResponse[];     // kept for StructurePage (full tree)
+  currentDivisions: DivisionResponse[];  // lazy-loaded for UserFormModal
+  currentServices: ServiceResponse[];    // lazy-loaded for UserFormModal
   roles: { id: number; name: string }[];
   treeData: FullDirection[];
   loading: boolean;
   actionLoading: boolean;
-  error: string | null; // 🌟 Added this to fix your page crash!
+  error: string | null;
   popup: {
     isOpen: boolean;
     type: "direction" | "division" | "service" | null;
@@ -34,11 +36,13 @@ const initialState: StructureState = {
   directions: [],
   divisions: [],
   services: [],
+  currentDivisions: [],
+  currentServices: [],
   roles: [],
   treeData: [],
   loading: false,
   actionLoading: false,
-  error: null, // 🌟 Initialized as null
+  error: null,
   popup: {
     isOpen: false,
     type: null,
@@ -60,6 +64,52 @@ export const fetchStructureDependenciesThunk = createAsyncThunk(
         structureApi.getRoles(),
       ]);
       return { dirs, divs, servs, roles };
+    } catch {
+      return rejectWithValue(i18next.t("errors.loadStructures"));
+    }
+  },
+);
+
+export const fetchDirectionsThunk = createAsyncThunk(
+  "structure/fetchDirections",
+  async (_, { rejectWithValue }) => {
+    try {
+      const dirs = await structureApi.getDirections();
+      return dirs;
+    } catch {
+      return rejectWithValue(i18next.t("errors.loadStructures"));
+    }
+  },
+);
+
+export const fetchRolesThunk = createAsyncThunk(
+  "structure/fetchRoles",
+  async (_, { rejectWithValue }) => {
+    try {
+      const roles = await structureApi.getRoles();
+      return roles;
+    } catch {
+      return rejectWithValue(i18next.t("errors.loadStructures"));
+    }
+  },
+);
+
+export const fetchDivisionsByDirectionThunk = createAsyncThunk(
+  "structure/fetchDivisionsByDirection",
+  async (directionId: number, { rejectWithValue }) => {
+    try {
+      return await structureApi.getDivisionsByDirection(directionId);
+    } catch {
+      return rejectWithValue(i18next.t("errors.loadStructures"));
+    }
+  },
+);
+
+export const fetchServicesByDivisionThunk = createAsyncThunk(
+  "structure/fetchServicesByDivision",
+  async (divisionId: number, { rejectWithValue }) => {
+    try {
+      return await structureApi.getServicesByDivision(divisionId);
     } catch {
       return rejectWithValue(i18next.t("errors.loadStructures"));
     }
@@ -177,7 +227,20 @@ const structureSlice = createSlice({
       })
       .addCase(fetchStructureDependenciesThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || i18next.t("errors.operationError"); // 🌟 Save error to state!
+        state.error = (action.payload as string) || i18next.t("errors.operationError");
+      })
+
+      .addCase(fetchDirectionsThunk.fulfilled, (state, action) => {
+        state.directions = action.payload;
+      })
+      .addCase(fetchRolesThunk.fulfilled, (state, action) => {
+        state.roles = action.payload;
+      })
+      .addCase(fetchDivisionsByDirectionThunk.fulfilled, (state, action) => {
+        state.currentDivisions = action.payload;
+      })
+      .addCase(fetchServicesByDivisionThunk.fulfilled, (state, action) => {
+        state.currentServices = action.payload;
       })
 
       // Matchers for action handling

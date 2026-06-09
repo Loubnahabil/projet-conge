@@ -3,17 +3,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import { jourFerieApi } from "@/api/jourFerieApi";
-import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
+import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 interface JourFerieState {
-  list: JourFerieResponseDTO[];
+  list: JourFerieResponse[];
   globalLoading: boolean;
   actionLoading: boolean;
   error: string | null;
   popup: {
     isOpen: boolean;
     mode: "create" | "edit";
-    targetItem: JourFerieResponseDTO | null;
+    targetItem: JourFerieResponse | null;
   };
 }
 
@@ -114,7 +114,7 @@ const jourFerieSlice = createSlice({
       state,
       action: PayloadAction<{
         mode: "create" | "edit";
-        item?: JourFerieResponseDTO;
+        item?: JourFerieResponse;
       }>,
     ) => {
       state.popup.isOpen = true;

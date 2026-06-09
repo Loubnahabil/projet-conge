@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,12 +18,16 @@ import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
 import { closePopup, saveUserThunk } from "@/store/slices/userSlice";
+import {
+  fetchDivisionsByDirectionThunk,
+  fetchServicesByDivisionThunk,
+} from "@/store/slices/structureSlice";
 import { userValidationSchema } from "@/validations/userSchema";
-import type { UserRequestDTO, UserResponseDTO } from "@/types/user.types";
+import type { UserRequest, UserResponse } from "@/types/user.types";
 
 function populateEditForm(
   setValue: ReturnType<typeof useForm<UserFormInputs>>["setValue"],
-  targetUser: UserResponseDTO,
+  targetUser: UserResponse,
   roles: { id: number; name: string }[],
 ) {
   setValue("nom", targetUser.nom);
@@ -66,7 +70,7 @@ export const UserFormModal: React.FC = () => {
   const actionLoading = useSelector(
     (state: RootState) => state.users.actionLoading,
   );
-  const { directions, divisions, services, roles } = useSelector(
+  const { directions, currentDivisions, currentServices, roles } = useSelector(
     (state: RootState) => state.structure,
   );
   const formError = useSelector((state: RootState) => state.users.error);
@@ -88,17 +92,53 @@ export const UserFormModal: React.FC = () => {
   const watchedServiceId = watch("serviceId");
   const watchedRoleId = watch("roleId");
 
+  const prevDirectionId = useRef<number | undefined>(undefined);
+  const prevDivisionId = useRef<number | undefined>(undefined);
+
   useEffect(() => {
     if (isOpen) {
+      prevDirectionId.current = undefined;
+      prevDivisionId.current = undefined;
       reset();
       if (mode === "edit" && targetUser) {
         populateEditForm(setValue, targetUser, roles);
+        if (targetUser.directionId) {
+          dispatch(fetchDivisionsByDirectionThunk(targetUser.directionId));
+        }
+        if (targetUser.divisionId) {
+          dispatch(fetchServicesByDivisionThunk(targetUser.divisionId));
+        }
       }
     }
-  }, [isOpen, mode, targetUser, reset, setValue, roles]);
+  }, [isOpen, mode, targetUser, reset, setValue, roles, dispatch]);
+
+  useEffect(() => {
+    if (!watchedDirectionId) return;
+    dispatch(fetchDivisionsByDirectionThunk(watchedDirectionId));
+  }, [watchedDirectionId, dispatch]);
+
+  useEffect(() => {
+    if (watchedDirectionId && prevDirectionId.current !== undefined) {
+      setValue("divisionId", 0);
+      setValue("serviceId", 0);
+    }
+    prevDirectionId.current = watchedDirectionId;
+  }, [watchedDirectionId, setValue]);
+
+  useEffect(() => {
+    if (!watchedDivisionId) return;
+    dispatch(fetchServicesByDivisionThunk(watchedDivisionId));
+  }, [watchedDivisionId, dispatch]);
+
+  useEffect(() => {
+    if (watchedDivisionId && prevDivisionId.current !== undefined) {
+      setValue("serviceId", 0);
+    }
+    prevDivisionId.current = watchedDivisionId;
+  }, [watchedDivisionId, setValue]);
 
   const onSave = (data: UserFormInputs) => {
-    const payload: UserRequestDTO = {
+    const payload: UserRequest = {
       nom: data.nom,
       prenom: data.prenom,
       email: data.email,
@@ -241,13 +281,11 @@ export const UserFormModal: React.FC = () => {
             disabled={!watchedDirectionId}
             fullWidth
           >
-            {divisions
-              .filter((div) => div.directionId === watchedDirectionId)
-              .map((d) => (
-                <MenuItem key={d.id} value={d.id}>
-                  {d.nom}
-                </MenuItem>
-              ))}
+            {currentDivisions.map((d) => (
+              <MenuItem key={d.id} value={d.id}>
+                {d.nom}
+              </MenuItem>
+            ))}
           </TextField>
 
           <TextField
@@ -263,13 +301,11 @@ export const UserFormModal: React.FC = () => {
             disabled={!watchedDivisionId}
             fullWidth
           >
-            {services
-              .filter((ser) => ser.divisionId === watchedDivisionId)
-              .map((s) => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.nom}
-                </MenuItem>
-              ))}
+            {currentServices.map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.nom}
+              </MenuItem>
+            ))}
           </TextField>
 
           <TextField

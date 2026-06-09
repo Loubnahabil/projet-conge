@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   IconButton,
   Button,
   Stack,
@@ -34,6 +35,11 @@ interface DemandeTableProps {
         | "warning";
     }
   >;
+  page: number;
+  rowsPerPage: number;
+  totalElements: number;
+  onPageChange: (page: number) => void;
+  onRowsPerPageChange: (rowsPerPage: number) => void;
   onOpenCreate: () => void;
   onOpenDetail: (d: DemandeResponse) => void;
   onOpenEdit: (d: DemandeResponse) => void;
@@ -44,6 +50,11 @@ interface DemandeTableProps {
 export const DemandeTable = ({
   demandes,
   statutConfig,
+  page,
+  rowsPerPage,
+  totalElements,
+  onPageChange,
+  onRowsPerPageChange,
   onOpenCreate,
   onOpenDetail,
   onOpenEdit,
@@ -51,6 +62,17 @@ export const DemandeTable = ({
   onCancelClick,
 }: DemandeTableProps) => {
   const { t } = useTranslation();
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    onPageChange(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    onRowsPerPageChange(parseInt(event.target.value, 10));
+  };
+
   return (
     <Box>
       <Box
@@ -178,6 +200,15 @@ export const DemandeTable = ({
             )}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={totalElements}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t("common.linesPerPage")}
+        />
       </TableContainer>
     </Box>
   );

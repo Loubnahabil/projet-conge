@@ -1,10 +1,10 @@
-export interface DirectionResponseDTO {
+export interface DirectionResponse {
   id: number;
   nom: string;
   code: string;
 }
 
-export interface DivisionResponseDTO {
+export interface DivisionResponse {
   id: number;
   nom: string;
   code: string;
@@ -12,7 +12,7 @@ export interface DivisionResponseDTO {
   directionNom: string;
 }
 
-export interface ServiceResponseDTO {
+export interface ServiceResponse {
   id: number;
   nom: string;
   code: string;
@@ -21,12 +21,12 @@ export interface ServiceResponseDTO {
 }
 
 // Fixed: Changed empty interface to type alias
-export type FullService = ServiceResponseDTO;
+export type FullService = ServiceResponse;
 
-export interface FullDivision extends DivisionResponseDTO {
+export interface FullDivision extends DivisionResponse {
   services: FullService[];
 }
 
-export interface FullDirection extends DirectionResponseDTO {
+export interface FullDirection extends DirectionResponse {
   divisions: FullDivision[];
 }

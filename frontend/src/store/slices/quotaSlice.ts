@@ -3,17 +3,18 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import { quotaApi } from "@/api/quotaApi";
-import type { QuotaResponseDTO } from "@/api/quotaApi";
+import type { QuotaResponse } from "@/api/quotaApi";
+import type { SpringPageWrapper } from "@/types/user.types";
 
-import { axiosInstance } from "@/api/axiosInstance";
-
-// 1. Extend the baseline type to handle user info and UI states
-export interface ExtendedQuota extends QuotaResponseDTO {
-  grade?: string;
-}
+// 1. Re-export for components that used the old ExtendedQuota name
+export type ExtendedQuota = QuotaResponse;
 
 interface QuotaState {
   list: ExtendedQuota[];
+  page: number;
+  rowsPerPage: number;
+  totalElements: number;
+  totalPages: number;
   globalLoading: boolean;
   actionLoading: boolean;
   feedback: { type: "success" | "error"; text: string } | null;
@@ -21,45 +22,26 @@ interface QuotaState {
 
 const initialState: QuotaState = {
   list: [],
+  page: 0,
+  rowsPerPage: 10,
+  totalElements: 0,
+  totalPages: 0,
   globalLoading: false,
   actionLoading: false,
   feedback: null,
 };
 
-// 2. Thunk: Heavy lifting matrix compilation moved out of the Page lifecycle!
-export const fetchQuotasMatrixThunk = createAsyncThunk(
-  "quotas/fetchMatrix",
-  async (year: number, { rejectWithValue }) => {
+// 2. Thunk: Uses the server-side paginated endpoint (single query)
+export const fetchQuotasPageThunk = createAsyncThunk(
+  "quotas/fetchPage",
+  async (
+    { year, page, size }: { year: number; page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
-      // Fetch users list
-      const usersResponse = await axiosInstance.get("/api/users");
-      const workers = usersResponse.data.content || usersResponse.data;
-
-      const compiledData: ExtendedQuota[] = [];
-
-      // Safely check and loop through every worker to populate the matrix
-      for (const user of workers) {
-        try {
-          const qData = await quotaApi.getQuotaByUserAndYear(user.id, year);
-          compiledData.push({
-            ...qData,
-            grade: user.grade || i18next.t("quota.nonSpecifie"),
-          });
-        } catch {
-          // If a quota entry is missing in DB for this year, generate the localized placeholder
-          compiledData.push({
-            id: -user.id, // Using negative tracking values for uninitialized entries
-            userId: user.id,
-            userNomComplet: `${user.prenom} ${user.nom}`,
-            annee: year,
-            joursAlloues: 30,
-            joursUtilises: 0,
-            joursRestants: 30,
-            grade: user.grade || i18next.t("quota.nonSpecifie"),
-          });
-        }
-      }
-      return compiledData;
+      const data: SpringPageWrapper<QuotaResponse> =
+        await quotaApi.getQuotasPage(year, page, size);
+      return data;
     } catch {
       return rejectWithValue(i18next.t("errors.loadQuotas"));
     }
@@ -96,22 +78,34 @@ const quotaSlice = createSlice({
     clearFeedback: (state) => {
       state.feedback = null;
     },
+    setQuotaPage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload;
+    },
+    setQuotaRowsPerPage: (state, action: PayloadAction<number>) => {
+      state.rowsPerPage = action.payload;
+      state.page = 0;
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Matrix Lifecycle
-      .addCase(fetchQuotasMatrixThunk.pending, (state) => {
+      // Fetch Page Lifecycle
+      .addCase(fetchQuotasPageThunk.pending, (state) => {
         state.globalLoading = true;
         state.feedback = null;
       })
       .addCase(
-        fetchQuotasMatrixThunk.fulfilled,
-        (state, action: PayloadAction<ExtendedQuota[]>) => {
+        fetchQuotasPageThunk.fulfilled,
+        (
+          state,
+          action: PayloadAction<SpringPageWrapper<QuotaResponse>>,
+        ) => {
           state.globalLoading = false;
-          state.list = action.payload;
+          state.list = action.payload.content;
+          state.totalElements = action.payload.totalElements;
+          state.totalPages = action.payload.totalPages;
         },
       )
-      .addCase(fetchQuotasMatrixThunk.rejected, (state, action) => {
+      .addCase(fetchQuotasPageThunk.rejected, (state, action) => {
         state.globalLoading = false;
         state.feedback = { type: "error", text: action.payload as string };
       })
@@ -126,7 +120,6 @@ const quotaSlice = createSlice({
           type: "success",
           text: i18next.t("quota.updateSuccess"),
         };
-        // Sync our local list state instantly with the updated item
         state.list = state.list.map((q) =>
           q.id === action.payload.id ? { ...q, ...action.payload } : q,
         );
@@ -138,5 +131,6 @@ const quotaSlice = createSlice({
   },
 });
 
-export const { clearFeedback } = quotaSlice.actions;
+export const { clearFeedback, setQuotaPage, setQuotaRowsPerPage } =
+  quotaSlice.actions;
 export default quotaSlice.reducer;

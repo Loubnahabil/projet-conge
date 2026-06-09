@@ -1,28 +1,37 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import type {
-  DirectionResponseDTO,
-  DivisionResponseDTO,
-  ServiceResponseDTO,
+  DirectionResponse,
+  DivisionResponse,
+  ServiceResponse,
 } from "@/types/structure.types";
 import type { AxiosResponse } from "axios";
 
 export const structureApi = {
   getDirections: () =>
     axiosInstance
-      .get<DirectionResponseDTO[]>("/api/directions")
-      .then((res: AxiosResponse<DirectionResponseDTO[]>) => res.data),
+      .get<DirectionResponse[]>("/api/directions")
+      .then((res: AxiosResponse<DirectionResponse[]>) => res.data),
 
   getDivisions: () =>
     axiosInstance
-      .get<DivisionResponseDTO[]>("/api/divisions")
-      .then((res: AxiosResponse<DivisionResponseDTO[]>) => res.data),
+      .get<DivisionResponse[]>("/api/divisions")
+      .then((res: AxiosResponse<DivisionResponse[]>) => res.data),
 
   getServices: () =>
     axiosInstance
-      .get<ServiceResponseDTO[]>("/api/services")
-      .then((res: AxiosResponse<ServiceResponseDTO[]>) => res.data),
+      .get<ServiceResponse[]>("/api/services")
+      .then((res: AxiosResponse<ServiceResponse[]>) => res.data),
 
-  // ⚡ Added endpoint to fetch real database roles seamlessly
+  getDivisionsByDirection: (directionId: number) =>
+    axiosInstance
+      .get<DivisionResponse[]>(`/api/divisions/by-direction/${directionId}`)
+      .then((res: AxiosResponse<DivisionResponse[]>) => res.data),
+
+  getServicesByDivision: (divisionId: number) =>
+    axiosInstance
+      .get<ServiceResponse[]>(`/api/services/by-division/${divisionId}`)
+      .then((res: AxiosResponse<ServiceResponse[]>) => res.data),
+
   getRoles: () =>
     axiosInstance
       .get<{ id: number; name: string }[]>("/api/roles")
@@ -30,55 +39,55 @@ export const structureApi = {
 
   createDirection: (nom: string) =>
     axiosInstance
-      .post<DirectionResponseDTO>("/api/directions", {
+      .post<DirectionResponse>("/api/directions", {
         nom,
         code: nom.substring(0, 3).toUpperCase(),
       })
-      .then((res: AxiosResponse<DirectionResponseDTO>) => res.data),
+      .then((res: AxiosResponse<DirectionResponse>) => res.data),
 
   createDivision: (directionId: number, nom: string) =>
     axiosInstance
-      .post<DivisionResponseDTO>("/api/divisions", {
+      .post<DivisionResponse>("/api/divisions", {
         nom,
         directionId,
         code: nom.substring(0, 3).toUpperCase(),
       })
-      .then((res: AxiosResponse<DivisionResponseDTO>) => res.data),
+      .then((res: AxiosResponse<DivisionResponse>) => res.data),
 
   createService: (divisionId: number, nom: string) =>
     axiosInstance
-      .post<ServiceResponseDTO>("/api/services", {
+      .post<ServiceResponse>("/api/services", {
         nom,
         divisionId,
         code: nom.substring(0, 3).toUpperCase(),
       })
-      .then((res: AxiosResponse<ServiceResponseDTO>) => res.data),
+      .then((res: AxiosResponse<ServiceResponse>) => res.data),
 
   updateDirection: (id: number, nom: string) =>
     axiosInstance
-      .put<DirectionResponseDTO>(`/api/directions/${id}`, {
+      .put<DirectionResponse>(`/api/directions/${id}`, {
         nom,
         code: "UPDATED",
       })
-      .then((res: AxiosResponse<DirectionResponseDTO>) => res.data),
+      .then((res: AxiosResponse<DirectionResponse>) => res.data),
 
   updateDivision: (id: number, directionId: number, nom: string) =>
     axiosInstance
-      .put<DivisionResponseDTO>(`/api/divisions/${id}`, {
+      .put<DivisionResponse>(`/api/divisions/${id}`, {
         nom,
         directionId,
         code: "UPDATED",
       })
-      .then((res: AxiosResponse<DivisionResponseDTO>) => res.data),
+      .then((res: AxiosResponse<DivisionResponse>) => res.data),
 
   updateService: (id: number, divisionId: number, nom: string) =>
     axiosInstance
-      .put<ServiceResponseDTO>(`/api/services/${id}`, {
+      .put<ServiceResponse>(`/api/services/${id}`, {
         nom,
         divisionId,
         code: "UPDATED",
       })
-      .then((res: AxiosResponse<ServiceResponseDTO>) => res.data),
+      .then((res: AxiosResponse<ServiceResponse>) => res.data),
 
   deleteDirection: (id: number) =>
     axiosInstance.delete(`/api/directions/${id}`),

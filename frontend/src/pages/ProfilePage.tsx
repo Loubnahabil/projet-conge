@@ -17,7 +17,7 @@ import { userApi } from "@/api/userApi";
 import { AppButton } from "@/components/atoms/AppButton";
 import { logout } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 
 export const ProfilePage = () => {
@@ -26,7 +26,7 @@ export const ProfilePage = () => {
   const { t } = useTranslation();
   const authUser = useSelector((state: RootState) => state.auth.user);
 
-  const [profile, setProfile] = useState<UserResponseDTO | null>(null);
+  const [profile, setProfile] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);

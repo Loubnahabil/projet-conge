@@ -1,25 +1,36 @@
 import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { auditApi } from "@/api/AuditApi";
-import type { DemandeHistoriqueDTO } from "@/types/Audit.types";
+import type { DemandeHistorique } from "@/types/Audit.types";
 
 interface AuditState {
-  entries: DemandeHistoriqueDTO[];
+  entries: DemandeHistorique[];
   loading: boolean;
   error: string | null;
+  page: number;
+  rowsPerPage: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 const initialState: AuditState = {
   entries: [],
   loading: false,
   error: null,
+  page: 0,
+  rowsPerPage: 20,
+  totalElements: 0,
+  totalPages: 0,
 };
 
 export const fetchJournalAuditThunk = createAsyncThunk(
   "audit/fetchJournal",
-  async (_, { rejectWithValue }) => {
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
-      return await auditApi.getJournalAudit();
+      return await auditApi.getJournalAudit(page, size);
     } catch {
       return rejectWithValue(i18next.t("errors.loadAudit"));
     }
@@ -29,7 +40,15 @@ export const fetchJournalAuditThunk = createAsyncThunk(
 const auditSlice = createSlice({
   name: "audit",
   initialState,
-  reducers: {},
+  reducers: {
+    setAuditPage: (state, action) => {
+      state.page = action.payload;
+    },
+    setAuditRowsPerPage: (state, action) => {
+      state.rowsPerPage = action.payload;
+      state.page = 0;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchJournalAuditThunk.pending, (state) => {
@@ -38,13 +57,19 @@ const auditSlice = createSlice({
       })
       .addCase(fetchJournalAuditThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.entries = action.payload;
+        state.entries = action.payload.content;
+        state.page = action.payload.number;
+        state.rowsPerPage = action.payload.size;
+        state.totalElements = action.payload.totalElements;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(fetchJournalAuditThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || i18next.t("errors.operationError");
+        state.error =
+          (action.payload as string) || i18next.t("errors.operationError");
       });
   },
 });
 
+export const { setAuditPage, setAuditRowsPerPage } = auditSlice.actions;
 export default auditSlice.reducer;

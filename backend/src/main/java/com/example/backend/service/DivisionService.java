@@ -26,6 +26,10 @@ public class DivisionService {
         return divisionMapper.toDTOList(divisionRepository.findAll());
     }
 
+    public List<DivisionResponseDTO> getByDirectionId(Long directionId) {
+        return divisionMapper.toDTOList(divisionRepository.findByDirectionId(directionId));
+    }
+
     @Transactional
     public DivisionResponseDTO create(DivisionRequestDTO request) {
         Direction parentDirection = directionRepository.findById(request.getDirectionId())

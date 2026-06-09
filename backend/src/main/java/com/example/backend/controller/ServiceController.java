@@ -23,6 +23,11 @@ public class ServiceController {
         return ResponseEntity.ok(serviceService.getAll());
     }
 
+    @GetMapping("/by-division/{divisionId}")
+    public ResponseEntity<List<ServiceResponseDTO>> getByDivisionId(@PathVariable Long divisionId) {
+        return ResponseEntity.ok(serviceService.getByDivisionId(divisionId));
+    }
+
     @PostMapping
     public ResponseEntity<ServiceResponseDTO> create(@Valid @RequestBody ServiceRequestDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(serviceService.create(request));

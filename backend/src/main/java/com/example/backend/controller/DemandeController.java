@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 
 
 @RestController
@@ -37,9 +41,11 @@ public class DemandeController {
 
 
     @GetMapping("/my-requests")
-    public ResponseEntity<List<DemandeResponseDTO>> getMyDemandes(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Page<DemandeResponseDTO>> getMyDemandes(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PageableDefault(size = 10, sort = "dateDemande", direction = Sort.Direction.DESC) Pageable pageable) {
         Long currentUserId = getAuthenticatedUserId(userDetails);
-        return ResponseEntity.ok(demandeService.getUserDemandes(currentUserId));
+        return ResponseEntity.ok(demandeService.getUserDemandes(currentUserId, pageable));
     }
 
     // Handles GET /api/demandes/a-viser for supervisor profiles
@@ -115,10 +121,11 @@ public class DemandeController {
         return ResponseEntity.ok(demandeService.getDemandesASignerPourDirecteur(signataireId));
     }
 
-    // Journal d'audit complet
+    // Journal d'audit complet (paginated)
     @GetMapping("/audit")
-    public ResponseEntity<List<DemandeHistoriqueResponseDTO>> getJournalAudit() {
-        return ResponseEntity.ok(historiqueService.getToutesLesActions());
+    public ResponseEntity<Page<DemandeHistoriqueResponseDTO>> getJournalAudit(
+            @PageableDefault(size = 20, sort = "dateAction", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(historiqueService.getToutesLesActions(pageable));
     }
 
     // Historique d'une demande spécifique

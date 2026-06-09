@@ -1,4 +1,4 @@
-export interface UserResponseDTO {
+export interface UserResponse {
   id: number;
   nom: string;
   prenom: string;
@@ -24,7 +24,7 @@ export interface SpringPageWrapper<T> {
   number: number;
 }
 
-export interface UserRequestDTO {
+export interface UserRequest {
   nom: string;
   prenom: string;
   email: string;

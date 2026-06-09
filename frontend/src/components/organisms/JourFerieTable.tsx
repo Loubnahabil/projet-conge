@@ -24,7 +24,7 @@ import {
   deleteHolidayThunk,
   openHolidayPopup,
 } from "@/store/slices/jourFerieSlice";
-import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
+import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 export const JourFerieTable: React.FC = () => {
   const { t } = useTranslation();
@@ -105,7 +105,7 @@ export const JourFerieTable: React.FC = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              holidays.map((item: JourFerieResponseDTO) => (
+              holidays.map((item: JourFerieResponse) => (
                 <TableRow
                   key={item.id}
                   sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}

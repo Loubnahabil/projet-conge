@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { Chip, type ChipProps } from "@mui/material";
+import { Chip } from "@mui/material";
+import { TYPE_COLOR, TYPE_TKEY } from "@/constants/constants";
 
 interface TypeCongeChipProps {
   typeConge: string;
@@ -9,14 +10,11 @@ interface TypeCongeChipProps {
 export const TypeCongeChip = ({ typeConge, size = "small" }: TypeCongeChipProps) => {
   const { t } = useTranslation();
 
-  const TYPE_CONFIG: Record<string, { label: string; color: ChipProps["color"] }> = {
-    ANNUEL: { label: t("leaveType.annuel"), color: "primary" },
-    MALADIE: { label: t("leaveType.maladie"), color: "warning" },
-  };
-
-  const config = TYPE_CONFIG[typeConge] || {
-    label: typeConge,
-    color: "default" as const,
-  };
-  return <Chip label={config.label} color={config.color} size={size} />;
+  return (
+    <Chip
+      label={t(TYPE_TKEY[typeConge] ?? typeConge)}
+      color={TYPE_COLOR[typeConge] ?? "default"}
+      size={size}
+    />
+  );
 };

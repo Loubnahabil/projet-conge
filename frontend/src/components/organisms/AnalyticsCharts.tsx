@@ -14,21 +14,7 @@ import {
 } from "recharts";
 import { DashboardSection } from "@/components/molecules/DashboardSection";
 import type { RootState } from "@/store";
-
-const statusLabelMap: Record<string, string> = {
-  BROUILLON: "status.brouillon",
-  SOUMISE: "status.soumise",
-  VISEE_CHEF: "status.viseeChef",
-  SIGNEE_DIRECTEUR: "status.signeeDirecteur",
-  REJETEE_CHEF: "status.rejeteeChef",
-  REJETEE_DIRECTEUR: "status.rejeteeDirecteur",
-  ANNULEE: "status.annulee",
-};
-
-const typeLabelMap: Record<string, string> = {
-  ANNUEL: "leaveType.annuel",
-  MALADIE: "leaveType.maladie",
-};
+import { STATUS_TKEY, TYPE_TKEY } from "@/constants/constants";
 
 export const AnalyticsCharts = () => {
   const { t } = useTranslation();
@@ -157,7 +143,7 @@ export const AnalyticsCharts = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {t(statusLabelMap[key] ?? key)}
+                  {t(STATUS_TKEY[key] ?? key)}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -188,7 +174,7 @@ export const AnalyticsCharts = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {t(typeLabelMap[key] ?? key)}
+                  {t(TYPE_TKEY[key] ?? key)}
                 </Typography>
                 <Typography
                   variant="body2"

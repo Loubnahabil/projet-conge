@@ -2,10 +2,10 @@ import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { userApi } from "@/api/userApi";
-import type { UserResponseDTO, UserRequestDTO } from "@/types/user.types";
+import type { UserResponse, UserRequest } from "@/types/user.types";
 
 interface UserState {
-  list: UserResponseDTO[];
+  list: UserResponse[];
   totalElements: number;
   page: number;
   rowsPerPage: number;
@@ -16,7 +16,7 @@ interface UserState {
   popup: {
     isOpen: boolean;
     mode: "create" | "edit";
-    targetUser: UserResponseDTO | null;
+    targetUser: UserResponse | null;
   };
 }
 
@@ -72,7 +72,7 @@ export const toggleUserStatusThunk = createAsyncThunk(
 export const saveUserThunk = createAsyncThunk(
   "users/save",
   async (
-    { payload, id }: { payload: UserRequestDTO; id?: number },
+    { payload, id }: { payload: UserRequest; id?: number },
     { dispatch, rejectWithValue },
   ) => {
     try {

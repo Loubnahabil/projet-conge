@@ -10,11 +10,13 @@ import { useTranslation } from "react-i18next";
 export const AuditPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.audit);
+  const { loading, error, page, rowsPerPage } = useSelector(
+    (state: RootState) => state.audit,
+  );
 
   useEffect(() => {
-    dispatch(fetchJournalAuditThunk());
-  }, [dispatch]);
+    dispatch(fetchJournalAuditThunk({ page, size: rowsPerPage }));
+  }, [dispatch, page, rowsPerPage]);
 
   if (loading) {
     return (
@@ -41,7 +43,6 @@ export const AuditPage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh", bgcolor: "#f8fafc" }}>
-      {/* Structural Header Area */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
           {t("audit.title")}
@@ -51,7 +52,6 @@ export const AuditPage = () => {
         </Typography>
       </Box>
 
-      {/* 🔍 Isolated Audit Table Organism */}
       <AuditTable />
     </Box>
   );
