@@ -3,7 +3,7 @@ import i18next from "i18next";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse } from "@/types/user.types";
 
 // Colonnes à exporter
 const COLUMNS = [
@@ -20,13 +20,13 @@ const COLUMNS = [
 
 type ColKey = (typeof COLUMNS)[number]["key"];
 
-function formatValue(key: ColKey, user: UserResponseDTO): string {
+function formatValue(key: ColKey, user: UserResponse): string {
   if (key === "enabled") return user.enabled ? i18next.t("export.oui") : i18next.t("export.non");
   if (key === "nom") return user.nom.toUpperCase();
   return String(user[key] ?? "");
 }
 
-export function useExportUsers(users: UserResponseDTO[]) {
+export function useExportUsers(users: UserResponse[]) {
   // ── EXCEL ──────────────────────────────────────────────────────────
   const exportExcel = () => {
     const rows = users.map((u) =>

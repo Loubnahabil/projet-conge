@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Paper,
   IconButton,
   TextField,
@@ -22,18 +23,30 @@ import type { RootState, AppDispatch } from "@/store";
 import { updateQuotaThunk } from "@/store/slices/quotaSlice";
 import type { ExtendedQuota } from "@/store/slices/quotaSlice";
 
-export const QuotaTable: React.FC = () => {
+interface QuotaTableProps {
+  page: number;
+  rowsPerPage: number;
+  totalElements: number;
+  onPageChange: (event: unknown, newPage: number) => void;
+  onRowsPerPageChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
+}
+
+export const QuotaTable: React.FC<QuotaTableProps> = ({
+  page,
+  rowsPerPage,
+  totalElements,
+  onPageChange,
+  onRowsPerPageChange,
+}) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  // 1. Extract database arrays and load states directly from global Redux
-  const {
-    list: quotas,
-    globalLoading,
-    actionLoading,
-  } = useSelector((state: RootState) => state.quotas);
+  const { list: quotas, globalLoading, actionLoading } = useSelector(
+    (state: RootState) => state.quotas,
+  );
 
-  // 2. Local isolated state handles for tracking inline cell modification row items
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
   const [editAlloues, setEditAlloues] = useState<number>(30);
   const [editUtilises, setEditUtilises] = useState<number>(0);
@@ -47,7 +60,6 @@ export const QuotaTable: React.FC = () => {
   };
 
   const handleSaveInline = async (id: number) => {
-    // Basic inline guard boundary validation checks
     if (editAlloues < 0 || editAlloues > 90) {
       setLocalError(t("quota.alloueRange"));
       return;
@@ -62,7 +74,6 @@ export const QuotaTable: React.FC = () => {
 
     setLocalError(null);
 
-    // Dispatching directly to our secure central update handler action!
     try {
       await dispatch(
         updateQuotaThunk({
@@ -73,7 +84,7 @@ export const QuotaTable: React.FC = () => {
       ).unwrap();
       setEditingRowId(null);
     } catch {
-      // Error is caught and surfaced smoothly via global slice feedback
+      // Error surfaced via global slice feedback
     }
   };
 
@@ -130,7 +141,6 @@ export const QuotaTable: React.FC = () => {
                   <TableCell>{row.userNomComplet}</TableCell>
                   <TableCell>{row.grade}</TableCell>
 
-                  {/* Allowed Column */}
                   <TableCell>
                     {isEditing ? (
                       <TextField
@@ -148,7 +158,6 @@ export const QuotaTable: React.FC = () => {
                     )}
                   </TableCell>
 
-                  {/* Utilized Column */}
                   <TableCell>
                     {isEditing ? (
                       <TextField
@@ -168,20 +177,22 @@ export const QuotaTable: React.FC = () => {
                     )}
                   </TableCell>
 
-                  {/* Remaining Column (Dynamic runtime calculation vs precomputed tracking) */}
                   <TableCell>
                     {isEditing ? (
-                      <Typography sx={{ fontWeight: "bold", color: "#757575" }}>
+                      <Typography
+                        sx={{ fontWeight: "bold", color: "#757575" }}
+                      >
                         {editAlloues - editUtilises} {t("quota.jrsCalcule")}
                       </Typography>
                     ) : (
-                      <Typography sx={{ fontWeight: "bold", color: "#2e7d32" }}>
+                      <Typography
+                        sx={{ fontWeight: "bold", color: "#2e7d32" }}
+                      >
                         {row.joursRestants} {t("quota.jrs")}
                       </Typography>
                     )}
                   </TableCell>
 
-                  {/* Actions Column */}
                   <TableCell>
                     {isEditing ? (
                       <Box sx={{ display: "flex", gap: 0.5 }}>
@@ -214,6 +225,17 @@ export const QuotaTable: React.FC = () => {
             })}
           </TableBody>
         </Table>
+
+        <TablePagination
+          component="div"
+          count={totalElements}
+          page={page}
+          onPageChange={onPageChange}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={onRowsPerPageChange}
+          rowsPerPageOptions={[10, 20, 50]}
+          labelRowsPerPage={t("common.rowsPerPage")}
+        />
       </TableContainer>
     </Box>
   );

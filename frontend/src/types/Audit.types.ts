@@ -1,5 +1,5 @@
 // src/types/Audit.types.ts
-export interface DemandeHistoriqueDTO {
+export interface DemandeHistorique {
   id: number;
   demandeId: number;
   statutAction: string;

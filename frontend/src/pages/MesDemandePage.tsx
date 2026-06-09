@@ -25,6 +25,8 @@ import {
   fetchDemandeHistoryThunk,
   clearDemandeError,
   clearSelectedHistory,
+  setDemandePage,
+  setDemandeRowsPerPage,
 } from "@/store/slices/demandeSlice";
 import { demandeApi } from "@/api/demandeApi";
 import type { AppDispatch, RootState } from "@/store";
@@ -34,6 +36,7 @@ import type {
   TypeConge,
 } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
+import { STATUS_COLOR, STATUS_TKEY } from "@/constants/constants";
 
 interface FormInputs {
   dateDebut: string;
@@ -45,22 +48,25 @@ interface FormInputs {
 export const MesDemandePage = () => {
   const { t } = useTranslation();
 
-  const statutConfig: Record<
-    string,
-    { label: string; color: "default" | "warning" | "info" | "success" | "error" }
-  > = {
-    BROUILLON: { label: t("status.brouillon"), color: "default" },
-    SOUMISE: { label: t("status.soumise"), color: "warning" },
-    VISEE_CHEF: { label: t("status.viseeChef"), color: "info" },
-    SIGNEE_DIRECTEUR: { label: t("status.signeeDirecteur"), color: "success" },
-    REJETEE_CHEF: { label: t("status.rejeteeChef"), color: "error" },
-    REJETEE_DIRECTEUR: { label: t("status.rejeteeDirecteur"), color: "error" },
-    ANNULEE: { label: t("status.annulee"), color: "default" },
-  };
+  const statutConfig = Object.keys(STATUS_COLOR).reduce(
+    (acc, key) => {
+      acc[key] = { label: t(STATUS_TKEY[key]), color: STATUS_COLOR[key] };
+      return acc;
+    },
+    {} as Record<string, { label: string; color: string }>,
+  );
 
   const dispatch = useDispatch<AppDispatch>();
-  const { demandes, interims, actionLoading, error, selectedHistory } =
-    useSelector((state: RootState) => state.demande);
+  const {
+    demandes,
+    interims,
+    actionLoading,
+    error,
+    selectedHistory,
+    page,
+    rowsPerPage,
+    totalElements,
+  } = useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
   const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(
@@ -76,9 +82,9 @@ export const MesDemandePage = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchMyDemandesThunk());
+    dispatch(fetchMyDemandesThunk({ page, size: rowsPerPage }));
     dispatch(fetchEligibleInterimsThunk());
-  }, [dispatch]);
+  }, [dispatch, page, rowsPerPage]);
 
   const handleOpenCreateForm = () => {
     setEditingDemande(null);
@@ -145,7 +151,7 @@ export const MesDemandePage = () => {
         );
       }
 
-      dispatch(fetchMyDemandesThunk());
+      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
       setView("LIST");
     } catch {
       // error already in Redux state
@@ -160,7 +166,7 @@ export const MesDemandePage = () => {
 
     try {
       await dispatch(soumettreDemandeThunk(demande.id)).unwrap();
-      dispatch(fetchMyDemandesThunk());
+      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
     } catch {
       // error in Redux
     }
@@ -178,7 +184,7 @@ export const MesDemandePage = () => {
 
     try {
       await dispatch(annulerDemandeThunk(selectedDemandeId)).unwrap();
-      dispatch(fetchMyDemandesThunk());
+      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
       if (view === "DETAIL") setView("LIST");
     } catch {
       // error in Redux
@@ -215,6 +221,14 @@ export const MesDemandePage = () => {
 
   const displayError = error;
 
+  const handlePageChange = (newPage: number) => {
+    dispatch(setDemandePage(newPage));
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    dispatch(setDemandeRowsPerPage(newRowsPerPage));
+  };
+
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
       {displayError && (
@@ -237,6 +251,11 @@ export const MesDemandePage = () => {
           <DemandeTable
             demandes={demandes}
             statutConfig={statutConfig}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            totalElements={totalElements}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
             onOpenCreate={handleOpenCreateForm}
             onOpenDetail={handleOpenDetailView}
             onOpenEdit={handleOpenEditForm}
@@ -302,3 +321,5 @@ export const MesDemandePage = () => {
     </Box>
   );
 };
+
+export default MesDemandePage;

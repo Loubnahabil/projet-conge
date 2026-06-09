@@ -17,7 +17,7 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { FormInput } from "@/components/molecules/FormInput";
 import { demandeValidationSchema } from "@/validations/demandeSchema";
 import type { DemandeResponse } from "@/types/Demande.types";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse } from "@/types/user.types";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
 import { useTranslation } from "react-i18next";
 
@@ -30,7 +30,7 @@ interface FormInputs {
 
 interface DemandeFormProps {
   editingDemande: DemandeResponse | null;
-  colleagues: UserResponseDTO[];
+  colleagues: UserResponse[];
   actionLoading: boolean;
   onCancel: () => void;
   onSaveWorkflow: (data: FormInputs, submitInstantly: boolean) => void;

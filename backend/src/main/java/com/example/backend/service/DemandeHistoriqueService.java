@@ -8,6 +8,8 @@ import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.repository.DemandeHistoriqueRepository;
 import com.example.backend.repository.DemandeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,13 +32,10 @@ public class DemandeHistoriqueService {
                 .toList();
     }
 
-    public List<DemandeHistoriqueResponseDTO> getToutesLesActions() {
+    public Page<DemandeHistoriqueResponseDTO> getToutesLesActions(Pageable pageable) {
         return historiqueRepository
-                .findAll(org.springframework.data.domain.Sort.by(
-                        org.springframework.data.domain.Sort.Direction.DESC, "dateAction"))
-                .stream()
-                .map(this::toDTO)
-                .toList();
+                .findAll(pageable)
+                .map(this::toDTO);
     }
 
     private DemandeHistoriqueResponseDTO toDTO(DemandeHistorique h) {

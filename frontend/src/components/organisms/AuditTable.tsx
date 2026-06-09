@@ -1,12 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { useState, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Box,
   Typography,
   Paper,
-  TextField,
-  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -14,39 +11,15 @@ import {
   TableHead,
   TableRow,
   TablePagination,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import HistoryIcon from "@mui/icons-material/History";
 import { StatusChip } from "@/components/atoms/StatusChip";
-import type { RootState } from "@/store";
-
-const STATUT_CONFIG: Record<
-  string,
-  {
-    color:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning";
-  }
-> = {
-  BROUILLON: { color: "default" },
-  SOUMISE: { color: "warning" },
-  VISEE_CHEF: { color: "info" },
-  SIGNEE_DIRECTEUR: { color: "success" },
-  REJETEE_CHEF: { color: "error" },
-  REJETEE_DIRECTEUR: { color: "error" },
-  ANNULEE: { color: "default" },
-};
-
-const ALL_STATUTS = Object.keys(STATUT_CONFIG);
+import type { RootState, AppDispatch } from "@/store";
+import {
+  setAuditPage,
+  setAuditRowsPerPage,
+} from "@/store/slices/auditSlice";
+import { ROLE_TKEY } from "@/constants/constants";
 
 const formatDate = (iso: string) => {
   const d = new Date(iso);
@@ -61,109 +34,26 @@ const formatDate = (iso: string) => {
   );
 };
 
-const STATUS_TKEY: Record<string, string> = {
-  BROUILLON: "status.brouillon",
-  SOUMISE: "status.soumise",
-  VISEE_CHEF: "status.viseeChefShort",
-  SIGNEE_DIRECTEUR: "status.signee",
-  REJETEE_CHEF: "status.rejeteeChef",
-  REJETEE_DIRECTEUR: "status.rejeteeDirecteur",
-  ANNULEE: "status.annulee",
-};
-
-const ROLE_TKEY: Record<string, string> = {
-  ADMIN: "role.admin",
-  FONCTIONNAIRE: "role.fonctionnaire",
-  CHEF_HIERARCHIE: "role.chefHierarchique",
-  SIGNATAIRE: "role.signataire",
-};
-
 export const AuditTable = () => {
   const { t } = useTranslation();
-  const { entries } = useSelector((state: RootState) => state.audit);
-
-  const [search, setSearch] = useState("");
-  const [statutFilter, setStatutFilter] = useState("ALL");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-
-  const filtered = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    return entries.filter((e) => {
-      const matchSearch =
-        !q ||
-        e.acteurNom.toLowerCase().includes(q) ||
-        e.acteurPrenom.toLowerCase().includes(q) ||
-        e.acteurEmail.toLowerCase().includes(q) ||
-        String(e.demandeId).includes(q) ||
-        (e.commentaire ?? "").toLowerCase().includes(q);
-      const matchStatut =
-        statutFilter === "ALL" || e.statutAction === statutFilter;
-      return matchSearch && matchStatut;
-    });
-  }, [entries, search, statutFilter]);
-
-  const paginated = filtered.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage,
+  const dispatch = useDispatch<AppDispatch>();
+  const { entries, page, rowsPerPage, totalElements } = useSelector(
+    (state: RootState) => state.audit,
   );
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+    dispatch(setAuditPage(newPage));
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    dispatch(setAuditRowsPerPage(parseInt(event.target.value, 10)));
   };
 
   return (
     <Box>
-      {/* Filters Control Block */}
       <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
-        <TextField
-          placeholder={t("audit.searchPlaceholder")}
-          size="small"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(0);
-          }}
-          sx={{ flex: 1, minWidth: 260, bgcolor: "#fff", borderRadius: "8px" }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "#94a3b8", fontSize: 18 }} />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-        <FormControl
-          size="small"
-          sx={{ minWidth: 200, bgcolor: "#fff", borderRadius: "8px" }}
-        >
-          <InputLabel>{t("audit.statut")}</InputLabel>
-          <Select
-            value={statutFilter}
-            label={t("audit.statut")}
-            onChange={(e) => {
-              setStatutFilter(e.target.value);
-              setPage(0);
-            }}
-          >
-            <MenuItem value="ALL">{t("audit.tousStatuts")}</MenuItem>
-            {ALL_STATUTS.map((s) => (
-              <MenuItem key={s} value={s}>
-                {t(STATUS_TKEY[s] ?? s)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
         <Paper
           sx={{
             px: 2,
@@ -184,12 +74,16 @@ export const AuditTable = () => {
             variant="body2"
             sx={{ fontWeight: 700, color: "#0f172a" }}
           >
-            {filtered.length} {t(filtered.length !== 1 ? "common.entries_plural" : "common.entries")}
+            {totalElements}{" "}
+            {t(
+              totalElements !== 1
+                ? "common.entries_plural"
+                : "common.entries",
+            )}
           </Typography>
         </Paper>
       </Box>
 
-      {/* Main Data Layout */}
       <TableContainer
         component={Paper}
         sx={{
@@ -222,7 +116,7 @@ export const AuditTable = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginated.length === 0 ? (
+            {entries.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -232,13 +126,11 @@ export const AuditTable = () => {
                   <HistoryIcon
                     sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
                   />
-                  <Typography variant="body2">
-                    {t("audit.noData")}
-                  </Typography>
+                  <Typography variant="body2">{t("audit.noData")}</Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              paginated.map((entry) => {
+              entries.map((entry) => {
                 return (
                   <TableRow
                     key={entry.id}
@@ -309,7 +201,7 @@ export const AuditTable = () => {
         </Table>
         <TablePagination
           component="div"
-          count={filtered.length}
+          count={totalElements}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}

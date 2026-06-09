@@ -24,7 +24,7 @@ import {
   toggleUserStatusThunk,
   openPopup,
 } from "@/store/slices/userSlice";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse } from "@/types/user.types";
 
 export const UserTable: React.FC = () => {
   const { t } = useTranslation();
@@ -53,7 +53,7 @@ export const UserTable: React.FC = () => {
   };
 
   // ⚡ Filter the original Redux list locally using your search term
-  const filteredUsers = users.filter((user: UserResponseDTO) => {
+  const filteredUsers = users.filter((user: UserResponse) => {
     if (!searchQuery) return true; // Show everyone if search is blank
 
     const term = searchQuery.toLowerCase().trim();
@@ -116,7 +116,7 @@ export const UserTable: React.FC = () => {
               </TableCell>
             </TableRow>
           ) : (
-            filteredUsers.map((user: UserResponseDTO) => (
+            filteredUsers.map((user: UserResponse) => (
               <TableRow
                 key={user.id}
                 sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}

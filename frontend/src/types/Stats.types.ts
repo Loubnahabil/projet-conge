@@ -1,11 +1,11 @@
 // src/types/stats.types.ts
 
-export interface DirectionStatDTO {
+export interface DirectionStat {
   directionNom: string;
   nombreDemandes: number;
 }
 
-export interface MoisStatDTO {
+export interface MoisStat {
   mois: number;
   moisLabel: string;
   nombreDemandes: number;
@@ -24,8 +24,8 @@ export interface DashboardStatsResponse {
   enAttenteVisa: number;
   enAttenteSignature: number;
 
-  parDirection: DirectionStatDTO[];
-  parMois: MoisStatDTO[];
+  parDirection: DirectionStat[];
+  parMois: MoisStat[];
 }
 
 export interface FonctionnaireDashboardStats {

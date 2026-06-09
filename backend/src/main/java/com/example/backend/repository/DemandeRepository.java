@@ -2,6 +2,8 @@ package com.example.backend.repository;
 
 import com.example.backend.entity.Demande;
 import com.example.backend.entity.StatutDemande;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,7 @@ public interface DemandeRepository extends JpaRepository<Demande, Long> {
 
     // Finds all leave requests belonging to a specific employee
     List<Demande> findByUserId(Long userId);
+    Page<Demande> findByUserId(Long userId, Pageable pageable);
 
 
 

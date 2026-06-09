@@ -1,6 +1,6 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse, DemandeRequest } from "@/types/Demande.types";
-import type { UserResponseDTO } from "@/types/user.types";
+import type { UserResponse, SpringPageWrapper } from "@/types/user.types";
 import type { HistoryRecord } from "@/types/Demande.types";
 
 export type UploadResponse = {
@@ -14,9 +14,13 @@ export type UploadResponse = {
 
 export const demandeApi = {
   // GET /api/demandes/my-requests
-  getMyDemandes: async (): Promise<DemandeResponse[]> => {
-    const response = await axiosInstance.get<DemandeResponse[]>(
+  getMyDemandes: async (
+    page: number,
+    size: number,
+  ): Promise<SpringPageWrapper<DemandeResponse>> => {
+    const response = await axiosInstance.get<SpringPageWrapper<DemandeResponse>>(
       "/api/demandes/my-requests",
+      { params: { page, size } },
     );
     return response.data;
   },
@@ -106,9 +110,9 @@ export const demandeApi = {
   },
 
   // GET /api/users/colleagues
-  getSameServiceColleagues: async (): Promise<UserResponseDTO[]> => {
+  getSameServiceColleagues: async (): Promise<UserResponse[]> => {
     try {
-      const response = await axiosInstance.get<UserResponseDTO[]>(
+      const response = await axiosInstance.get<UserResponse[]>(
         "/api/users/colleagues",
       );
       return response.data;

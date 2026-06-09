@@ -15,7 +15,10 @@ import {
   setSearchQuery,
   openPopup,
 } from "@/store/slices/userSlice";
-import { fetchStructureDependenciesThunk } from "@/store/slices/structureSlice";
+import {
+  fetchDirectionsThunk,
+  fetchRolesThunk,
+} from "@/store/slices/structureSlice";
 import { useTranslation } from "react-i18next";
 
 export const UserPage = () => {
@@ -34,7 +37,8 @@ export const UserPage = () => {
 
   useEffect(() => {
     dispatch(fetchUsersListThunk());
-    dispatch(fetchStructureDependenciesThunk());
+    dispatch(fetchDirectionsThunk());
+    dispatch(fetchRolesThunk());
   }, [dispatch]);
 
   const handleSearch = (value: string) => {

@@ -10,6 +10,8 @@ import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.DemandeMapper;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,8 +40,8 @@ public class DemandeService {
     private final EmailService emailService; // ← injected
 
     @Transactional(readOnly = true)
-    public List<DemandeResponseDTO> getUserDemandes(Long userId) {
-        return demandeMapper.toDTOList(demandeRepository.findByUserId(userId));
+    public Page<DemandeResponseDTO> getUserDemandes(Long userId, Pageable pageable) {
+        return demandeRepository.findByUserId(userId, pageable).map(demandeMapper::toDTO);
     }
 
     @Transactional(readOnly = true)

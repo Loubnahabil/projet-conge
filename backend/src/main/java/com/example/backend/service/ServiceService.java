@@ -26,6 +26,10 @@ public class ServiceService {
         return serviceMapper.toDTOList(serviceRepository.findAll());
     }
 
+    public List<ServiceResponseDTO> getByDivisionId(Long divisionId) {
+        return serviceMapper.toDTOList(serviceRepository.findByDivisionId(divisionId));
+    }
+
     @Transactional
     public ServiceResponseDTO create(ServiceRequestDTO request) {
         Division parentDivision = divisionRepository.findById(request.getDivisionId())

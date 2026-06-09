@@ -9,7 +9,8 @@ import lombok.*;
 public class QuotaResponseDTO {
     private Long id;
     private Long userId;
-    private String userNomComplet; // Friendly name for frontend tables (e.g., "Benani Karim")
+    private String userNomComplet;
+    private String grade;
     private int annee;
     private int joursAlloues;
     private int joursUtilises;
