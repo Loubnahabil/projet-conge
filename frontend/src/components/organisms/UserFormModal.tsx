@@ -18,7 +18,28 @@ import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
 import { closePopup, saveUserThunk } from "@/store/slices/userSlice";
 import { userValidationSchema } from "@/validations/userSchema";
-import type { UserRequestDTO } from "@/types/user.types";
+import type { UserRequestDTO, UserResponseDTO } from "@/types/user.types";
+
+function populateEditForm(
+  setValue: ReturnType<typeof useForm<UserFormInputs>>["setValue"],
+  targetUser: UserResponseDTO,
+  roles: { id: number; name: string }[],
+) {
+  setValue("nom", targetUser.nom);
+  setValue("prenom", targetUser.prenom);
+  setValue("email", targetUser.email);
+  setValue("ppr", targetUser.ppr);
+  setValue("grade", targetUser.grade);
+  setValue("dateDebutFonction", targetUser.dateDebutFonction);
+  setValue("directionId", targetUser.directionId);
+  setValue("divisionId", targetUser.divisionId);
+  setValue("serviceId", targetUser.serviceId);
+
+  const matchingRole = roles.find((r) => r.name === targetUser.role);
+  if (matchingRole) {
+    setValue("roleId", matchingRole.id);
+  }
+}
 
 interface UserFormInputs {
   nom: string;
@@ -29,10 +50,10 @@ interface UserFormInputs {
   ppr: string;
   grade: string;
   dateDebutFonction: string;
-  directionId: string;
-  divisionId: string;
-  serviceId: string;
-  roleId: string;
+  directionId: number;
+  divisionId: number;
+  serviceId: number;
+  roleId: number;
 }
 
 export const UserFormModal: React.FC = () => {
@@ -62,24 +83,14 @@ export const UserFormModal: React.FC = () => {
 
   const watchedDirectionId = watch("directionId");
   const watchedDivisionId = watch("divisionId");
+  const watchedServiceId = watch("serviceId");
+  const watchedRoleId = watch("roleId");
 
   useEffect(() => {
     if (isOpen) {
       reset();
       if (mode === "edit" && targetUser) {
-        setValue("nom", targetUser.nom);
-        setValue("prenom", targetUser.prenom);
-        setValue("email", targetUser.email);
-        setValue("ppr", targetUser.ppr);
-        setValue("grade", targetUser.grade);
-        setValue("dateDebutFonction", targetUser.dateDebutFonction);
-        setValue("directionId", targetUser.directionId?.toString() || "");
-        setValue("divisionId", targetUser.divisionId?.toString() || "");
-        setValue("serviceId", targetUser.serviceId?.toString() || "");
-        console.log(targetUser.serviceId);
-
-        const matchingRole = roles.find((r) => r.name === targetUser.role);
-        setValue("roleId", matchingRole ? matchingRole.id.toString() : "");
+        populateEditForm(setValue, targetUser, roles);
       }
     }
   }, [isOpen, mode, targetUser, reset, setValue, roles]);
@@ -92,8 +103,8 @@ export const UserFormModal: React.FC = () => {
       ppr: data.ppr,
       grade: data.grade,
       dateDebutFonction: data.dateDebutFonction,
-      serviceId: Number(data.serviceId),
-      roleId: Number(data.roleId),
+      serviceId: data.serviceId,
+      roleId: data.roleId,
       ...(mode === "create" ? { password: data.password } : {}),
     };
 
@@ -202,13 +213,14 @@ export const UserFormModal: React.FC = () => {
             label="Direction"
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
+            value={watchedDirectionId ?? ""}
             {...register("directionId")}
             error={!!errors.directionId}
             helperText={errors.directionId?.message}
             fullWidth
           >
             {directions.map((d) => (
-              <MenuItem key={d.id} value={d.id.toString()}>
+              <MenuItem key={d.id} value={d.id}>
                 {d.nom}
               </MenuItem>
             ))}
@@ -220,6 +232,7 @@ export const UserFormModal: React.FC = () => {
             label="Division"
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
+            value={watchedDivisionId ?? ""}
             {...register("divisionId")}
             error={!!errors.divisionId}
             helperText={errors.divisionId?.message}
@@ -227,9 +240,9 @@ export const UserFormModal: React.FC = () => {
             fullWidth
           >
             {divisions
-              .filter((div) => div.directionId === Number(watchedDirectionId))
+              .filter((div) => div.directionId === watchedDirectionId)
               .map((d) => (
-                <MenuItem key={d.id} value={d.id.toString()}>
+                <MenuItem key={d.id} value={d.id}>
                   {d.nom}
                 </MenuItem>
               ))}
@@ -241,6 +254,7 @@ export const UserFormModal: React.FC = () => {
             label="Service d'affectation"
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
+            value={watchedServiceId ?? ""}
             {...register("serviceId")}
             error={!!errors.serviceId}
             helperText={errors.serviceId?.message}
@@ -248,9 +262,9 @@ export const UserFormModal: React.FC = () => {
             fullWidth
           >
             {services
-              .filter((ser) => ser.divisionId === Number(watchedDivisionId))
+              .filter((ser) => ser.divisionId === watchedDivisionId)
               .map((s) => (
-                <MenuItem key={s.id} value={s.id.toString()}>
+                <MenuItem key={s.id} value={s.id}>
                   {s.nom}
                 </MenuItem>
               ))}
@@ -262,13 +276,14 @@ export const UserFormModal: React.FC = () => {
             label="Rôle Système"
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
+            value={watchedRoleId ?? ""}
             {...register("roleId")}
             error={!!errors.roleId}
             helperText={errors.roleId?.message}
             fullWidth
           >
             {roles.map((r) => (
-              <MenuItem key={r.id} value={r.id.toString()}>
+              <MenuItem key={r.id} value={r.id}>
                 {formatRoleLabel(r.name)}
               </MenuItem>
             ))}
