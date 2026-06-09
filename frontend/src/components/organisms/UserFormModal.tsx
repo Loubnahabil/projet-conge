@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -57,6 +58,7 @@ interface UserFormInputs {
 }
 
 export const UserFormModal: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { isOpen, mode, targetUser } = useSelector(
     (state: RootState) => state.users.popup,
@@ -127,8 +129,8 @@ export const UserFormModal: React.FC = () => {
     >
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
         {mode === "create"
-          ? "Ajouter un Nouveau Fonctionnaire"
-          : "Modifier Profil Fonctionnaire"}
+          ? t("userForm.titleCreate")
+          : t("userForm.titleEdit")}
       </DialogTitle>
       <DialogContent dividers>
         <Box
@@ -138,13 +140,13 @@ export const UserFormModal: React.FC = () => {
         >
           <Box sx={{ display: "flex", gap: 2 }}>
             <FormInput
-              label="Nom *"
+              label={t("userForm.nom")}
               registration={register("nom")}
               error={!!errors.nom}
               helperText={errors.nom?.message}
             />
             <FormInput
-              label="Prénom *"
+              label={t("userForm.prenom")}
               registration={register("prenom")}
               error={!!errors.prenom}
               helperText={errors.prenom?.message}
@@ -152,7 +154,7 @@ export const UserFormModal: React.FC = () => {
           </Box>
 
           <FormInput
-            label="Email Professionnel *"
+            label={t("userForm.email")}
             type="email"
             registration={register("email")}
             error={!!errors.email}
@@ -162,14 +164,14 @@ export const UserFormModal: React.FC = () => {
           {mode === "create" && (
             <Box sx={{ display: "flex", gap: 2 }}>
               <FormInput
-                label="Mot de passe temporaire *"
+                label={t("userForm.password")}
                 type="password"
                 registration={register("password")}
                 error={!!errors.password}
                 helperText={errors.password?.message}
               />
               <FormInput
-                label="Confirmer le mot de passe *"
+                label={t("userForm.confirmPassword")}
                 type="password"
                 registration={register("confirmPassword")}
                 error={!!errors.confirmPassword}
@@ -180,13 +182,13 @@ export const UserFormModal: React.FC = () => {
 
           <Box sx={{ display: "flex", gap: 2 }}>
             <FormInput
-              label="Numéro PPR *"
+              label={t("userForm.ppr")}
               registration={register("ppr")}
               error={!!errors.ppr}
               helperText={errors.ppr?.message}
             />
             <FormInput
-              label="Grade / Échelle *"
+              label={t("userForm.grade")}
               registration={register("grade")}
               error={!!errors.grade}
               helperText={errors.grade?.message}
@@ -197,7 +199,7 @@ export const UserFormModal: React.FC = () => {
             variant="caption"
             sx={{ color: "#475569", mb: -1, fontWeight: "500" }}
           >
-            Date de début de fonction *
+            {t("userForm.dateDebutFonction")}
           </Typography>
           <FormInput
             label=""
@@ -210,7 +212,7 @@ export const UserFormModal: React.FC = () => {
           <TextField
             select
             required
-            label="Direction"
+            label={t("userForm.direction")}
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
             value={watchedDirectionId ?? ""}
@@ -229,7 +231,7 @@ export const UserFormModal: React.FC = () => {
           <TextField
             select
             required
-            label="Division"
+            label={t("userForm.division")}
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
             value={watchedDivisionId ?? ""}
@@ -251,7 +253,7 @@ export const UserFormModal: React.FC = () => {
           <TextField
             select
             required
-            label="Service d'affectation"
+            label={t("userForm.service")}
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
             value={watchedServiceId ?? ""}
@@ -273,7 +275,7 @@ export const UserFormModal: React.FC = () => {
           <TextField
             select
             required
-            label="Rôle Système"
+            label={t("userForm.role")}
             size="small"
             slotProps={{ select: { displayEmpty: true } }}
             value={watchedRoleId ?? ""}
@@ -297,13 +299,13 @@ export const UserFormModal: React.FC = () => {
       </DialogContent>
       <DialogActions sx={{ p: 2.5, gap: 1 }}>
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={() => dispatch(closePopup())}
           disabled={actionLoading}
         />
         <AppButton
-          text="Enregistrer"
+          text={t("userForm.save")}
           onClick={handleSubmit(onSave)}
           loading={actionLoading}
         />

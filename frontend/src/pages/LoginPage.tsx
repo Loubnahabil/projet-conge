@@ -5,8 +5,10 @@ import { loginThunk } from "@/store/slices/authSlice";
 import { LoginForm } from "@/components/organisms/LoginForm"; // Importing our complete organism!
 import type { AppDispatch, RootState } from "@/store/index";
 import type { LoginRequest } from "@/types/auth.types";
+import { useTranslation } from "react-i18next";
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   // Grab the global loading/error state from our Redux store
   const { loading, error } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
@@ -53,7 +55,7 @@ const LoginPage = () => {
             fontSize: "1.5rem",
           }}
         >
-          Gestion des Congés
+          {t("auth.loginTitle")}
         </Typography>
 
         {/* We place our finished Organism inside the card layout */}

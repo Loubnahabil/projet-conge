@@ -11,6 +11,7 @@ import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
 import { EmptyState } from "@/components/atoms/EmptyState";
 import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse } from "@/types/Demande.types";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   open: boolean;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
+  const { t } = useTranslation();
   if (!demande) return null;
 
   const handleOpen = async (pieceId: number) => {
@@ -48,7 +50,7 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
         <Divider sx={{ mb: 2 }} />
 
         <Typography variant="overline" color="textSecondary">
-          Demandeur
+          {t("detailDrawer.demandeur")}
         </Typography>
         <Typography variant="body1" sx={{ fontWeight: 600, mb: 0.5 }}>
           {demande.userNomComplet}
@@ -60,21 +62,21 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
         <Divider sx={{ mb: 2 }} />
 
         <Typography variant="overline" color="textSecondary">
-          Détails
+          {t("detailDrawer.details")}
         </Typography>
         <Stack spacing={1.5} sx={{ mt: 1, mb: 3 }}>
           {[
             {
-              label: "Type",
+              label: t("detailDrawer.type"),
               value:
                 demande.typeConge === "ANNUEL"
-                  ? "Congé Annuel"
-                  : "Congé Maladie",
+                  ? t("leaveType.congeAnnuel")
+                  : t("leaveType.congeMaladie"),
             },
-            { label: "Date début", value: demande.dateDebut },
-            { label: "Date fin", value: demande.dateFin },
-            { label: "Durée", value: `${demande.duree} jours ouvrables` },
-            { label: "Intérim", value: demande.interimNomComplet ?? "—" },
+            { label: t("detailDrawer.dateDebut"), value: demande.dateDebut },
+            { label: t("detailDrawer.dateFin"), value: demande.dateFin },
+            { label: t("detailDrawer.duree"), value: `${demande.duree} ${t("demandeTable.joursOuvrables")}` },
+            { label: t("detailDrawer.interim"), value: demande.interimNomComplet ?? "—" },
           ].map((row) => (
             <Stack
               key={row.label}
@@ -94,11 +96,11 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
         <Divider sx={{ mb: 2 }} />
 
         <Typography variant="overline" color="textSecondary">
-          Pièces justificatives
+          {t("detailDrawer.piecesJustificatives")}
         </Typography>
         <Stack spacing={1} sx={{ mt: 1 }}>
           {!demande.piecesJustificatives?.length ? (
-            <EmptyState message="Aucun fichier joint." />
+            <EmptyState message={t("detailDrawer.aucunFichier")} />
           ) : (
             demande.piecesJustificatives.map((piece) => (
               <DocumentFileLink

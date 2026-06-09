@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   TableContainer,
   Table,
@@ -34,8 +35,10 @@ export const SignataireDemandeTable = ({
   onRejectClick,
   onDownloadClick,
   onViewClick,
-  emptyMessage = "Aucune demande trouvée.",
+  emptyMessage,
 }: SignataireDemandeTableProps) => {
+  const { t } = useTranslation();
+  const defaultEmpty = emptyMessage ?? t("common.noData");
   return (
     <TableContainer
       component={Paper}
@@ -49,22 +52,22 @@ export const SignataireDemandeTable = ({
         <TableHead sx={{ bgcolor: "#f8fafc" }}>
           <TableRow>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Fonctionnaire
+              {t("signataire.fonctionnaire")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Service
+              {t("signataire.service")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Type
+              {t("common.type")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Date début
+              {t("signataire.dateDebut")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Date fin
+              {t("signataire.dateFin")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Durée (j)
+              {t("signataire.dureeJ")}
             </TableCell>
 
             {showActions ? (
@@ -72,11 +75,11 @@ export const SignataireDemandeTable = ({
                 align="right"
                 sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
               >
-                Actions
+                {t("common.actions")}
               </TableCell>
             ) : (
               <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Statut
+                {t("common.status")}
               </TableCell>
             )}
           </TableRow>
@@ -86,7 +89,7 @@ export const SignataireDemandeTable = ({
           {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} sx={{ py: 3 }}>
-                <EmptyState message={emptyMessage} />
+                <EmptyState message={defaultEmpty} />
               </TableCell>
             </TableRow>
           ) : (
@@ -112,7 +115,7 @@ export const SignataireDemandeTable = ({
 
                   {showActions ? (
                     <TableCell align="right" sx={{ pr: 2 }}>
-                      <Tooltip title="Voir détails">
+                      <Tooltip title={t("signataire.voirDetails")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#2563eb", mr: 1 }}
@@ -122,7 +125,7 @@ export const SignataireDemandeTable = ({
                         </IconButton>
                       </Tooltip>
 
-                      <Tooltip title="Signer et déposer le document">
+                      <Tooltip title={t("signataire.signerDeposer")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#2563eb", mr: 1 }}
@@ -132,7 +135,7 @@ export const SignataireDemandeTable = ({
                         </IconButton>
                       </Tooltip>
 
-                      <Tooltip title="Télécharger le PDF">
+                      <Tooltip title={t("signataire.telechargerPdf")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#16a34a", mr: 1 }}
@@ -145,7 +148,7 @@ export const SignataireDemandeTable = ({
                         </IconButton>
                       </Tooltip>
 
-                      <Tooltip title="Rejeter">
+                      <Tooltip title={t("signataire.rejeter")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#d32f2f" }}
@@ -162,7 +165,7 @@ export const SignataireDemandeTable = ({
                         sx={{ alignItems: "center", gap: 1 }}
                       >
                         <StatusChip statut={d.statut} />
-                        <Tooltip title="Voir détails">
+                        <Tooltip title={t("signataire.voirDetails")}>
                           <IconButton
                             size="small"
                             sx={{ color: "#94a3b8" }}

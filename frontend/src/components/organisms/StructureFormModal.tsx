@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -23,6 +24,7 @@ interface FormInputs {
 }
 
 export const StructureFormModal: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { actionLoading, popup } = useSelector(
     (state: RootState) => state.structure,
@@ -72,8 +74,8 @@ export const StructureFormModal: React.FC = () => {
         sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}
       >
         {popup.mode === "create"
-          ? `Ajouter une ${popup.type}`
-          : `Modifier la ${popup.type}`}
+          ? `${t("structure.addTitle")} ${popup.type}`
+          : `${t("structure.editTitle")} ${popup.type}`}
       </DialogTitle>
 
       <DialogContent>
@@ -84,7 +86,7 @@ export const StructureFormModal: React.FC = () => {
           sx={{ mt: 1 }}
         >
           <FormInput
-            label={`Nom de la ${popup.type} *`}
+            label={`${t("structure.nomField")} ${popup.type} *`}
             registration={register("nom")}
             error={!!errors.nom}
             helperText={errors.nom?.message}
@@ -94,13 +96,13 @@ export const StructureFormModal: React.FC = () => {
 
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={() => dispatch(closeStructurePopup())}
           disabled={actionLoading}
         />
         <AppButton
-          text="Enregistrer"
+          text={t("common.save")}
           onClick={handleSubmit(onSave)}
           loading={actionLoading}
         />

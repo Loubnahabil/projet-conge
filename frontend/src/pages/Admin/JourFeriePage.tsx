@@ -10,8 +10,10 @@ import {
   fetchHolidaysThunk,
   openHolidayPopup,
 } from "@/store/slices/jourFerieSlice";
+import { useTranslation } from "react-i18next";
 
 export const JourFeriePage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { globalLoading, error } = useSelector(
     (state: RootState) => state.jourFerie,
@@ -48,10 +50,10 @@ export const JourFeriePage = () => {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: "700", color: "#1e293b" }}>
-          Gestion des Jours Fériés
+          {t("jourFerie.title")}
         </Typography>
         <AppButton
-          text="+ Ajouter un jour férié"
+          text={t("jourFerie.addButton")}
           onClick={() => dispatch(openHolidayPopup({ mode: "create" }))}
         />
       </Box>

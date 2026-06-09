@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { userApi } from "@/api/userApi";
@@ -48,7 +49,7 @@ export const fetchUsersListThunk = createAsyncThunk(
       return data;
     } catch {
       return rejectWithValue(
-        "Erreur de chargement de la liste des fonctionnaires.",
+        i18next.t("errors.loadUsers"),
       );
     }
   },
@@ -62,7 +63,7 @@ export const toggleUserStatusThunk = createAsyncThunk(
       dispatch(fetchUsersListThunk());
     } catch {
       return rejectWithValue(
-        "Erreur lors du changement de statut actif/inactif.",
+        i18next.t("errors.toggleUserStatus"),
       );
     }
   },
@@ -88,7 +89,7 @@ export const saveUserThunk = createAsyncThunk(
       const message =
         e.response?.data?.message ||
         e.response?.data?.error ||
-        "Erreur lors de l'enregistrement du fonctionnaire.";
+        i18next.t("errors.saveUser");
       return rejectWithValue(message);
     }
   },
@@ -102,7 +103,7 @@ export const deleteUserThunk = createAsyncThunk(
       dispatch(fetchUsersListThunk());
     } catch {
       return rejectWithValue(
-        "Impossible de supprimer ce profil car des dépendances y sont rattachées.",
+        i18next.t("errors.deleteUserDependencies"),
       );
     }
   },

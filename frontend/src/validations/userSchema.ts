@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import i18next from "i18next";
 
 // Interface copy placed here for type safety mapping reference
 interface UserFormInputs {
@@ -19,28 +20,28 @@ interface UserFormInputs {
 // Added <UserFormInputs> here to align TypeScript types perfectly
 export const userValidationSchema: yup.ObjectSchema<UserFormInputs> =
   yup.object({
-    nom: yup.string().required("Le nom est obligatoire"),
-    prenom: yup.string().required("Le prénom est obligatoire"),
+    nom: yup.string().required(() => i18next.t("validation.nomRequired")),
+    prenom: yup.string().required(() => i18next.t("validation.prenomRequired")),
     email: yup
       .string()
-      .required("L'email est obligatoire")
-      .email("Email invalide"),
-    ppr: yup.string().required("Le PPR est obligatoire"),
-    grade: yup.string().required("Le grade est obligatoire"),
+      .required(() => i18next.t("validation.emailRequired"))
+      .email(() => i18next.t("validation.emailInvalid")),
+    ppr: yup.string().required(() => i18next.t("validation.pprRequired")),
+    grade: yup.string().required(() => i18next.t("validation.gradeRequired")),
     dateDebutFonction: yup
       .string()
-      .required("La date de début de fonction est obligatoire"),
-    directionId: yup.number().typeError("Veuillez sélectionner une direction").required("La direction est obligatoire"),
-    divisionId: yup.number().typeError("Veuillez sélectionner une division").required("La division est obligatoire"),
-    serviceId: yup.number().typeError("Veuillez sélectionner un service").required("Le service est obligatoire"),
-    roleId: yup.number().typeError("Veuillez sélectionner un rôle").required("Le rôle système est obligatoire"),
+      .required(() => i18next.t("validation.dateDebutFonctionRequired")),
+    directionId: yup.number().typeError(() => i18next.t("validation.directionTypeError")).required(() => i18next.t("validation.directionRequired")),
+    divisionId: yup.number().typeError(() => i18next.t("validation.divisionTypeError")).required(() => i18next.t("validation.divisionRequired")),
+    serviceId: yup.number().typeError(() => i18next.t("validation.serviceTypeError")).required(() => i18next.t("validation.serviceRequired")),
+    roleId: yup.number().typeError(() => i18next.t("validation.roleTypeError")).required(() => i18next.t("validation.roleRequired")),
 
     password: yup.string().when("$isCreate", {
       is: true,
       then: (schema) =>
         schema
-          .required("Le mot de passe temporaire est obligatoire")
-          .min(6, "Minimum 6 caractères"),
+          .required(() => i18next.t("validation.passwordRequired"))
+          .min(6, () => i18next.t("validation.passwordMin")),
       otherwise: (schema) => schema.notRequired(),
     }),
 
@@ -48,10 +49,10 @@ export const userValidationSchema: yup.ObjectSchema<UserFormInputs> =
       is: true,
       then: (schema) =>
         schema
-          .required("La confirmation du mot de passe est obligatoire")
+          .required(() => i18next.t("validation.confirmPasswordRequired"))
           .oneOf(
             [yup.ref("password")],
-            "Les mots de passe ne correspondent pas",
+            () => i18next.t("validation.passwordMismatch"),
           ),
       otherwise: (schema) => schema.notRequired(),
     }),

@@ -18,10 +18,12 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { logout } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { UserResponseDTO } from "@/types/user.types";
+import { useTranslation } from "react-i18next";
 
 export const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const authUser = useSelector((state: RootState) => state.auth.user);
 
   const [profile, setProfile] = useState<UserResponseDTO | null>(null);
@@ -47,7 +49,7 @@ export const ProfilePage = () => {
         setPrenom(data.prenom);
         setEmail(data.email);
       })
-      .catch(() => setError("Impossible de charger votre profil."))
+      .catch(() => setError(t("profile.loadError")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -56,11 +58,11 @@ export const ProfilePage = () => {
     setSuccess(null);
 
     if (newPassword && newPassword !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t("profile.passwordMismatch"));
       return;
     }
     if (newPassword && !currentPassword) {
-      setError("Veuillez saisir votre mot de passe actuel.");
+      setError(t("profile.passwordRequired"));
       return;
     }
 
@@ -73,7 +75,7 @@ export const ProfilePage = () => {
         ...(newPassword ? { currentPassword, newPassword } : {}),
       });
 
-      setSuccess("Profil mis à jour avec succès.");
+      setSuccess(t("profile.updateSuccess"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -87,7 +89,7 @@ export const ProfilePage = () => {
       }
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors de la mise à jour.";
+        err instanceof Error ? err.message : t("profile.updateError");
       setError(message);
     } finally {
       setSaving(false);
@@ -107,7 +109,7 @@ export const ProfilePage = () => {
   if (loading)
     return (
       <Box sx={{ p: 4 }}>
-        <Typography>Chargement...</Typography>
+        <Typography>{t("common.loading")}</Typography>
       </Box>
     );
 
@@ -147,47 +149,47 @@ export const ProfilePage = () => {
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
           <Badge sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-            Informations administratives
+            {t("profile.infoAdmin")}
           </Typography>
         </Stack>
         <Stack spacing={2}>
           <TextField
-            label="PPR"
+            label={t("profile.ppr")}
             value={profile?.ppr ?? "—"}
             disabled
             size="small"
             fullWidth
           />
           <TextField
-            label="Grade / Échelle"
+            label={t("profile.grade")}
             value={profile?.grade ?? "—"}
             disabled
             size="small"
             fullWidth
           />
           <TextField
-            label="Direction"
+            label={t("profile.direction")}
             value={profile?.directionNom ?? "—"}
             disabled
             size="small"
             fullWidth
           />
           <TextField
-            label="Division"
+            label={t("profile.division")}
             value={profile?.divisionNom ?? "—"}
             disabled
             size="small"
             fullWidth
           />
           <TextField
-            label="Service"
+            label={t("profile.service")}
             value={profile?.serviceNom ?? "—"}
             disabled
             size="small"
             fullWidth
           />
           <TextField
-            label="Date de début de fonction"
+            label={t("profile.dateDebutFonction")}
             value={profile?.dateDebutFonction ?? "—"}
             disabled
             size="small"
@@ -203,20 +205,20 @@ export const ProfilePage = () => {
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
           <Person sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-            Informations personnelles
+            {t("profile.infoPerso")}
           </Typography>
         </Stack>
         <Stack spacing={2}>
           <Stack direction="row" spacing={2}>
             <TextField
-              label="Nom"
+              label={t("profile.nom")}
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               size="small"
               fullWidth
             />
             <TextField
-              label="Prénom"
+              label={t("profile.prenom")}
               value={prenom}
               onChange={(e) => setPrenom(e.target.value)}
               size="small"
@@ -224,7 +226,7 @@ export const ProfilePage = () => {
             />
           </Stack>
           <TextField
-            label="Email professionnel"
+            label={t("profile.email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             size="small"
@@ -240,15 +242,15 @@ export const ProfilePage = () => {
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
           <Lock sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-            Changer le mot de passe
+            {t("profile.changerMotDePasse")}
           </Typography>
         </Stack>
         <Typography variant="body2" sx={{ color: "#64748b", mb: 3 }}>
-          Laissez vide si vous ne souhaitez pas modifier votre mot de passe.
+          {t("profile.mdpLeaveEmpty")}
         </Typography>
         <Stack spacing={2}>
           <TextField
-            label="Mot de passe actuel"
+            label={t("profile.mdpActuel")}
             type="password"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
@@ -256,7 +258,7 @@ export const ProfilePage = () => {
             fullWidth
           />
           <TextField
-            label="Nouveau mot de passe"
+            label={t("profile.nouveauMdp")}
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -264,7 +266,7 @@ export const ProfilePage = () => {
             fullWidth
           />
           <TextField
-            label="Confirmer le nouveau mot de passe"
+            label={t("profile.confirmerNouveauMdp")}
             type="password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -289,7 +291,7 @@ export const ProfilePage = () => {
 
       <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
         <AppButton
-          text="Enregistrer les modifications"
+          text={t("profile.saveButton")}
           onClick={handleSave}
           loading={saving}
         />

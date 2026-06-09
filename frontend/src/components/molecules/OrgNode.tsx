@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, IconButton } from "@mui/material";
 import {
   KeyboardArrowDown,
@@ -7,8 +8,6 @@ import {
   Folder,
   Settings,
 } from "@mui/icons-material";
-// 🌟 Fixed this import! Changed from "@/components/molecules/OrgBadge" to "../molecules/OrgBadge" (or wherever your molecules sit relative to organisms)
-// If OrgBadge is in molecules: "../../components/molecules/OrgBadge" or "../molecules/OrgBadge" depending on your exact folder nesting level
 import { OrgBadge } from "@/components/molecules/OrgBadge";
 import { AppButton } from "@/components/atoms/AppButton";
 
@@ -31,11 +30,12 @@ export const OrgNode = ({
   onDelete,
   children,
 }: OrgNodeProps) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const getIcon = () => {
     if (type === "direction")
-      return <Business sx={{ color: "#1976d2", mr: 1 }} />; // Matches your blue header
+      return <Business sx={{ color: "#1976d2", mr: 1 }} />;
     if (type === "division") return <Folder sx={{ color: "#e4a11b", mr: 1 }} />;
     return <Settings sx={{ color: "#2e7d32", mr: 1, fontSize: "1.1rem" }} />;
   };
@@ -44,22 +44,20 @@ export const OrgNode = ({
 
   return (
     <Box sx={{ width: "100%", mb: 1 }}>
-      {/* Light Mode Row Container */}
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           p: 1.5,
-          bgcolor: "#fff", // Crisp white base rows
-          border: "1px solid #e2e8f0", // Clean soft border dividers
+          bgcolor: "#fff",
+          border: "1px solid #e2e8f0",
           borderRadius: "8px",
-          color: "#333", // Crisp dark readable text
+          color: "#333",
           boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
           "&:hover": { bgcolor: "#f8fafc" },
         }}
       >
-        {/* Left Section */}
         <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
           {type !== "service" ? (
             <IconButton
@@ -88,35 +86,33 @@ export const OrgNode = ({
           {badgeText && <OrgBadge text={badgeText} />}
         </Box>
 
-        {/* Right Section Action Buttons */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           {type === "direction" && onAddChild && (
-            <AppButton text="+ Division" variant="text" onClick={onAddChild} />
+            <AppButton text={t("structure.addDivision")} variant="text" onClick={onAddChild} />
           )}
           {type === "division" && onAddChild && (
-            <AppButton text="+ Service" variant="text" onClick={onAddChild} />
+            <AppButton text={t("structure.addService")} variant="text" onClick={onAddChild} />
           )}
 
-          <AppButton text="Modifier" variant="text" onClick={onEdit} />
+          <AppButton text={t("structure.modifier")} variant="text" onClick={onEdit} />
 
           <button
             onClick={onDelete}
             style={{
               background: "none",
               border: "none",
-              color: "#d32f2f", // Clear administrative red
+              color: "#d32f2f",
               cursor: "pointer",
               fontSize: "0.875rem",
               fontWeight: "500",
               padding: "4px 8px",
             }}
           >
-            Supprimer
+            {t("structure.supprimer")}
           </button>
         </Box>
       </Box>
 
-      {/* Expanded Hierarchy branch with clean dark-gray indicator line */}
       {isOpen && hasChildren && (
         <Box
           sx={{
@@ -130,7 +126,7 @@ export const OrgNode = ({
               top: 0,
               bottom: "16px",
               width: "1.5px",
-              bgcolor: "#cbd5e1", // Light grey branch lines
+              bgcolor: "#cbd5e1",
             },
           }}
         >

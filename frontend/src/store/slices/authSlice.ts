@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import {
   createSlice,
   createAsyncThunk,
@@ -26,12 +27,12 @@ export const loginThunk = createAsyncThunk(
       // ✅ Use Axios type guard to cleanly extract the backend error message
       if (axios.isAxiosError(error)) {
         return rejectWithValue(
-          error.response?.data?.error || "Erreur de connexion",
+          error.response?.data?.error || i18next.t("errors.loginError"),
         );
       }
 
       // Fallback for generic/network errors
-      return rejectWithValue("Erreur de connexion");
+      return rejectWithValue(i18next.t("errors.loginError"));
     }
   },
 );

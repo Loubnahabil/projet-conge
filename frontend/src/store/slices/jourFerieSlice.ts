@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -38,7 +39,7 @@ export const fetchHolidaysThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Impossible de charger les jours fériés.";
+          : i18next.t("errors.loadHolidays");
 
       return rejectWithValue(message);
     }
@@ -58,7 +59,7 @@ export const createHolidayThunk = createAsyncThunk(
       return response;
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Échec de la création.";
+        err instanceof Error ? err.message : i18next.t("errors.createHoliday");
 
       return rejectWithValue(message);
     }
@@ -82,7 +83,7 @@ export const updateHolidayThunk = createAsyncThunk(
       return response;
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Échec de la modification.";
+        err instanceof Error ? err.message : i18next.t("errors.updateHoliday");
 
       return rejectWithValue(message);
     }
@@ -98,7 +99,7 @@ export const deleteHolidayThunk = createAsyncThunk(
       return id;
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Échec de la suppression.";
+        err instanceof Error ? err.message : i18next.t("errors.deleteHoliday");
 
       return rejectWithValue(message);
     }
@@ -174,7 +175,7 @@ const jourFerieSlice = createSlice({
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
           state.error =
-            action.payload || "Une erreur opérationnelle est survenue.";
+            action.payload || i18next.t("errors.operationalError");
         },
       );
   },

@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import i18next from "i18next";
 
 interface StructureFormInputs {
   nom: string;
@@ -6,5 +7,5 @@ interface StructureFormInputs {
 
 export const structureValidationSchema: yup.ObjectSchema<StructureFormInputs> =
   yup.object({
-    nom: yup.string().required("Ce champ est obligatoire"),
+    nom: yup.string().required(() => i18next.t("validation.fieldRequired")),
   });

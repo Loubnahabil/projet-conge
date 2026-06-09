@@ -1,4 +1,5 @@
 import { Box, Button, CircularProgress, Alert } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "@/components/molecules/FormInput"; // Importing our molecule!
@@ -12,6 +13,7 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ onSubmit, loading, error }: LoginFormProps) => {
+  const { t } = useTranslation();
   // We configure our form and Yup validation rules here
   const {
     register,
@@ -33,7 +35,7 @@ export const LoginForm = ({ onSubmit, loading, error }: LoginFormProps) => {
 
       {/* Reusing our Molecule for the Email field */}
       <FormInput
-        label="Email"
+        label={t("auth.email")}
         type="email"
         registration={register("email")}
         error={!!errors.email}
@@ -42,7 +44,7 @@ export const LoginForm = ({ onSubmit, loading, error }: LoginFormProps) => {
 
       {/* Reusing our Molecule for the Password field */}
       <FormInput
-        label="Mot de passe"
+        label={t("auth.password")}
         type="password"
         registration={register("password")}
         error={!!errors.password}
@@ -60,7 +62,7 @@ export const LoginForm = ({ onSubmit, loading, error }: LoginFormProps) => {
         {loading ? (
           <CircularProgress size={24} color="inherit" />
         ) : (
-          "Se connecter"
+          t("auth.loginButton")
         )}
       </Button>
     </Box>

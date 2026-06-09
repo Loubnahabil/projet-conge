@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   AppBar,
   Toolbar,
@@ -15,6 +16,7 @@ import authApi from "@/api/authApi";
 import type { RootState, AppDispatch } from "@/store";
 
 export const Navbar = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
@@ -43,7 +45,7 @@ export const Navbar = () => {
           component="div"
           sx={{ fontWeight: "bold" }}
         >
-          Gestion des Congés
+          {t("navbar.title")}
         </Typography>
 
         {/* Right Side: Welcome message, Profile Icon, and Logout Button */}
@@ -53,12 +55,12 @@ export const Navbar = () => {
               variant="body1"
               sx={{ fontWeight: "500", color: "#fff" }}
             >
-              Bonjour, {user.prenom} {user.nom}
+              {`${t("navbar.bonjour")} ${user.prenom} ${user.nom}`}
             </Typography>
           )}
 
           {/* Profile Icon Button */}
-          <Tooltip title="Mon profil">
+          <Tooltip title={t("navbar.monProfil")}>
             <IconButton
               onClick={() => navigate("/profile")}
               sx={{ color: "#fff" }}
@@ -80,7 +82,7 @@ export const Navbar = () => {
               },
             }}
           >
-            Déconnexion
+            {t("navbar.deconnexion")}
           </Button>
         </Box>
       </Toolbar>

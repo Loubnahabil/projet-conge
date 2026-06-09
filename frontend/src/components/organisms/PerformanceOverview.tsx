@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Grid, Skeleton } from "@mui/material";
 import { StatCard } from "@/components/molecules/StatCard";
 import type { RootState } from "@/store";
 
 export const PerformanceOverview = () => {
+  const { t } = useTranslation();
   const { data: stats, loading } = useSelector(
     (state: RootState) => state.stats,
   );
@@ -28,37 +30,37 @@ export const PerformanceOverview = () => {
     <Grid container spacing={2}>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <StatCard
-          label="Total demandes"
+          label={t("dashboard.totalDemandes")}
           value={stats.totalDemandes}
-          sub="Toutes périodes"
+          sub={t("dashboard.toutesPeriodes")}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <StatCard
-          label="En attente de visa"
+          label={t("dashboard.enAttenteVisa")}
           value={stats.enAttenteVisa}
-          sub="Traitement hiérarchique"
+          sub={t("dashboard.traitementHierarchique")}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <StatCard
-          label="En attente de signature"
+          label={t("dashboard.enAttenteSignature")}
           value={stats.enAttenteSignature}
-          sub="Traitement direction"
+          sub={t("dashboard.traitementDirection")}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <StatCard
-          label="Taux de validation"
+          label={t("dashboard.tauxValidation")}
           value={`${stats.tauxValidation}%`}
-          sub="Demandes approuvées"
+          sub={t("dashboard.demandesApprouvees")}
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
         <StatCard
-          label="Taux de rejet"
+          label={t("dashboard.tauxRejet")}
           value={`${stats.tauxRejet}%`}
-          sub="Demandes refusées"
+          sub={t("dashboard.demandesRefusees")}
         />
       </Grid>
     </Grid>

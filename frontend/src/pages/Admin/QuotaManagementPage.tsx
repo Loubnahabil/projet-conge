@@ -8,8 +8,10 @@ import {
   fetchQuotasMatrixThunk,
   clearFeedback,
 } from "@/store/slices/quotaSlice";
+import { useTranslation } from "react-i18next";
 
 export default function QuotaManagementPage() {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
   // 1. Local track state solely for the active structural year filter
@@ -47,7 +49,7 @@ export default function QuotaManagementPage() {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: "bold", color: "#1a237e" }}>
-          Gestion des Quotas Annuels
+          {t("quota.title")}
         </Typography>
 
         {/* 🧪 Drop our completely isolated Year Filter Molecule */}

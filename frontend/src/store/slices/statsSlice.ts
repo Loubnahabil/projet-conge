@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { statsApi } from "@/api/Statsapi";
 import type { DashboardStatsResponse } from "@/types/Stats.types";
@@ -20,7 +21,7 @@ export const fetchDashboardStatsThunk = createAsyncThunk(
     try {
       return await statsApi.getDashboard();
     } catch {
-      return rejectWithValue("Impossible de charger les statistiques.");
+      return rejectWithValue(i18next.t("errors.loadStats"));
     }
   },
 );
@@ -41,8 +42,8 @@ const statsSlice = createSlice({
       })
       .addCase(fetchDashboardStatsThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Une erreur est survenue.";
-      });
+        state.error = (action.payload as string) || i18next.t("errors.operationError");
+      })
   },
 });
 

@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -50,7 +51,7 @@ export const fetchMyDemandesThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Impossible de charger vos demandes.";
+          : i18next.t("errors.loadDemandes");
       return rejectWithValue(message);
     }
   },
@@ -65,7 +66,7 @@ export const fetchEligibleInterimsThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Impossible de charger la liste des intérimaires.";
+          : i18next.t("errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -83,7 +84,7 @@ export const createDemandeThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Erreur lors de la création de la demande.";
+          : i18next.t("errors.createDemande");
       return rejectWithValue(message);
     }
   },
@@ -101,7 +102,7 @@ export const updateDemandeThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Erreur lors de la modification de la demande.";
+          : i18next.t("errors.updateDemande");
       return rejectWithValue(message);
     }
   },
@@ -114,7 +115,7 @@ export const soumettreDemandeThunk = createAsyncThunk(
       return await demandeApi.soumettre(id);
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors de la soumission.";
+        err instanceof Error ? err.message : i18next.t("errors.submitDemande");
       return rejectWithValue(message);
     }
   },
@@ -127,7 +128,7 @@ export const annulerDemandeThunk = createAsyncThunk(
       return await demandeApi.annulerDemande(id);
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors de l'annulation.";
+        err instanceof Error ? err.message : i18next.t("errors.cancelDemande");
       return rejectWithValue(message);
     }
   },
@@ -142,7 +143,7 @@ export const fetchDemandeHistoryThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Impossible de charger l'historique.";
+          : i18next.t("errors.loadHistorique");
       return rejectWithValue(message);
     }
   },
@@ -157,7 +158,7 @@ export const fetchPendingChefVisasThunk = createAsyncThunk(
       return await demandeApi.getDemandesAViser();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du chargement.";
+        err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -170,7 +171,7 @@ export const fetchTraiteesChefThunk = createAsyncThunk(
       return await demandeApi.getDemandesTraiteesChef();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du chargement.";
+        err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -186,7 +187,7 @@ export const visaChefThunk = createAsyncThunk(
       return await demandeApi.visaChef(id, approve, { commentaire });
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du visa.";
+        err instanceof Error ? err.message : i18next.t("errors.visaError");
       return rejectWithValue(message);
     }
   },
@@ -201,7 +202,7 @@ export const fetchPendingSignaturesThunk = createAsyncThunk(
       return await demandeApi.getDemandesASigner();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du chargement.";
+        err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -214,7 +215,7 @@ export const fetchTraiteesSignataireThunk = createAsyncThunk(
       return await demandeApi.getDemandesTraiteesSignataire();
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du chargement.";
+        err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -230,7 +231,7 @@ export const signataireApproveThunk = createAsyncThunk(
       return await demandeApi.uploadDocument(id, file, "DECISION_SIGNEE");
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors de la signature.";
+        err instanceof Error ? err.message : i18next.t("errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -246,7 +247,7 @@ export const signataireRejectThunk = createAsyncThunk(
       return await demandeApi.rejetSignataire(id, { commentaire });
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "Erreur lors du rejet.";
+        err instanceof Error ? err.message : i18next.t("errors.rejetError");
       return rejectWithValue(message);
     }
   },

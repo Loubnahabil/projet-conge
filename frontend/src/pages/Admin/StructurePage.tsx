@@ -16,8 +16,10 @@ import type {
   FullDivision,
   FullService,
 } from "@/types/structure.types";
+import { useTranslation } from "react-i18next";
 
 export const StructurePage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { treeData, loading, error } = useSelector(
     (state: RootState) => state.structure,
@@ -31,7 +33,7 @@ export const StructurePage = () => {
     type: "direction" | "division" | "service",
     id: number,
   ) => {
-    if (window.confirm(`Voulez-vous vraiment supprimer ce ${type} ?`)) {
+    if (window.confirm(`${t("structure.confirmDelete")} ${type} ?`)) {
       dispatch(deleteStructureNodeThunk({ type, id }));
     }
   };
@@ -63,10 +65,10 @@ export const StructurePage = () => {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: "700", color: "#1e293b" }}>
-          Structure organisationnelle
+          {t("structure.title")}
         </Typography>
         <AppButton
-          text="+ Ajouter une direction"
+          text={t("structure.addDirection")}
           onClick={() =>
             dispatch(openStructurePopup({ mode: "create", type: "direction" }))
           }

@@ -16,8 +16,10 @@ import {
   openPopup,
 } from "@/store/slices/userSlice";
 import { fetchStructureDependenciesThunk } from "@/store/slices/structureSlice";
+import { useTranslation } from "react-i18next";
 
 export const UserPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
   // ⚡ Récupération de globalLoading, searchQuery et list (users) depuis Redux
@@ -66,27 +68,27 @@ export const UserPage = () => {
         }}
       >
         <Typography variant="h5" sx={{ fontWeight: "700", color: "#1e293b" }}>
-          Gestion des Fonctionnaires
+          {t("userTable.title")}
         </Typography>
 
         {/* 📦 Groupe de boutons d'action (Export + Ajout) */}
         <Box sx={{ display: "flex", gap: 1.5 }}>
           <AppButton
-            text="Excel"
+            text={t("userTable.exportExcel")}
             onClick={exportExcel}
             startIcon={<FileDownload />}
             variant="outlined"
             color="success"
           />
           <AppButton
-            text="PDF"
+            text={t("userTable.exportPdf")}
             onClick={exportPDF}
             startIcon={<FileDownload />}
             variant="outlined"
             color="error"
           />
           <AppButton
-            text="+ Ajouter un Fonctionnaire"
+            text={t("userTable.addButton")}
             onClick={() => dispatch(openPopup({ mode: "create" }))}
           />
         </Box>
@@ -95,7 +97,7 @@ export const UserPage = () => {
       {/* 🧪 Reusable Search Molecule */}
       <Box sx={{ mb: 3, display: "flex", gap: 2 }}>
         <SearchBar
-          placeholder="Rechercher par PPR, Nom, Email..."
+          placeholder={t("userTable.searchPlaceholder")}
           value={searchQuery}
           onChange={handleSearch}
         />

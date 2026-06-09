@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { auditApi } from "@/api/AuditApi";
 import type { DemandeHistoriqueDTO } from "@/types/Audit.types";
@@ -20,7 +21,7 @@ export const fetchJournalAuditThunk = createAsyncThunk(
     try {
       return await auditApi.getJournalAudit();
     } catch {
-      return rejectWithValue("Impossible de charger le journal d'audit.");
+      return rejectWithValue(i18next.t("errors.loadAudit"));
     }
   },
 );
@@ -41,7 +42,7 @@ const auditSlice = createSlice({
       })
       .addCase(fetchJournalAuditThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Une erreur est survenue.";
+        state.error = (action.payload as string) || i18next.t("errors.operationError");
       });
   },
 });
