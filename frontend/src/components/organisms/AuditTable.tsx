@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -23,11 +24,9 @@ import HistoryIcon from "@mui/icons-material/History";
 import { StatusChip } from "@/components/atoms/StatusChip";
 import type { RootState } from "@/store";
 
-// ⚡ Using standard MUI color variants exactly like your Demande configuration setup
 const STATUT_CONFIG: Record<
   string,
   {
-    label: string;
     color:
       | "default"
       | "primary"
@@ -38,20 +37,13 @@ const STATUT_CONFIG: Record<
       | "warning";
   }
 > = {
-  BROUILLON: { label: "Brouillon", color: "default" },
-  SOUMISE: { label: "Soumise", color: "warning" },
-  VISEE_CHEF: { label: "Visée chef", color: "info" },
-  SIGNEE_DIRECTEUR: { label: "Signée", color: "success" },
-  REJETEE_CHEF: { label: "Rejetée chef", color: "error" },
-  REJETEE_DIRECTEUR: { label: "Rejetée direction", color: "error" },
-  ANNULEE: { label: "Annulée", color: "default" },
-};
-
-const ROLE_LABEL: Record<string, string> = {
-  ADMIN: "Admin",
-  FONCTIONNAIRE: "Fonctionnaire",
-  CHEF_HIERARCHIE: "Chef hiérarchique",
-  SIGNATAIRE: "Signataire",
+  BROUILLON: { color: "default" },
+  SOUMISE: { color: "warning" },
+  VISEE_CHEF: { color: "info" },
+  SIGNEE_DIRECTEUR: { color: "success" },
+  REJETEE_CHEF: { color: "error" },
+  REJETEE_DIRECTEUR: { color: "error" },
+  ANNULEE: { color: "default" },
 };
 
 const ALL_STATUTS = Object.keys(STATUT_CONFIG);
@@ -69,7 +61,25 @@ const formatDate = (iso: string) => {
   );
 };
 
+const STATUS_TKEY: Record<string, string> = {
+  BROUILLON: "status.brouillon",
+  SOUMISE: "status.soumise",
+  VISEE_CHEF: "status.viseeChefShort",
+  SIGNEE_DIRECTEUR: "status.signee",
+  REJETEE_CHEF: "status.rejeteeChef",
+  REJETEE_DIRECTEUR: "status.rejeteeDirecteur",
+  ANNULEE: "status.annulee",
+};
+
+const ROLE_TKEY: Record<string, string> = {
+  ADMIN: "role.admin",
+  FONCTIONNAIRE: "role.fonctionnaire",
+  CHEF_HIERARCHIE: "role.chefHierarchique",
+  SIGNATAIRE: "role.signataire",
+};
+
 export const AuditTable = () => {
+  const { t } = useTranslation();
   const { entries } = useSelector((state: RootState) => state.audit);
 
   const [search, setSearch] = useState("");
@@ -114,7 +124,7 @@ export const AuditTable = () => {
       {/* Filters Control Block */}
       <Box sx={{ display: "flex", gap: 2, mb: 3, flexWrap: "wrap" }}>
         <TextField
-          placeholder="Rechercher par nom, email, demande…"
+          placeholder={t("audit.searchPlaceholder")}
           size="small"
           value={search}
           onChange={(e) => {
@@ -136,19 +146,19 @@ export const AuditTable = () => {
           size="small"
           sx={{ minWidth: 200, bgcolor: "#fff", borderRadius: "8px" }}
         >
-          <InputLabel>Statut</InputLabel>
+          <InputLabel>{t("audit.statut")}</InputLabel>
           <Select
             value={statutFilter}
-            label="Statut"
+            label={t("audit.statut")}
             onChange={(e) => {
               setStatutFilter(e.target.value);
               setPage(0);
             }}
           >
-            <MenuItem value="ALL">Tous les statuts</MenuItem>
+            <MenuItem value="ALL">{t("audit.tousStatuts")}</MenuItem>
             {ALL_STATUTS.map((s) => (
               <MenuItem key={s} value={s}>
-                {STATUT_CONFIG[s]?.label ?? s}
+                {t(STATUS_TKEY[s] ?? s)}
               </MenuItem>
             ))}
           </Select>
@@ -168,13 +178,13 @@ export const AuditTable = () => {
           }}
         >
           <Typography variant="body2" sx={{ color: "#64748b" }}>
-            Total :
+            {t("audit.total")}
           </Typography>
           <Typography
             variant="body2"
             sx={{ fontWeight: 700, color: "#0f172a" }}
           >
-            {filtered.length} entrée{filtered.length !== 1 ? "s" : ""}
+            {filtered.length} {t(filtered.length !== 1 ? "common.entries_plural" : "common.entries")}
           </Typography>
         </Paper>
       </Box>
@@ -223,7 +233,7 @@ export const AuditTable = () => {
                     sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
                   />
                   <Typography variant="body2">
-                    Aucune entrée trouvée dans le journal d'audit.
+                    {t("audit.noData")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -259,7 +269,7 @@ export const AuditTable = () => {
                     </TableCell>
 
                     <TableCell sx={{ color: "#334155" }}>
-                      {ROLE_LABEL[entry.acteurRole] ?? entry.acteurRole}
+                      {t(ROLE_TKEY[entry.acteurRole] ?? entry.acteurRole)}
                     </TableCell>
 
                     <TableCell
@@ -304,7 +314,7 @@ export const AuditTable = () => {
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Lignes par page:"
+          labelRowsPerPage={t("common.linesPerPage")}
         />
       </TableContainer>
     </Box>

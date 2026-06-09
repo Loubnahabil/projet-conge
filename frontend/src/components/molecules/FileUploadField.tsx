@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography, IconButton } from "@mui/material";
 import {
   CloudUpload,
@@ -24,21 +25,18 @@ export const FileUploadField = ({
   existingFileName,
   onChange,
 }: FileUploadFieldProps) => {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null); // URL preview pour images
 
   const validate = (f: File): string | null => {
-    // Validation extension
     const ext = f.name.substring(f.name.lastIndexOf(".")).toLowerCase();
     if (!ALLOWED_EXTENSIONS.includes(ext))
-      return "Format non autorisé (PDF, JPG, PNG uniquement)";
-
-    // Validation taille
+      return t("upload.formatNotAllowed");
     if (f.size > MAX_SIZE)
-      return `Fichier trop lourd (max 5 Mo, actuel : ${(f.size / 1024 / 1024).toFixed(1)} Mo)`;
-
+      return t("upload.fileTooHeavy", { size: (f.size / 1024 / 1024).toFixed(1) });
     return null;
   };
 
@@ -53,7 +51,6 @@ export const FileUploadField = ({
     if (validationError) {
       setLocalError(validationError);
       onChange(null);
-      // Reset input pour pouvoir re-sélectionner le même fichier
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
@@ -61,7 +58,6 @@ export const FileUploadField = ({
     setFile(selected);
     onChange(selected);
 
-    // Prévisualisation image uniquement
     if (selected.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (ev) => setPreview(ev.target?.result as string);
@@ -96,7 +92,6 @@ export const FileUploadField = ({
         onChange={handleChange}
       />
 
-      {/* Zone de drop / sélection */}
       {!file && !existingFileName && (
         <Box
           onClick={() => inputRef.current?.click()}
@@ -113,15 +108,14 @@ export const FileUploadField = ({
         >
           <CloudUpload sx={{ fontSize: 32, color: "#64748b", mb: 1 }} />
           <Typography variant="body2" sx={{ color: "#475569" }}>
-            Cliquez pour sélectionner un fichier
+            {t("upload.clickToSelect")}
           </Typography>
           <Typography variant="caption" sx={{ color: "#94a3b8" }}>
-            PDF, PNG, JPG — max 5 Mo
+            {t("upload.acceptedFormats")}
           </Typography>
         </Box>
       )}
 
-      {/* Fichier existant (mode édition) */}
       {!file && existingFileName && (
         <Box
           onClick={() => inputRef.current?.click()}
@@ -144,13 +138,12 @@ export const FileUploadField = ({
               {existingFileName}
             </Typography>
             <Typography variant="caption" sx={{ color: "#16a34a" }}>
-              Cliquez pour remplacer ce fichier
+              {t("upload.clickToReplace")}
             </Typography>
           </Box>
         </Box>
       )}
 
-      {/* Prévisualisation image */}
       {file && preview && (
         <Box
           onClick={handlePreview}
@@ -165,7 +158,7 @@ export const FileUploadField = ({
         >
           <img
             src={preview}
-            alt="Prévisualisation"
+            alt={t("upload.preview")}
             style={{
               width: "100%",
               maxHeight: 220,
@@ -201,7 +194,6 @@ export const FileUploadField = ({
         </Box>
       )}
 
-      {/* Prévisualisation PDF (pas d'image → juste infos) */}
       {file && isPdf && (
         <Box
           onClick={handlePreview}
@@ -243,7 +235,6 @@ export const FileUploadField = ({
         </Box>
       )}
 
-      {/* Message d'erreur */}
       {displayError && (
         <Typography
           variant="caption"

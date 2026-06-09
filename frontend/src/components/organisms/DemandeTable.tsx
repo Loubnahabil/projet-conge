@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
@@ -49,6 +50,7 @@ export const DemandeTable = ({
   onDirectSubmit,
   onCancelClick,
 }: DemandeTableProps) => {
+  const { t } = useTranslation();
   return (
     <Box>
       <Box
@@ -60,24 +62,24 @@ export const DemandeTable = ({
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          Mes Demandes de Congé
+          {t("demandeTable.title")}
         </Typography>
         <Button variant="contained" onClick={onOpenCreate}>
-          Nouvelle Demande
+          {t("demandeTable.newButton")}
         </Button>
       </Box>
       <TableContainer>
         <Table>
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Début</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Fin</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Durée</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>Statut</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.id")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.type")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.debut")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.fin")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.duree")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("common.status")}</TableCell>
               <TableCell align="right" sx={{ fontWeight: 600, pr: 3 }}>
-                Actions
+                {t("common.actions")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -85,7 +87,7 @@ export const DemandeTable = ({
             {demandes.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} sx={{ py: 3 }}>
-                  <EmptyState message="Aucune demande trouvée." />
+                  <EmptyState message={t("demandeTable.noDemandes")} />
                 </TableCell>
               </TableRow>
             ) : (
@@ -98,7 +100,7 @@ export const DemandeTable = ({
                   <TableRow key={d.id} hover>
                     <TableCell>#{d.id}</TableCell>
                     <TableCell>
-                      {d.typeConge === "ANNUEL" ? "Annuel" : "Maladie"}
+                      {d.typeConge === "ANNUEL" ? t("leaveType.annuel") : t("leaveType.maladie")}
                     </TableCell>
                     <TableCell>{d.dateDebut}</TableCell>
                     <TableCell>{d.dateFin}</TableCell>
@@ -112,7 +114,7 @@ export const DemandeTable = ({
                         spacing={0.5}
                         sx={{ justifyContent: "flex-end" }}
                       >
-                        <Tooltip title="Voir Détails">
+                        <Tooltip title={t("demandeTable.voirDetails")}>
                           <IconButton
                             color="info"
                             onClick={() => onOpenDetail(d)}
@@ -123,7 +125,7 @@ export const DemandeTable = ({
                         </Tooltip>
 
                         {canEdit && (
-                          <Tooltip title="Modifier">
+                          <Tooltip title={t("demandeTable.modifier")}>
                             <IconButton
                               color="primary"
                               onClick={() => onOpenEdit(d)}
@@ -136,7 +138,7 @@ export const DemandeTable = ({
 
                         {isBrouillon && (
                           <>
-                            <Tooltip title="Soumettre">
+                            <Tooltip title={t("demandeTable.soumettre")}>
                               <IconButton
                                 sx={{ color: "#16a34a" }}
                                 onClick={() => onDirectSubmit(d)}
@@ -145,7 +147,7 @@ export const DemandeTable = ({
                                 <Send fontSize="small" />
                               </IconButton>
                             </Tooltip>
-                            <Tooltip title="Annuler (Supprimer)">
+                            <Tooltip title={t("demandeTable.annulerSupprimer")}>
                               <IconButton
                                 color="error"
                                 onClick={() => onCancelClick(d.id)}
@@ -158,7 +160,7 @@ export const DemandeTable = ({
                         )}
 
                         {isSoumise && (
-                          <Tooltip title="Annuler la demande">
+                          <Tooltip title={t("demandeTable.annulerDemande")}>
                             <IconButton
                               color="error"
                               onClick={() => onCancelClick(d.id)}

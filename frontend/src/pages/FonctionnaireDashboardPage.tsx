@@ -13,8 +13,10 @@ import { EmptyState } from "@/components/atoms/EmptyState";
 import { statsApi } from "@/api/Statsapi";
 import { StatCard } from "@/components/molecules/StatCard";
 import type { FonctionnaireDashboardStats } from "@/types/Stats.types";
+import { useTranslation } from "react-i18next";
 
 const FonctionnaireDashboardPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [stats, setStats] = useState<FonctionnaireDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ const FonctionnaireDashboardPage = () => {
     statsApi
       .getFonctionnaireDashboard()
       .then(setStats)
-      .catch(() => setError("Erreur lors du chargement des statistiques."))
+      .catch(() => setError(t("profile.loadError")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -49,7 +51,7 @@ const FonctionnaireDashboardPage = () => {
         variant="h5"
         sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Tableau de bord
+        {t("dashboard.fonctionnaireTitle")}
       </Typography>
 
       {error && (
@@ -63,37 +65,37 @@ const FonctionnaireDashboardPage = () => {
           <Grid container spacing={2} sx={{ mb: 4 }}>
             <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <StatCard
-                label="Quota alloué"
-                value={`${stats.quotaAlloue} jours`}
-                sub="Année en cours"
+                label={t("dashboard.quotaAlloue")}
+                value={`${stats.quotaAlloue} ${t("demandeTable.jours")}`}
+                sub={t("dashboard.anneeEnCours")}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <StatCard
-                label="Quota utilisé"
-                value={`${stats.quotaUtilise} jours`}
-                sub="Année en cours"
+                label={t("dashboard.quotaUtilise")}
+                value={`${stats.quotaUtilise} ${t("demandeTable.jours")}`}
+                sub={t("dashboard.anneeEnCours")}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <StatCard
-                label="Quota restant"
-                value={`${stats.quotaRestant} jours`}
-                sub="Année en cours"
+                label={t("dashboard.quotaRestant")}
+                value={`${stats.quotaRestant} ${t("demandeTable.jours")}`}
+                sub={t("dashboard.anneeEnCours")}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <StatCard
-                label="Total demandes"
+                label={t("dashboard.totalDemandes")}
                 value={stats.totalDemandes}
-                sub="Toutes périodes"
+                sub={t("dashboard.toutesPeriodes")}
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <StatCard
-                label="En attente"
+                label={t("dashboard.enAttente")}
                 value={stats.enAttenteVisa}
-                sub="Visa chef"
+                sub={t("dashboard.visaChef")}
               />
             </Grid>
           </Grid>
@@ -105,14 +107,14 @@ const FonctionnaireDashboardPage = () => {
               onClick={() => navigate("/mes-demandes")}
               sx={{ mr: 2 }}
             >
-              Faire une demande de congé
+              {t("dashboard.faireDemande")}
             </Button>
             <Button
               variant="outlined"
               size="large"
               onClick={() => navigate("/mes-demandes")}
             >
-              Voir mes demandes
+              {t("dashboard.voirMesDemandes")}
             </Button>
           </Box>
 
@@ -127,10 +129,10 @@ const FonctionnaireDashboardPage = () => {
               variant="h6"
               sx={{ fontWeight: 600, color: "#1e293b", mb: 2 }}
             >
-              Demandes récentes
+              {t("dashboard.demandesRecentes")}
             </Typography>
             {stats.demandesRecentes.length === 0 ? (
-              <EmptyState message="Aucune demande pour le moment." />
+              <EmptyState message={t("dashboard.aucuneDemande")} />
             ) : (
               <Grid container spacing={2}>
                 {stats.demandesRecentes.map((demande) => (
@@ -150,12 +152,12 @@ const FonctionnaireDashboardPage = () => {
                         sx={{ fontWeight: 600, color: "#0f172a" }}
                       >
                         {demande.typeConge === "ANNUEL"
-                          ? "Congé annuel"
-                          : "Congé maladie"}
+                          ? t("leaveType.congeAnnuel")
+                          : t("leaveType.congeMaladie")}
                       </Typography>
                       <Typography variant="caption" sx={{ color: "#64748b" }}>
                         {demande.dateDebut} → {demande.dateFin} ({demande.duree}{" "}
-                        jours)
+                        {t("demandeTable.jours")})
                       </Typography>
                       <Typography
                         variant="caption"
@@ -175,15 +177,15 @@ const FonctionnaireDashboardPage = () => {
                                   : "#64748b",
                         }}
                       >
-                        {demande.statut === "BROUILLON" && "Brouillon"}
-                        {demande.statut === "SOUMISE" && "Soumise"}
-                        {demande.statut === "VISEE_CHEF" && "Visée par le chef"}
+                        {demande.statut === "BROUILLON" && t("status.brouillon")}
+                        {demande.statut === "SOUMISE" && t("status.soumise")}
+                        {demande.statut === "VISEE_CHEF" && t("status.viseeChef")}
                         {demande.statut === "SIGNEE_DIRECTEUR" &&
-                          "Signée par le directeur"}
-                        {demande.statut === "REJETEE_CHEF" && "Rejetée (chef)"}
+                          t("status.signeeDirecteur")}
+                        {demande.statut === "REJETEE_CHEF" && t("status.rejeteeChef")}
                         {demande.statut === "REJETEE_DIRECTEUR" &&
-                          "Rejetée (directeur)"}
-                        {demande.statut === "ANNULEE" && "Annulée"}
+                          t("status.rejeteeDirecteur")}
+                        {demande.statut === "ANNULEE" && t("status.annulee")}
                       </Typography>
                     </Paper>
                   </Grid>

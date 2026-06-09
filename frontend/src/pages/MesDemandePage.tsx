@@ -33,6 +33,7 @@ import type {
   DemandeRequest,
   TypeConge,
 } from "@/types/Demande.types";
+import { useTranslation } from "react-i18next";
 
 interface FormInputs {
   dateDebut: string;
@@ -41,20 +42,22 @@ interface FormInputs {
   interimId: string;
 }
 
-const statutConfig: Record<
-  string,
-  { label: string; color: "default" | "warning" | "info" | "success" | "error" }
-> = {
-  BROUILLON: { label: "Brouillon", color: "default" },
-  SOUMISE: { label: "Soumise", color: "warning" },
-  VISEE_CHEF: { label: "Visée par le Chef", color: "info" },
-  SIGNEE_DIRECTEUR: { label: "Signée Directeur", color: "success" },
-  REJETEE_CHEF: { label: "Rejetée Chef", color: "error" },
-  REJETEE_DIRECTEUR: { label: "Rejetée Directeur", color: "error" },
-  ANNULEE: { label: "Annulée", color: "default" },
-};
-
 export const MesDemandePage = () => {
+  const { t } = useTranslation();
+
+  const statutConfig: Record<
+    string,
+    { label: string; color: "default" | "warning" | "info" | "success" | "error" }
+  > = {
+    BROUILLON: { label: t("status.brouillon"), color: "default" },
+    SOUMISE: { label: t("status.soumise"), color: "warning" },
+    VISEE_CHEF: { label: t("status.viseeChef"), color: "info" },
+    SIGNEE_DIRECTEUR: { label: t("status.signeeDirecteur"), color: "success" },
+    REJETEE_CHEF: { label: t("status.rejeteeChef"), color: "error" },
+    REJETEE_DIRECTEUR: { label: t("status.rejeteeDirecteur"), color: "error" },
+    ANNULEE: { label: t("status.annulee"), color: "default" },
+  };
+
   const dispatch = useDispatch<AppDispatch>();
   const { demandes, interims, actionLoading, error, selectedHistory } =
     useSelector((state: RootState) => state.demande);
@@ -108,9 +111,7 @@ export const MesDemandePage = () => {
     submitInstantly: boolean,
   ) => {
     if (data.typeConge === "MALADIE" && submitInstantly && !selectedFile) {
-      setFileError(
-        "Une pièce justificative (Certificat médical) est obligatoire pour soumettre un congé maladie.",
-      );
+      setFileError(t("demandeForm.maladieRequiresDoc"));
       return;
     }
 
@@ -188,7 +189,7 @@ export const MesDemandePage = () => {
 
   const getInterimName = useCallback(
     (id?: number) => {
-      if (!id) return "Aucun";
+      if (!id) return t("quota.nonSpecifie");
       const found = interims.find((c) => c.id === id);
       return found ? `${found.nom} ${found.prenom}` : `ID: ${id}`;
     },
@@ -279,23 +280,22 @@ export const MesDemandePage = () => {
         open={cancelDialogOpen}
         onClose={() => setCancelDialogOpen(false)}
       >
-        <DialogTitle>Confirmer l'annulation</DialogTitle>
+        <DialogTitle>{t("annulation.title")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Êtes-vous sûr de vouloir annuler ou supprimer cette demande de congé
-            administrative ? Cette action est irréversible.
+            {t("annulation.message")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCancelDialogOpen(false)} color="inherit">
-            Ignorer
+            {t("common.ignore")}
           </Button>
           <Button
             onClick={handleConfirmCancellation}
             color="error"
             variant="contained"
           >
-            Confirmer
+            {t("annulation.confirm")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -42,7 +43,7 @@ export const fetchQuotasMatrixThunk = createAsyncThunk(
           const qData = await quotaApi.getQuotaByUserAndYear(user.id, year);
           compiledData.push({
             ...qData,
-            grade: user.grade || "Non spécifié",
+            grade: user.grade || i18next.t("quota.nonSpecifie"),
           });
         } catch {
           // If a quota entry is missing in DB for this year, generate the localized placeholder
@@ -54,13 +55,13 @@ export const fetchQuotasMatrixThunk = createAsyncThunk(
             joursAlloues: 30,
             joursUtilises: 0,
             joursRestants: 30,
-            grade: user.grade || "Non spécifié",
+            grade: user.grade || i18next.t("quota.nonSpecifie"),
           });
         }
       }
       return compiledData;
     } catch {
-      return rejectWithValue("Erreur lors du chargement des quotas.");
+      return rejectWithValue(i18next.t("errors.loadQuotas"));
     }
   },
 );
@@ -83,7 +84,7 @@ export const updateQuotaThunk = createAsyncThunk(
       });
       return updatedData;
     } catch {
-      return rejectWithValue("Échec de la mise à jour du quota.");
+      return rejectWithValue(i18next.t("errors.updateQuota"));
     }
   },
 );
@@ -123,7 +124,7 @@ const quotaSlice = createSlice({
         state.actionLoading = false;
         state.feedback = {
           type: "success",
-          text: "Quota mis à jour avec succès.",
+          text: i18next.t("quota.updateSuccess"),
         };
         // Sync our local list state instantly with the updated item
         state.list = state.list.map((q) =>

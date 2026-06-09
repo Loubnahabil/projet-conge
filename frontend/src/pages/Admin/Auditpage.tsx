@@ -5,8 +5,10 @@ import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { AuditTable } from "@/components/organisms/AuditTable";
 import { fetchJournalAuditThunk } from "@/store/slices/auditSlice";
 import type { RootState, AppDispatch } from "@/store";
+import { useTranslation } from "react-i18next";
 
 export const AuditPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error } = useSelector((state: RootState) => state.audit);
 
@@ -42,10 +44,10 @@ export const AuditPage = () => {
       {/* Structural Header Area */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
-          Journal d'Audit
+          {t("audit.title")}
         </Typography>
         <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
-          Historique complet de toutes les actions sur les demandes de congés
+          {t("audit.description")}
         </Typography>
       </Box>
 

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
 
@@ -11,8 +12,8 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
   value,
   onChange,
 }) => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
-  // Provide choices for previous year, current year, and next year
   const yearsList = [currentYear - 1, currentYear, currentYear + 1];
 
   const handleSelectChange = (event: SelectChangeEvent<number>) => {
@@ -21,11 +22,11 @@ export const YearSelector: React.FC<YearSelectorProps> = ({
 
   return (
     <FormControl size="small" sx={{ minWidth: 120 }}>
-      <InputLabel id="year-selector-label">Année</InputLabel>
+      <InputLabel id="year-selector-label">{t("yearSelector.annee")}</InputLabel>
       <Select
         labelId="year-selector-label"
         value={value}
-        label="Année"
+        label={t("yearSelector.annee")}
         onChange={handleSelectChange}
       >
         {yearsList.map((y) => (

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -26,6 +27,7 @@ export const SignataireDecisionModal = ({
   onClose,
   onConfirm,
 }: SignataireDecisionModalProps) => {
+  const { t } = useTranslation();
   const [commentaire, setCommentaire] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -33,7 +35,7 @@ export const SignataireDecisionModal = ({
     setLocalError(null);
 
     if (!commentaire.trim()) {
-      setLocalError("Un commentaire est obligatoire en cas de rejet.");
+      setLocalError(t("signataire.commentaireRequis"));
       return;
     }
 
@@ -43,7 +45,7 @@ export const SignataireDecisionModal = ({
   return (
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
-        Confirmer le rejet — Direction
+        {t("signataire.confirmerRejetDirection")}
       </DialogTitle>
 
       <DialogContent dividers>
@@ -53,7 +55,7 @@ export const SignataireDecisionModal = ({
           )}
 
           <TextField
-            label="Motif du rejet *"
+            label={t("signataire.motifRejet")}
             multiline
             rows={3}
             size="small"
@@ -67,14 +69,14 @@ export const SignataireDecisionModal = ({
 
       <DialogActions sx={{ p: 2.5, gap: 1 }}>
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={onClose}
           disabled={actionLoading}
         />
 
         <AppButton
-          text="Rejeter"
+          text={t("signataire.rejeter")}
           onClick={handleSubmit}
           loading={actionLoading}
         />

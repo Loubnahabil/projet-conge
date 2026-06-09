@@ -19,6 +19,7 @@ import { demandeValidationSchema } from "@/validations/demandeSchema";
 import type { DemandeResponse } from "@/types/Demande.types";
 import type { UserResponseDTO } from "@/types/user.types";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
+import { useTranslation } from "react-i18next";
 
 interface FormInputs {
   dateDebut: string;
@@ -58,6 +59,7 @@ export const DemandeForm = ({
   fileError,
   onFileChange,
 }: DemandeFormProps) => {
+  const { t } = useTranslation();
   const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
   const {
     register,
@@ -106,14 +108,13 @@ export const DemandeForm = ({
         </IconButton>
         <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
           {editingDemande
-            ? `Modifier la Demande N #${editingDemande.id}`
-            : "Nouvelle Demande de Congé"}
+            ? `${t("demandeForm.titleEdit")} #${editingDemande.id}`
+            : t("demandeForm.titleCreate")}
         </Typography>
       </Stack>
 
       <Typography variant="body2" color="textSecondary" sx={{ mb: 3, pl: 5 }}>
-        Saisissez vos dates d'absence. Les week-ends et jours fériés nationaux
-        sont automatiquement exclus du décompte final.
+        {t("demandeForm.description")}
       </Typography>
 
       <Divider sx={{ mb: 4 }} />
@@ -121,7 +122,7 @@ export const DemandeForm = ({
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
-            label="Date de la Demande"
+            label={t("demandeForm.dateDemande")}
             value={new Date().toLocaleDateString("fr-FR")}
             disabled
             fullWidth
@@ -131,20 +132,20 @@ export const DemandeForm = ({
         <Grid size={{ xs: 12, sm: 6 }}>
           <TextField
             select
-            label="Type de congé *"
+            label={t("demandeForm.typeConge")}
             size="small"
             fullWidth
             {...register("typeConge")}
             error={!!errors.typeConge}
             helperText={errors.typeConge?.message}
           >
-            <MenuItem value="ANNUEL">Congé Annuel</MenuItem>
-            <MenuItem value="MALADIE">Congé Maladie</MenuItem>
+            <MenuItem value="ANNUEL">{t("leaveType.congeAnnuel")}</MenuItem>
+            <MenuItem value="MALADIE">{t("leaveType.congeMaladie")}</MenuItem>
           </TextField>
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <FormInput
-            label="Date de début *"
+            label={t("demandeForm.dateDebut")}
             type="date"
             registration={register("dateDebut")}
             error={!!errors.dateDebut}
@@ -153,7 +154,7 @@ export const DemandeForm = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <FormInput
-            label="Date de fin *"
+            label={t("demandeForm.dateFin")}
             type="date"
             registration={register("dateFin")}
             error={!!errors.dateFin}
@@ -162,8 +163,8 @@ export const DemandeForm = ({
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <TextField
-            label="Durée calculée"
-            value={`${calculatedDuree} jours`}
+            label={t("demandeForm.dureeCalculee")}
+            value={`${calculatedDuree} ${t("demandeTable.jours")}`}
             size="small"
             disabled
             fullWidth
@@ -173,7 +174,7 @@ export const DemandeForm = ({
         <Grid size={{ xs: 12 }}>
           <TextField
             select
-            label="Intérimaire (Collègues du même service) *"
+            label={t("demandeForm.interimaire")}
             size="small"
             fullWidth
             {...register("interimId")}
@@ -192,10 +193,10 @@ export const DemandeForm = ({
             variant="subtitle2"
             sx={{ fontWeight: 600, color: "#475569", mb: 1 }}
           >
-            Pièces Justificatives{" "}
+            {t("demandeForm.piecesJustificatives")}{" "}
             {watchTypeConge === "MALADIE" && (
               <span style={{ color: "#ef4444" }}>
-                * (obligatoire pour congé maladie)
+                {t("demandeForm.maladieObligatoire")}
               </span>
             )}
           </Typography>
@@ -210,7 +211,7 @@ export const DemandeForm = ({
         sx={{ mt: 5, justifyContent: "flex-end" }}
       >
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={onCancel}
           disabled={actionLoading}
@@ -221,10 +222,10 @@ export const DemandeForm = ({
           onClick={handleSubmit((data) => onSaveWorkflow(data, false))}
           disabled={actionLoading}
         >
-          Enregistrer Brouillon
+          {t("demandeForm.saveDraft")}
         </Button>
         <AppButton
-          text="Soumettre la Demande"
+          text={t("demandeForm.submitDemande")}
           onClick={handleSubmit((data) => onSaveWorkflow(data, true))}
           loading={actionLoading}
         />

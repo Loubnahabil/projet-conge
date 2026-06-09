@@ -25,8 +25,10 @@ import {
 import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse } from "@/types/Demande.types";
 import type { SignataireDashboardStats } from "@/types/Stats.types";
+import { useTranslation } from "react-i18next";
 
 export const SignatairePage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { pendingSignatures, traiteesSignataire, signataireLoading, actionLoading, error } =
     useSelector((state: RootState) => state.demande);
@@ -111,37 +113,37 @@ export const SignatairePage = () => {
         variant="h5"
         sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Tableau de bord — Signataire
+        {t("signataire.title")}
       </Typography>
 
       {dashboardStats && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="En attente de signature"
+              label={t("signataire.enAttenteSignature")}
               value={dashboardStats.enAttenteSignature}
-              sub="Demandes à traiter"
+              sub={t("signataire.aTraiter")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Signées"
+              label={t("signataire.signees")}
               value={dashboardStats.signees}
-              sub="Total"
+              sub={t("dashboard.total")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Rejetées"
+              label={t("signataire.rejetees")}
               value={dashboardStats.rejetees}
-              sub="Total"
+              sub={t("dashboard.total")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Total traitées"
+              label={t("signataire.traitees")}
               value={dashboardStats.totalTraitees}
-              sub="Toutes périodes"
+              sub={t("dashboard.toutesPeriodes")}
             />
           </Grid>
         </Grid>
@@ -158,8 +160,8 @@ export const SignatairePage = () => {
         onChange={handleTabChange}
         sx={{ mb: 3, borderBottom: "1px solid #e2e8f0" }}
       >
-        <Tab label={`À signer (${pendingDemandes.length})`} />
-        <Tab label="Demandes traitées" />
+        <Tab label={`${t("signataire.aSigner")} (${pendingDemandes.length})`} />
+        <Tab label={t("signataire.demandesTraitees")} />
       </Tabs>
 
       {tab === 0 && (
@@ -170,7 +172,7 @@ export const SignatairePage = () => {
           onDownloadClick={(id) => demandeApi.generatePdf(id)}
           onRejectClick={(id) => setRejectDialog({ open: true, targetId: id })}
           onViewClick={(d) => setDrawerDemande(d)}
-          emptyMessage="Aucune demande en attente de signature."
+          emptyMessage={t("signataire.aucuneAttente")}
         />
       )}
 
@@ -183,7 +185,7 @@ export const SignatairePage = () => {
           <SignataireDemandeTable
             data={traiteesSignataire}
             onViewClick={(d) => setDrawerDemande(d)}
-            emptyMessage="Aucune demande traitée pour l'instant."
+            emptyMessage={t("signataire.aucuneTraitee")}
           />
         ))}
 

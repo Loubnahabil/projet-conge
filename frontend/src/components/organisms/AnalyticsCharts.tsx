@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Box, Typography, Grid, Skeleton } from "@mui/material";
 import {
@@ -14,7 +15,23 @@ import {
 import { DashboardSection } from "@/components/molecules/DashboardSection";
 import type { RootState } from "@/store";
 
+const statusLabelMap: Record<string, string> = {
+  BROUILLON: "status.brouillon",
+  SOUMISE: "status.soumise",
+  VISEE_CHEF: "status.viseeChef",
+  SIGNEE_DIRECTEUR: "status.signeeDirecteur",
+  REJETEE_CHEF: "status.rejeteeChef",
+  REJETEE_DIRECTEUR: "status.rejeteeDirecteur",
+  ANNULEE: "status.annulee",
+};
+
+const typeLabelMap: Record<string, string> = {
+  ANNUEL: "leaveType.annuel",
+  MALADIE: "leaveType.maladie",
+};
+
 export const AnalyticsCharts = () => {
+  const { t } = useTranslation();
   const { data: stats, loading } = useSelector(
     (state: RootState) => state.stats,
   );
@@ -46,7 +63,7 @@ export const AnalyticsCharts = () => {
     <Grid container spacing={2} sx={{ mt: 1 }}>
       {/* Demandes par Direction */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <DashboardSection title="Demandes par direction">
+        <DashboardSection title={t("analytics.demandesParDirection")}>
           <Box sx={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
               <BarChart
@@ -85,7 +102,7 @@ export const AnalyticsCharts = () => {
 
       {/* Statistiques Mensuelles */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <DashboardSection title="Statistiques mensuelles">
+        <DashboardSection title={t("analytics.statistiquesMensuelles")}>
           <Box sx={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
               <LineChart
@@ -125,7 +142,7 @@ export const AnalyticsCharts = () => {
 
       {/* Nombre de demandes par état */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <DashboardSection title="Nombre de demandes par état">
+        <DashboardSection title={t("analytics.nombreDemandesParEtat")}>
           <Box
             sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}
           >
@@ -140,7 +157,7 @@ export const AnalyticsCharts = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {key}
+                  {t(statusLabelMap[key] ?? key)}
                 </Typography>
                 <Typography
                   variant="body2"
@@ -156,7 +173,7 @@ export const AnalyticsCharts = () => {
 
       {/* Demandes par Type de Congé */}
       <Grid size={{ xs: 12, md: 6 }}>
-        <DashboardSection title="Demandes par type de congé">
+        <DashboardSection title={t("analytics.demandesParType")}>
           <Box
             sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}
           >
@@ -171,7 +188,7 @@ export const AnalyticsCharts = () => {
                 }}
               >
                 <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {key}
+                  {t(typeLabelMap[key] ?? key)}
                 </Typography>
                 <Typography
                   variant="body2"

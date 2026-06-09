@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { structureApi } from "@/api/structureApi";
@@ -60,7 +61,7 @@ export const fetchStructureDependenciesThunk = createAsyncThunk(
       ]);
       return { dirs, divs, servs, roles };
     } catch {
-      return rejectWithValue("Erreur de chargement des structures.");
+      return rejectWithValue(i18next.t("errors.loadStructures"));
     }
   },
 );
@@ -92,7 +93,7 @@ export const saveStructureNodeThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Une erreur est survenue lors de l'enregistrement.";
+          : i18next.t("errors.saveStructure");
       return rejectWithValue(message);
     }
   },
@@ -116,7 +117,7 @@ export const deleteStructureNodeThunk = createAsyncThunk(
       const message =
         err instanceof Error
           ? err.message
-          : "Échec de la suppression. Vérifiez l'existence de sous-éléments.";
+          : i18next.t("errors.deleteStructure");
       return rejectWithValue(message);
     }
   },
@@ -176,7 +177,7 @@ const structureSlice = createSlice({
       })
       .addCase(fetchStructureDependenciesThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || "Une erreur est survenue."; // 🌟 Save error to state!
+        state.error = (action.payload as string) || i18next.t("errors.operationError"); // 🌟 Save error to state!
       })
 
       // Matchers for action handling
@@ -203,7 +204,7 @@ const structureSlice = createSlice({
           !action.type.includes("fetchDependencies"),
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
-          state.error = action.payload || "Opération impossible.";
+          state.error = action.payload || i18next.t("errors.operationImpossible");
         },
       );
   },

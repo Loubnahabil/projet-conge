@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/atoms/EmptyState";
 import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
 import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse, HistoryRecord } from "@/types/Demande.types";
+import { useTranslation } from "react-i18next";
 
 interface DemandeDetailProps {
   selectedDemande: DemandeResponse;
@@ -49,6 +50,7 @@ export const DemandeDetail = ({
   getInterimName,
   formatDate,
 }: DemandeDetailProps) => {
+  const { t } = useTranslation();
   const isCancelable =
     selectedDemande.statut === "BROUILLON" ||
     selectedDemande.statut === "SOUMISE";
@@ -86,8 +88,8 @@ export const DemandeDetail = ({
             <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
               DEM-2026-00{selectedDemande.id} —{" "}
               {selectedDemande.typeConge === "ANNUEL"
-                ? "Congé annuel"
-                : "Congé maladie"}
+                ? t("leaveType.congeAnnuel")
+                : t("leaveType.congeMaladie")}
             </Typography>
             <Stack
               direction="row"
@@ -99,7 +101,7 @@ export const DemandeDetail = ({
                 sx={{ fontWeight: 700 }}
               />
               <Typography variant="caption" color="textSecondary">
-                En attente de traitement par le circuit administratif
+                {t("demandeDetail.enAttente")}
               </Typography>
             </Stack>
           </Box>
@@ -114,7 +116,7 @@ export const DemandeDetail = ({
             onClick={() => onCancelClick(selectedDemande.id)}
             sx={{ textTransform: "none", fontWeight: 600, borderRadius: "8px" }}
           >
-            Annuler la demande
+            {t("demandeDetail.annulerButton")}
           </Button>
         )}
       </Box>
@@ -132,7 +134,7 @@ export const DemandeDetail = ({
                   variant="subtitle1"
                   sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
                 >
-                  DOCUMENTS SIGNÉS
+                  {t("demandeDetail.documentsSignes")}
                 </Typography>
                 <Stack spacing={1}>
                   {selectedDemande.piecesJustificatives.map((piece) => (
@@ -153,27 +155,27 @@ export const DemandeDetail = ({
               variant="subtitle1"
               sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
             >
-              INFORMATIONS DOSSIER
+              {t("demandeDetail.infosDossier")}
             </Typography>
             <Stack spacing={2}>
               {[
                 {
-                  label: "Type de congé",
+                  label: t("demandeDetail.typeConge"),
                   value:
                     selectedDemande.typeConge === "ANNUEL"
-                      ? "Congé Annuel"
-                      : "Congé Maladie",
+                      ? t("leaveType.congeAnnuel")
+                      : t("leaveType.congeMaladie"),
                 },
-                { label: "Date de départ", value: selectedDemande.dateDebut },
-                { label: "Date de retour", value: selectedDemande.dateFin },
+                { label: t("demandeDetail.dateDepart"), value: selectedDemande.dateDebut },
+                { label: t("demandeDetail.dateRetour"), value: selectedDemande.dateFin },
                 {
-                  label: "Durée accordée",
-                  value: `${selectedDemande.duree} jours ouvrables`,
+                  label: t("demandeDetail.dureeAccordee"),
+                  value: `${selectedDemande.duree} ${t("demandeTable.joursOuvrables")}`,
                   bold: true,
                 },
-                { label: "Année administrative", value: "2026" },
+                { label: t("demandeDetail.anneeAdministrative"), value: "2026" },
                 {
-                  label: "Intérim désigné",
+                  label: t("demandeDetail.interimDesigné"),
                   value: getInterimName(selectedDemande.interimId),
                   blue: true,
                 },
@@ -216,13 +218,13 @@ export const DemandeDetail = ({
               variant="subtitle1"
               sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
             >
-              HISTORIQUE DES ETATS
+              {t("demandeDetail.historiqueEtats")}
             </Typography>
 
             {actionLoading ? (
               <LoadingSpinner />
             ) : demandeHistory.length === 0 ? (
-              <EmptyState message="Aucun historique de suivi enregistré." />
+              <EmptyState message={t("demandeDetail.aucunHistorique")} />
             ) : (
               <Stack
                 spacing={3}
@@ -281,7 +283,7 @@ export const DemandeDetail = ({
                         variant="caption"
                         sx={{ color: "#64748b", display: "block" }}
                       >
-                        par {log.acteurPrenom} {log.acteurNom}
+                        {t("demandeDetail.par")} {log.acteurPrenom} {log.acteurNom}
                         {log.acteurRole ? ` (${log.acteurRole})` : ""}
                       </Typography>
                     )}

@@ -22,8 +22,10 @@ import {
 import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse } from "@/types/Demande.types";
 import type { ChefDashboardStats } from "@/types/Stats.types";
+import { useTranslation } from "react-i18next";
 
 export const ChefDashboardPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { pendingChefVisas, traiteesChef, chefLoading, actionLoading, error } =
     useSelector((state: RootState) => state.demande);
@@ -106,37 +108,37 @@ export const ChefDashboardPage = () => {
         variant="h5"
         sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
       >
-        Tableau de bord — Chef hiérarchique
+        {t("chef.title")}
       </Typography>
 
       {dashboardStats && (
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="En attente de visa"
+              label={t("chef.enAttenteVisa")}
               value={dashboardStats.enAttenteVisa}
-              sub="Demandes à traiter"
+              sub={t("chef.aTraiter")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Approuvées"
+              label={t("chef.approuvees")}
               value={dashboardStats.approuvees}
-              sub="Total"
+              sub={t("dashboard.total")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Rejetées"
+              label={t("chef.rejetees")}
               value={dashboardStats.rejetees}
-              sub="Total"
+              sub={t("dashboard.total")}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
-              label="Total traitées"
+              label={t("chef.traitees")}
               value={dashboardStats.totalTraitees}
-              sub="Toutes périodes"
+              sub={t("dashboard.toutesPeriodes")}
             />
           </Grid>
         </Grid>
@@ -153,8 +155,8 @@ export const ChefDashboardPage = () => {
         onChange={handleTabChange}
         sx={{ mb: 3, borderBottom: "1px solid #e2e8f0" }}
       >
-        <Tab label={`À viser (${pendingDemandes.length})`} />
-        <Tab label="Demandes traitées" />
+        <Tab label={`${t("chef.aViser")} (${pendingDemandes.length})`} />
+        <Tab label={t("chef.demandesTraitees")} />
       </Tabs>
 
       {tab === 0 && (
@@ -163,7 +165,7 @@ export const ChefDashboardPage = () => {
           showActions
           onActionClick={handleOpenDecisionWorkflow}
           onViewClick={(d) => setDrawerDemande(d)}
-          emptyMessage="Aucune demande en attente de visa."
+          emptyMessage={t("chef.aucuneAttente")}
         />
       )}
 
@@ -176,7 +178,7 @@ export const ChefDashboardPage = () => {
           <ChefDemandeTable
             data={traiteesChef}
             onViewClick={(d) => setDrawerDemande(d)}
-            emptyMessage="Aucune demande traitée pour l'instant."
+            emptyMessage={t("chef.aucuneTraitee")}
           />
         ))}
 

@@ -3,7 +3,8 @@ import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { store } from "@/store/index";
 import AppRoutes from "@/routes/AppRoutes";
-import { injectStore } from "@/api/axiosInstance"; // <-- Import the helper
+import { injectStore } from "@/api/axiosInstance";
+import "@/i18n";
 
 injectStore(store);
 ReactDOM.createRoot(document.getElementById("root")!).render(

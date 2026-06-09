@@ -5,8 +5,10 @@ import { PerformanceOverview } from "@/components/organisms/PerformanceOverview"
 import { AnalyticsCharts } from "@/components/organisms/AnalyticsCharts";
 import { fetchDashboardStatsThunk } from "@/store/slices/statsSlice";
 import type { RootState, AppDispatch } from "@/store";
+import { useTranslation } from "react-i18next";
 
 export const AdminDashboardPage = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { error } = useSelector((state: RootState) => state.stats);
 
@@ -21,10 +23,10 @@ export const AdminDashboardPage = () => {
       {/* Structural Layout Title Block[cite: 10] */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
-          Tableau de Bord Administratif
+          {t("dashboard.adminTitle")}
         </Typography>
         <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
-          Vue d'ensemble des demandes de congés — {currentYear}
+          {`${t("dashboard.adminSubtitle")} — ${currentYear}`}
         </Typography>
       </Box>
 

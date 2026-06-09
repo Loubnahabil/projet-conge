@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogTitle,
@@ -25,6 +26,7 @@ export const SignataireUploadModal = ({
   onCancel,
   onUpload,
 }: SignataireUploadModalProps) => {
+  const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (file: File | null) => {
@@ -38,7 +40,7 @@ export const SignataireUploadModal = ({
   return (
     <Dialog open={open} onClose={onCancel} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
-        Déposer la décision signée
+        {t("signataire.deposerDecision")}
       </DialogTitle>
 
       <DialogContent>
@@ -52,13 +54,13 @@ export const SignataireUploadModal = ({
 
       <DialogActions sx={{ p: 2.5, gap: 1 }}>
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={onCancel}
           disabled={actionLoading}
         />
         <AppButton
-          text="Déposer"
+          text={t("signataire.deposer")}
           onClick={handleSubmit}
           loading={actionLoading}
           disabled={!selectedFile}

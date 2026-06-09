@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import i18next from "i18next";
 
 interface DemandeFormInputs {
   dateDebut: string;
@@ -9,19 +10,19 @@ interface DemandeFormInputs {
 
 export const demandeValidationSchema: yup.ObjectSchema<DemandeFormInputs> =
   yup.object({
-    dateDebut: yup.string().required("La date de début est obligatoire"),
+    dateDebut: yup.string().required(() => i18next.t("validation.dateDebutRequired")),
     dateFin: yup
       .string()
-      .required("La date de fin est obligatoire")
+      .required(() => i18next.t("validation.dateFinRequired"))
       .test(
         "date-order",
-        "La date de fin doit être après la date de début",
+        () => i18next.t("validation.dateFinApresDebut"),
         function (val) {
           const { dateDebut } = this.parent;
           if (!dateDebut || !val) return true;
           return new Date(val) >= new Date(dateDebut);
         },
       ),
-    typeConge: yup.string().required("Le type de congé est obligatoire"),
-    interimId: yup.string().required("L'intérimaire est obligatoire"),
+    typeConge: yup.string().required(() => i18next.t("validation.typeCongeRequired")),
+    interimId: yup.string().required(() => i18next.t("validation.interimaireRequired")),
   });

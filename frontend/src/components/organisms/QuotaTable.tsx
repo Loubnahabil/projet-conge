@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Table,
@@ -22,6 +23,7 @@ import { updateQuotaThunk } from "@/store/slices/quotaSlice";
 import type { ExtendedQuota } from "@/store/slices/quotaSlice";
 
 export const QuotaTable: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
   // 1. Extract database arrays and load states directly from global Redux
@@ -47,17 +49,15 @@ export const QuotaTable: React.FC = () => {
   const handleSaveInline = async (id: number) => {
     // Basic inline guard boundary validation checks
     if (editAlloues < 0 || editAlloues > 90) {
-      setLocalError("Les jours alloués doivent être compris entre 0 et 90.");
+      setLocalError(t("quota.alloueRange"));
       return;
     }
     if (editUtilises < 0) {
-      setLocalError("Les jours utilisés ne peuvent pas être négatifs.");
+      setLocalError(t("quota.utilisesNegatif"));
       return;
     }
     if (editAlloues < editUtilises) {
-      setLocalError(
-        "Attention: Les jours alloués sont inférieurs aux jours utilisés.",
-      );
+      setLocalError(t("quota.alloueInferieur"));
     }
 
     setLocalError(null);
@@ -102,22 +102,22 @@ export const QuotaTable: React.FC = () => {
           <TableHead sx={{ backgroundColor: "#f5f5f5" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Nom Complet
+                {t("quota.nomComplet")}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Grade
+                {t("quota.grade")}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Jours Alloués
+                {t("quota.joursAlloues")}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Jours Utilisés
+                {t("quota.joursUtilises")}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Jours Restants
+                {t("quota.joursRestants")}
               </TableCell>
               <TableCell sx={{ fontWeight: "bold", color: "#1a237e" }}>
-                Actions
+                {t("common.actions")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -172,11 +172,11 @@ export const QuotaTable: React.FC = () => {
                   <TableCell>
                     {isEditing ? (
                       <Typography sx={{ fontWeight: "bold", color: "#757575" }}>
-                        {editAlloues - editUtilises} jrs (calculé)
+                        {editAlloues - editUtilises} {t("quota.jrsCalcule")}
                       </Typography>
                     ) : (
                       <Typography sx={{ fontWeight: "bold", color: "#2e7d32" }}>
-                        {row.joursRestants} jrs
+                        {row.joursRestants} {t("quota.jrs")}
                       </Typography>
                     )}
                   </TableCell>

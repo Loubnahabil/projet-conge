@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import React from "react";
 import {
   TableContainer,
@@ -30,8 +31,10 @@ export const ChefDemandeTable = ({
   showActions = false,
   onActionClick,
   onViewClick,
-  emptyMessage = "Aucune demande trouvée.",
+  emptyMessage,
 }: ChefDemandeTableProps) => {
+  const { t } = useTranslation();
+  const emptyMsg = emptyMessage ?? t("common.noData");
   return (
     <TableContainer
       component={Paper}
@@ -45,33 +48,33 @@ export const ChefDemandeTable = ({
         <TableHead sx={{ bgcolor: "#f8fafc" }}>
           <TableRow>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Fonctionnaire
+              {t("chef.fonctionnaire")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Service
+              {t("chef.service")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Type
+              {t("common.type")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Date début
+              {t("chef.dateDebut")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Date fin
+              {t("chef.dateFin")}
             </TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              Durée (j)
+              {t("chef.dureeJ")}
             </TableCell>
             {showActions ? (
               <TableCell
                 align="right"
                 sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
               >
-                Actions
+                {t("common.actions")}
               </TableCell>
             ) : (
               <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Statut
+                {t("common.status")}
               </TableCell>
             )}
           </TableRow>
@@ -80,7 +83,7 @@ export const ChefDemandeTable = ({
           {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} sx={{ py: 3 }}>
-                <EmptyState message={emptyMessage} />
+                <EmptyState message={emptyMsg} />
               </TableCell>
             </TableRow>
           ) : (
@@ -102,7 +105,7 @@ export const ChefDemandeTable = ({
 
                   {showActions ? (
                     <TableCell align="right" sx={{ pr: 2 }}>
-                      <Tooltip title="Voir détails">
+                      <Tooltip title={t("demandeTable.voirDetailsShort")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#2563eb", mr: 1 }}
@@ -111,7 +114,7 @@ export const ChefDemandeTable = ({
                           <Visibility fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Approuver">
+                      <Tooltip title={t("chef.approuver")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#16a34a", mr: 1 }}
@@ -120,7 +123,7 @@ export const ChefDemandeTable = ({
                           <CheckCircle fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Rejeter">
+                      <Tooltip title={t("chef.rejeter")}>
                         <IconButton
                           size="small"
                           sx={{ color: "#d32f2f" }}
@@ -137,7 +140,7 @@ export const ChefDemandeTable = ({
                         sx={{ alignItems: "center", gap: 1 }}
                       >
                         <StatusChip statut={d.statut} />
-                        <Tooltip title="Voir détails">
+                        <Tooltip title={t("demandeTable.voirDetailsShort")}>
                           <IconButton
                             size="small"
                             sx={{ color: "#94a3b8" }}

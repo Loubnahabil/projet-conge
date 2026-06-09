@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import {
   Dialog,
@@ -28,6 +29,7 @@ export const ChefDecisionModal = ({
   onCancel,
   onConfirm,
 }: ChefDecisionModalProps) => {
+  const { t } = useTranslation();
   const [commentaire, setCommentaire] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -45,7 +47,7 @@ export const ChefDecisionModal = ({
     setLocalError(null);
 
     if (mode === "reject" && !commentaire.trim()) {
-      setLocalError("Un commentaire est obligatoire en cas de rejet.");
+      setLocalError(t("chef.commentaireRequis"));
       return;
     }
 
@@ -58,7 +60,7 @@ export const ChefDecisionModal = ({
   return (
     <Dialog open={open} onClose={handleCancel}>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
-        {mode === "approve" ? "Confirmer l'approbation" : "Confirmer le rejet"}
+        {t(mode === "approve" ? "chef.confirmerApprobation" : "chef.confirmerRejet")}
       </DialogTitle>
 
       <DialogContent dividers>
@@ -67,7 +69,7 @@ export const ChefDecisionModal = ({
 
           <TextField
             label={
-              mode === "reject" ? "Motif du rejet *" : "Commentaire (optionnel)"
+              mode === "reject" ? t("chef.motifRejet") : t("chef.commentaire")
             }
             multiline
             rows={3}
@@ -82,14 +84,14 @@ export const ChefDecisionModal = ({
 
       <DialogActions sx={{ p: 2.5, gap: 1 }}>
         <AppButton
-          text="Annuler"
+          text={t("common.cancel")}
           variant="outlined"
           onClick={handleCancel}
           disabled={actionLoading}
         />
 
         <AppButton
-          text={mode === "approve" ? "Approuver" : "Rejeter"}
+          text={t(mode === "approve" ? "chef.approuver" : "chef.rejeter")}
           onClick={handleValidationSubmit}
           loading={actionLoading}
         />

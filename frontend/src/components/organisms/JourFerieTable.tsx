@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Table,
@@ -26,6 +27,7 @@ import {
 import type { JourFerieResponseDTO } from "@/types/jourFerie.types";
 
 export const JourFerieTable: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { list: holidays } = useSelector((state: RootState) => state.jourFerie);
 
@@ -73,16 +75,16 @@ export const JourFerieTable: React.FC = () => {
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
               <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Date
+                {t("jourFerie.date")}
               </TableCell>
               <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                Libellé du jour férié
+                {t("jourFerie.libelle")}
               </TableCell>
               <TableCell
                 align="right"
                 sx={{ fontWeight: 600, color: "#475569", pr: 3 }}
               >
-                Actions
+                {t("common.actions")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -98,7 +100,7 @@ export const JourFerieTable: React.FC = () => {
                     sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
                   />
                   <Typography variant="body2">
-                    Aucun jour férié enregistré pour le moment.
+                    {t("jourFerie.noData")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -154,12 +156,11 @@ export const JourFerieTable: React.FC = () => {
         }}
       >
         <DialogTitle sx={{ fontWeight: "700", color: "#1e293b", pb: 1 }}>
-          Confirmer la suppression
+          {t("jourFerie.confirmDeleteTitle")}
         </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ color: "#475569", fontSize: "0.95rem" }}>
-            Voulez-vous vraiment supprimer ce jour férié ? Cette action est
-            irréversible et mettra à jour les calculs de congés.
+            {t("jourFerie.confirmDeleteMessage")}
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 1, gap: 1 }}>
@@ -173,7 +174,7 @@ export const JourFerieTable: React.FC = () => {
               textTransform: "none",
             }}
           >
-            Annuler
+            {t("common.cancel")}
           </Button>
           <Button
             onClick={handleConfirmDelete}
@@ -186,7 +187,7 @@ export const JourFerieTable: React.FC = () => {
               "&:hover": { boxShadow: "none" },
             }}
           >
-            Supprimer
+            {t("common.delete")}
           </Button>
         </DialogActions>
       </Dialog>

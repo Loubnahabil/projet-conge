@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import {
   Table,
   TableBody,
@@ -26,6 +27,7 @@ import {
 import type { UserResponseDTO } from "@/types/user.types";
 
 export const UserTable: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
   // ⚡ Pulling states straight out of your users slice state
@@ -77,25 +79,25 @@ export const UserTable: React.FC = () => {
         <TableHead sx={{ bgcolor: "#f8fafc" }}>
           <TableRow>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              PPR
+              {t("userTable.ppr")}
             </TableCell>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              Fonctionnaire
+              {t("userTable.fonctionnaire")}
             </TableCell>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              Structure Affectation
+              {t("userTable.structure")}
             </TableCell>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              Grade
+              {t("userTable.grade")}
             </TableCell>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              Actif
+              {t("userTable.actif")}
             </TableCell>
             <TableCell
               align="right"
               sx={{ fontWeight: "600", color: "#475569", pr: 4 }}
             >
-              Actions
+              {t("common.actions")}
             </TableCell>
           </TableRow>
         </TableHead>
@@ -109,7 +111,7 @@ export const UserTable: React.FC = () => {
               >
                 <Person sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }} />
                 <Typography variant="body2">
-                  Aucun fonctionnaire trouvé dans le système.
+                  {t("userTable.noUsers")}
                 </Typography>
               </TableCell>
             </TableRow>
@@ -178,7 +180,7 @@ export const UserTable: React.FC = () => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Lignes par page:"
+        labelRowsPerPage={t("common.linesPerPage")}
       />
     </TableContainer>
   );

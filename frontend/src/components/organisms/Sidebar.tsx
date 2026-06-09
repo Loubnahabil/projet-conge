@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Drawer,
@@ -15,50 +16,51 @@ import type { RootState } from "@/store";
 const DRAWER_WIDTH = 240;
 
 interface MenuItem {
-  text: string;
+  labelKey: string;
   path: string;
   roles: string[] | "all";
 }
 
 const menuItems: MenuItem[] = [
   // ── Admin Dashboard ────────────────────────────────────────────────────────
-  { text: "Tableau de Bord", path: "/dashboard", roles: ["ADMIN"] },
+  { labelKey: "dashboard", path: "/dashboard", roles: ["ADMIN"] },
 
   // ── Fonctionnaire Roles ────────────────────────────────────────────────────
-  { text: "Tableau de Bord", path: "/fonctionnaire/dashboard", roles: ["FONCTIONNAIRE"] },
-  { text: "Mes Demandes", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
+  { labelKey: "dashboard", path: "/fonctionnaire/dashboard", roles: ["FONCTIONNAIRE"] },
+  { labelKey: "myRequests", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
 
   // ── Chef roles ────────────────────────────────────────────────────────────
   {
-    text: "Tableau de Bord",
+    labelKey: "dashboard",
     path: "/chef/demandes",
     roles: ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"],
   },
 
   // ── Signataire ────────────────────────────────────────────────────────────
   {
-    text: "Tableau de Bord",
+    labelKey: "dashboard",
     path: "/signataire/demandes",
     roles: ["SIGNATAIRE"],
   },
 
   // ── Admin Management Links ────────────────────────────────────────────────
   {
-    text: "Structure organisationnelle",
+    labelKey: "structure",
     path: "/admin/structure",
     roles: ["ADMIN"],
   },
-  { text: "Jours Fériés", path: "/admin/jours-feries", roles: ["ADMIN"] },
+  { labelKey: "holidays", path: "/admin/jours-feries", roles: ["ADMIN"] },
   {
-    text: "Gestion des Fonctionnaires",
+    labelKey: "users",
     path: "/admin/fonctionnaires",
     roles: ["ADMIN"],
   },
-  { text: "Gestion des Quotas", path: "/admin/quotas", roles: ["ADMIN"] },
-  { text: "Journal d'Audit", path: "/admin/audit", roles: ["ADMIN"] },
+  { labelKey: "quotas", path: "/admin/quotas", roles: ["ADMIN"] },
+  { labelKey: "audit", path: "/admin/audit", roles: ["ADMIN"] },
 ];
 
 export const Sidebar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const role = useSelector((state: RootState) => state.auth.user?.role);
@@ -87,7 +89,7 @@ export const Sidebar = () => {
           {visibleItems.map((item) => {
             const isSelected = location.pathname === item.path;
             return (
-              <ListItem key={item.text} disablePadding>
+              <ListItem key={item.labelKey + item.path} disablePadding>
                 <ListItemButton
                   onClick={() => navigate(item.path)}
                   selected={isSelected}
@@ -110,7 +112,7 @@ export const Sidebar = () => {
                           fontSize: "0.95rem",
                         }}
                       >
-                        {item.text}
+                        {t(`sidebar.${item.labelKey}`)}
                       </Typography>
                     }
                   />
