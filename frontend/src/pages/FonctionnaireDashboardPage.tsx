@@ -14,6 +14,7 @@ import { statsApi } from "@/api/Statsapi";
 import { StatCard } from "@/components/molecules/StatCard";
 import type { FonctionnaireDashboardStats } from "@/types/Stats.types";
 import { useTranslation } from "react-i18next";
+import { TYPE_TKEY } from "@/constants/constants";
 
 const FonctionnaireDashboardPage = () => {
   const { t } = useTranslation();
@@ -151,9 +152,7 @@ const FonctionnaireDashboardPage = () => {
                         variant="body2"
                         sx={{ fontWeight: 600, color: "#0f172a" }}
                       >
-                        {demande.typeConge === "ANNUEL"
-                          ? t("leaveType.congeAnnuel")
-                          : t("leaveType.congeMaladie")}
+                        {t(TYPE_TKEY[demande.typeConge] ?? demande.typeConge)}
                       </Typography>
                       <Typography variant="caption" sx={{ color: "#64748b" }}>
                         {demande.dateDebut} → {demande.dateFin} ({demande.duree}{" "}

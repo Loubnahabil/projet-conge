@@ -139,10 +139,7 @@ export const SignataireDemandeTable = ({
                         <IconButton
                           size="small"
                           sx={{ color: "#16a34a", mr: 1 }}
-                          onClick={() => {
-                            console.log("button clicked, id:", d.id);
-                            onDownloadClick?.(d.id);
-                          }}
+                          onClick={() => onDownloadClick?.(d.id)}
                         >
                           <Download fontSize="small" />
                         </IconButton>

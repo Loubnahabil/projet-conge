@@ -9,37 +9,37 @@ import type { AxiosResponse } from "axios";
 export const structureApi = {
   getDirections: () =>
     axiosInstance
-      .get<DirectionResponse[]>("/api/directions")
+      .get<DirectionResponse[]>("/directions")
       .then((res: AxiosResponse<DirectionResponse[]>) => res.data),
 
   getDivisions: () =>
     axiosInstance
-      .get<DivisionResponse[]>("/api/divisions")
+      .get<DivisionResponse[]>("/divisions")
       .then((res: AxiosResponse<DivisionResponse[]>) => res.data),
 
   getServices: () =>
     axiosInstance
-      .get<ServiceResponse[]>("/api/services")
+      .get<ServiceResponse[]>("/services")
       .then((res: AxiosResponse<ServiceResponse[]>) => res.data),
 
   getDivisionsByDirection: (directionId: number) =>
     axiosInstance
-      .get<DivisionResponse[]>(`/api/divisions/by-direction/${directionId}`)
+      .get<DivisionResponse[]>(`/divisions/by-direction/${directionId}`)
       .then((res: AxiosResponse<DivisionResponse[]>) => res.data),
 
   getServicesByDivision: (divisionId: number) =>
     axiosInstance
-      .get<ServiceResponse[]>(`/api/services/by-division/${divisionId}`)
+      .get<ServiceResponse[]>(`/services/by-division/${divisionId}`)
       .then((res: AxiosResponse<ServiceResponse[]>) => res.data),
 
   getRoles: () =>
     axiosInstance
-      .get<{ id: number; name: string }[]>("/api/roles")
+      .get<{ id: number; name: string }[]>("/roles")
       .then((res: AxiosResponse<{ id: number; name: string }[]>) => res.data),
 
   createDirection: (nom: string) =>
     axiosInstance
-      .post<DirectionResponse>("/api/directions", {
+      .post<DirectionResponse>("/directions", {
         nom,
         code: nom.substring(0, 3).toUpperCase(),
       })
@@ -47,7 +47,7 @@ export const structureApi = {
 
   createDivision: (directionId: number, nom: string) =>
     axiosInstance
-      .post<DivisionResponse>("/api/divisions", {
+      .post<DivisionResponse>("/divisions", {
         nom,
         directionId,
         code: nom.substring(0, 3).toUpperCase(),
@@ -56,7 +56,7 @@ export const structureApi = {
 
   createService: (divisionId: number, nom: string) =>
     axiosInstance
-      .post<ServiceResponse>("/api/services", {
+      .post<ServiceResponse>("/services", {
         nom,
         divisionId,
         code: nom.substring(0, 3).toUpperCase(),
@@ -65,7 +65,7 @@ export const structureApi = {
 
   updateDirection: (id: number, nom: string) =>
     axiosInstance
-      .put<DirectionResponse>(`/api/directions/${id}`, {
+      .put<DirectionResponse>(`/directions/${id}`, {
         nom,
         code: "UPDATED",
       })
@@ -73,7 +73,7 @@ export const structureApi = {
 
   updateDivision: (id: number, directionId: number, nom: string) =>
     axiosInstance
-      .put<DivisionResponse>(`/api/divisions/${id}`, {
+      .put<DivisionResponse>(`/divisions/${id}`, {
         nom,
         directionId,
         code: "UPDATED",
@@ -82,7 +82,7 @@ export const structureApi = {
 
   updateService: (id: number, divisionId: number, nom: string) =>
     axiosInstance
-      .put<ServiceResponse>(`/api/services/${id}`, {
+      .put<ServiceResponse>(`/services/${id}`, {
         nom,
         divisionId,
         code: "UPDATED",
@@ -90,7 +90,7 @@ export const structureApi = {
       .then((res: AxiosResponse<ServiceResponse>) => res.data),
 
   deleteDirection: (id: number) =>
-    axiosInstance.delete(`/api/directions/${id}`),
-  deleteDivision: (id: number) => axiosInstance.delete(`/api/divisions/${id}`),
-  deleteService: (id: number) => axiosInstance.delete(`/api/services/${id}`),
+    axiosInstance.delete(`/directions/${id}`),
+  deleteDivision: (id: number) => axiosInstance.delete(`/divisions/${id}`),
+  deleteService: (id: number) => axiosInstance.delete(`/services/${id}`),
 };

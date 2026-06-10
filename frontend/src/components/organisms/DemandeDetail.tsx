@@ -15,6 +15,8 @@ import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
 import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse, HistoryRecord } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
+import { openBlobInNewTab } from "@/utils/fileUtils";
+import { TYPE_TKEY } from "@/constants/constants";
 
 interface DemandeDetailProps {
   selectedDemande: DemandeResponse;
@@ -57,11 +59,10 @@ export const DemandeDetail = ({
 
   const handleOpenPiece = async (pieceId: number) => {
     const response = await axiosInstance.get(
-      `/api/demandes/${selectedDemande.id}/pieces/${pieceId}`,
+      `/demandes/${selectedDemande.id}/pieces/${pieceId}`,
       { responseType: "blob" },
     );
-    const url = window.URL.createObjectURL(response.data);
-    window.open(url, "_blank");
+    openBlobInNewTab(response.data);
   };
 
   return (
@@ -87,9 +88,7 @@ export const DemandeDetail = ({
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 800, color: "#0f172a" }}>
               DEM-2026-00{selectedDemande.id} —{" "}
-              {selectedDemande.typeConge === "ANNUEL"
-                ? t("leaveType.congeAnnuel")
-                : t("leaveType.congeMaladie")}
+              {t(TYPE_TKEY[selectedDemande.typeConge] ?? selectedDemande.typeConge)}
             </Typography>
             <Stack
               direction="row"
@@ -161,10 +160,7 @@ export const DemandeDetail = ({
               {[
                 {
                   label: t("demandeDetail.typeConge"),
-                  value:
-                    selectedDemande.typeConge === "ANNUEL"
-                      ? t("leaveType.congeAnnuel")
-                      : t("leaveType.congeMaladie"),
+                  value: t(TYPE_TKEY[selectedDemande.typeConge] ?? selectedDemande.typeConge),
                 },
                 { label: t("demandeDetail.dateDepart"), value: selectedDemande.dateDebut },
                 { label: t("demandeDetail.dateRetour"), value: selectedDemande.dateFin },

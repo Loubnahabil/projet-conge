@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { TYPE_TKEY } from "@/constants/constants";
 import {
   Box,
   Typography,
@@ -133,9 +134,7 @@ export const DemandeTable = ({
                   <TableRow key={d.id} hover>
                     <TableCell>#{d.id}</TableCell>
                     <TableCell>
-                      {d.typeConge === "ANNUEL"
-                        ? t("leaveType.annuel")
-                        : t("leaveType.maladie")}
+                      {t(TYPE_TKEY[d.typeConge] ?? d.typeConge)}
                     </TableCell>
                     <TableCell>{d.dateDebut}</TableCell>
                     <TableCell>{d.dateFin}</TableCell>

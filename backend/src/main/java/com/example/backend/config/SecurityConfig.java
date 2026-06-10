@@ -1,7 +1,8 @@
 package com.example.backend.config;
 
-import com.example.backend.security.CustomUserDetailsService;
+import com.example.backend.config.RouteProperties.RouteRule;
 import com.example.backend.security.JwtFilter;
+import com.example.backend.security.RequestLoggingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -29,7 +31,8 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-    private final CustomUserDetailsService userDetailsService;
+    private final RequestLoggingFilter requestLoggingFilter;
+    private final RouteProperties routeProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,56 +64,38 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> {
+                    for (String url : routeProperties.getPublicUrls()) {
+                        auth.requestMatchers(url).permitAll();
+                    }
+                    for (RouteRule rule : routeProperties.getAllRules()) {
+                        String pattern = rule.getPattern();
+                        String methodStr = rule.getMethod();
+                        List<String> roles = rule.getRoles();
 
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/uploads/**").permitAll()
+                        boolean isAuthenticated = roles != null && roles.size() == 1
+                                && "AUTHENTICATED".equalsIgnoreCase(roles.get(0));
 
+                        var matcher = (methodStr != null && !"ANY".equalsIgnoreCase(methodStr))
+                                ? auth.requestMatchers(HttpMethod.valueOf(methodStr.toUpperCase()), pattern)
+                                : auth.requestMatchers(pattern);
 
-                        .requestMatchers(HttpMethod.PUT, "/demandes/*/soumettre").hasAuthority("FONCTIONNAIRE")
-                        .requestMatchers(HttpMethod.PUT, "/demandes/*").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
-                        .requestMatchers(HttpMethod.PUT, "/demandes/*/visa-chef").hasAuthority("CHEF_HIERARCHIE")
-                        .requestMatchers(HttpMethod.PUT, "/demandes/*/rejet-signataire").hasAuthority("SIGNATAIRE")
-                        .requestMatchers("/demandes/a-viser").hasAuthority("CHEF_HIERARCHIE")
-                        .requestMatchers("/demandes/a-signer").hasAuthority("SIGNATAIRE")
-                        .requestMatchers("/demandes/my-requests").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
-
-                        .requestMatchers(HttpMethod.POST, "/demandes/*/upload").hasAnyAuthority("FONCTIONNAIRE", "SIGNATAIRE")
-
-
-                        .requestMatchers(HttpMethod.GET,  "/users/me").authenticated()
-                        .requestMatchers(HttpMethod.PUT,  "/users/me").authenticated()
-                        .requestMatchers("/users/colleagues").hasAuthority("FONCTIONNAIRE")
-                        .requestMatchers("/users/**").hasAuthority("ADMIN")
-
-                        .requestMatchers("/statistiques/dashboard").hasAuthority("ADMIN")
-                        .requestMatchers("/statistiques/fonctionnaire-dashboard").hasAuthority("FONCTIONNAIRE")
-                        .requestMatchers("/statistiques/chef-dashboard").hasAuthority("CHEF_HIERARCHIE")
-                        .requestMatchers("/statistiques/signataire-dashboard").hasAuthority("SIGNATAIRE")
-                        .requestMatchers("/directions/**").hasAuthority("ADMIN")
-                        .requestMatchers("/divisions/**").hasAuthority("ADMIN")
-                        .requestMatchers("/services/**").hasAuthority("ADMIN")
-                        .requestMatchers("/jours-feries/**").hasAuthority("ADMIN")
-                        .requestMatchers("/admin/quotas/**").hasAuthority("ADMIN")
-                        .requestMatchers("/demandes/audit").hasAuthority("ADMIN")
-                        .requestMatchers("/demandes/all").hasAuthority("ADMIN")
-                        .requestMatchers("/demandes/*/historique").hasAnyAuthority("ADMIN", "FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE")
-
-                        .requestMatchers("/demandes/traitees-chef").hasAuthority("CHEF_HIERARCHIE")
-                        .requestMatchers("/demandes/traitees-signataire").hasAuthority("SIGNATAIRE")
-                        .requestMatchers("/demandes/*/generate-pdf").hasAuthority("SIGNATAIRE")
-
-                        // Rule added right before the catch-all to allow authorized profiles to download documents
-                        .requestMatchers(HttpMethod.GET, "/demandes/*/pieces/**").hasAnyAuthority("FONCTIONNAIRE", "CHEF_HIERARCHIE", "SIGNATAIRE", "ADMIN")
-
-                        .requestMatchers("/demandes/**").hasAuthority("FONCTIONNAIRE")
-
-                        .anyRequest().authenticated())
-
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                        if (isAuthenticated) {
+                            matcher.authenticated();
+                        } else if (roles != null && !roles.isEmpty()) {
+                            if (roles.size() == 1) {
+                                matcher.hasAuthority(roles.get(0));
+                            } else {
+                                matcher.hasAnyAuthority(roles.toArray(String[]::new));
+                            }
+                        } else {
+                            matcher.authenticated();
+                        }
+                    }
+                    auth.anyRequest().authenticated();
+                })
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(requestLoggingFilter, JwtFilter.class);
 
         return http.build();
     }

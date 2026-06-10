@@ -20,19 +20,7 @@ import {
   setAuditRowsPerPage,
 } from "@/store/slices/auditSlice";
 import { ROLE_TKEY } from "@/constants/constants";
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return (
-    d.toLocaleDateString("fr-MA", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }) +
-    " " +
-    d.toLocaleTimeString("fr-MA", { hour: "2-digit", minute: "2-digit" })
-  );
-};
+import { formatDateFR } from "@/utils/dateUtils";
 
 export const AuditTable = () => {
   const { t } = useTranslation();
@@ -143,7 +131,7 @@ export const AuditTable = () => {
                         fontSize: "0.8rem",
                       }}
                     >
-                      {formatDate(entry.dateAction)}
+                      {formatDateFR(entry.dateAction)}
                     </TableCell>
 
                     <TableCell>

@@ -11,6 +11,7 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -35,11 +37,11 @@ public class AuthService {
 
     @Transactional
     public LoginResponseDTO login(LoginRequestDTO request) {
+        log.info("Tentative connexion - email={}", request.getEmail());
         // this throws BadCredentialsException automatically if wrong
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(), request.getPassword()));
-
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -61,6 +63,8 @@ public class AuthService {
                 .findFirst()
                 .map(Role::getName)
                 .orElse("");
+
+        log.info("Connexion réussie - email={} role={}", request.getEmail(), role);
 
         return LoginResponseDTO.builder()
                 .accessToken(accessToken)
@@ -108,6 +112,7 @@ public class AuthService {
     }
     @Transactional
     public void logout(String email) {
+        log.info("Déconnexion - email={}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         refreshTokenRepository.deleteByUser(user);

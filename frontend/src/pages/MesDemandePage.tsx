@@ -37,6 +37,7 @@ import type {
 } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
 import { STATUS_COLOR, STATUS_TKEY } from "@/constants/constants";
+import { formatDateFR } from "@/utils/dateUtils";
 
 interface FormInputs {
   dateDebut: string;
@@ -53,7 +54,10 @@ export const MesDemandePage = () => {
       acc[key] = { label: t(STATUS_TKEY[key]), color: STATUS_COLOR[key] };
       return acc;
     },
-    {} as Record<string, { label: string; color: string }>,
+    {} as Record<
+      string,
+      { label: string; color: (typeof STATUS_COLOR)[string] }
+    >,
   );
 
   const dispatch = useDispatch<AppDispatch>();
@@ -202,22 +206,7 @@ export const MesDemandePage = () => {
     [interims],
   );
 
-  const formatDate = (iso: string) => {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    return (
-      d.toLocaleDateString("fr-MA", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }) +
-      " " +
-      d.toLocaleTimeString("fr-MA", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  };
+  const formatDate = (iso: string) => formatDateFR(iso);
 
   const displayError = error;
 
@@ -301,9 +290,7 @@ export const MesDemandePage = () => {
       >
         <DialogTitle>{t("annulation.title")}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t("annulation.message")}
-          </DialogContentText>
+          <DialogContentText>{t("annulation.message")}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCancelDialogOpen(false)} color="inherit">

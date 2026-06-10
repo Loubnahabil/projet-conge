@@ -18,31 +18,31 @@ export interface QuotaRequest {
 }
 
 export const quotaApi = {
-  // GET /api/quotas/user/{userId}/year/{annee}
+  // GET /quotas/user/{userId}/year/{annee}
   getQuotaByUserAndYear: async (userId: number, annee: number) => {
     const response = await axiosInstance.get<QuotaResponse>(
-      `/api/quotas/user/${userId}/year/${annee}`,
+      `/quotas/user/${userId}/year/${annee}`,
     );
     return response.data;
   },
 
-  // GET /api/quotas?year=2026&page=0&size=10
+  // GET /quotas?year=2026&page=0&size=10
   getQuotasPage: async (
     year: number,
     page: number,
     size: number,
   ): Promise<SpringPageWrapper<QuotaResponse>> => {
     const response = await axiosInstance.get<SpringPageWrapper<QuotaResponse>>(
-      "/api/quotas",
+      "/quotas",
       { params: { year, page, size } },
     );
     return response.data;
   },
 
-  // PUT /api/quotas/{id}
+  // PUT /quotas/{id}
   updateQuota: async (id: number, data: QuotaRequest) => {
     const response = await axiosInstance.put<QuotaResponse>(
-      `/api/quotas/${id}`,
+      `/quotas/${id}`,
       data,
     );
     return response.data;

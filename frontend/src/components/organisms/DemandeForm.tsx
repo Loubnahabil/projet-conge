@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,6 +20,8 @@ import type { DemandeResponse } from "@/types/Demande.types";
 import type { UserResponse } from "@/types/user.types";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
 import { useTranslation } from "react-i18next";
+import { calculerJoursOuvrables } from "@/services/leave.service";
+import { jourFerieApi } from "@/api/jourFerieApi";
 
 interface FormInputs {
   dateDebut: string;
@@ -39,17 +41,6 @@ interface DemandeFormProps {
   onFileChange: (file: File | null) => void;
 }
 
-const MOROCCAN_HOLIDAYS = [
-  "2026-01-11",
-  "2026-05-01",
-  "2026-07-30",
-  "2026-08-14",
-  "2026-08-20",
-  "2026-08-21",
-  "2026-11-06",
-  "2026-11-18",
-];
-
 export const DemandeForm = ({
   editingDemande,
   colleagues,
@@ -62,6 +53,14 @@ export const DemandeForm = ({
   const { t } = useTranslation();
   const existingFileName =
     editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
+  const [holidays, setHolidays] = useState<string[]>([]);
+
+  useEffect(() => {
+    jourFerieApi.getAll().then((list) => {
+      setHolidays(list.map((h) => h.date));
+    });
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -81,25 +80,10 @@ export const DemandeForm = ({
   const watchDateDebut = useWatch({ control, name: "dateDebut" });
   const watchDateFin = useWatch({ control, name: "dateFin" });
 
-  // Compute live local durations
-  let calculatedDuree = 0;
-  if (watchDateDebut && watchDateFin) {
-    const start = new Date(watchDateDebut);
-    const end = new Date(watchDateFin);
-    if (start <= end) {
-      let days = 0;
-      const current = new Date(start);
-      while (current <= end) {
-        const dayOfWeek = current.getDay();
-        const dateStr = current.toISOString().split("T")[0];
-        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-        const isHoliday = MOROCCAN_HOLIDAYS.includes(dateStr);
-        if (!isWeekend && !isHoliday) days++;
-        current.setDate(current.getDate() + 1);
-      }
-      calculatedDuree = days;
-    }
-  }
+  const calculatedDuree =
+    watchDateDebut && watchDateFin
+      ? calculerJoursOuvrables(watchDateDebut, watchDateFin, holidays)
+      : 0;
 
   return (
     <Box>

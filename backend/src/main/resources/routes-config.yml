@@ -1,0 +1,85 @@
+routes:
+  public-urls:
+    - /auth/**
+    - /swagger-ui/**
+    - /swagger-ui.html
+    - /v3/api-docs/**
+    - /uploads/**
+
+  demande-urls:
+    - pattern: /demandes/*
+      method: PUT
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
+    - pattern: /demandes/**
+      roles: [ FONCTIONNAIRE ]
+    - pattern: /demandes/my-requests
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
+    - pattern: /demandes/*/historique
+      roles: [ ADMIN, FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
+    - pattern: /demandes/*/pieces/**
+      method: GET
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE, ADMIN ]
+    - pattern: /demandes/*/upload
+      method: POST
+      roles: [ FONCTIONNAIRE, SIGNATAIRE ]
+
+  fonctionnaire-urls:
+    - pattern: /demandes/*/soumettre
+      method: PUT
+      roles: [ FONCTIONNAIRE ]
+    - pattern: /users/colleagues
+      roles: [ FONCTIONNAIRE ]
+    - pattern: /statistiques/fonctionnaire-dashboard
+      roles: [ FONCTIONNAIRE ]
+
+  chef-urls:
+    - pattern: /demandes/*/visa-chef
+      method: PUT
+      roles: [ CHEF_HIERARCHIE ]
+    - pattern: /demandes/a-viser
+      roles: [ CHEF_HIERARCHIE ]
+    - pattern: /demandes/traitees-chef
+      roles: [ CHEF_HIERARCHIE ]
+    - pattern: /statistiques/chef-dashboard
+      roles: [ CHEF_HIERARCHIE ]
+
+  signataire-urls:
+    - pattern: /demandes/*/rejet-signataire
+      method: PUT
+      roles: [ SIGNATAIRE ]
+    - pattern: /demandes/a-signer
+      roles: [ SIGNATAIRE ]
+    - pattern: /demandes/traitees-signataire
+      roles: [ SIGNATAIRE ]
+    - pattern: /demandes/*/generate-pdf
+      roles: [ SIGNATAIRE ]
+    - pattern: /statistiques/signataire-dashboard
+      roles: [ SIGNATAIRE ]
+
+  admin-urls:
+    - pattern: /users/**
+      roles: [ ADMIN ]
+    - pattern: /statistiques/dashboard
+      roles: [ ADMIN ]
+    - pattern: /directions/**
+      roles: [ ADMIN ]
+    - pattern: /divisions/**
+      roles: [ ADMIN ]
+    - pattern: /services/**
+      roles: [ ADMIN ]
+    - pattern: /jours-feries/**
+      roles: [ ADMIN ]
+    - pattern: /admin/quotas/**
+      roles: [ ADMIN ]
+    - pattern: /demandes/audit
+      roles: [ ADMIN ]
+    - pattern: /demandes/all
+      roles: [ ADMIN ]
+
+  authenticated-urls:
+    - pattern: /users/me
+      method: GET
+      roles: [ AUTHENTICATED ]
+    - pattern: /users/me
+      method: PUT
+      roles: [ AUTHENTICATED ]

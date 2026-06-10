@@ -33,6 +33,7 @@ export const PerformanceOverview = () => {
           label={t("dashboard.totalDemandes")}
           value={stats.totalDemandes}
           sub={t("dashboard.toutesPeriodes")}
+          color="#3b82f6"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
@@ -40,6 +41,7 @@ export const PerformanceOverview = () => {
           label={t("dashboard.enAttenteVisa")}
           value={stats.enAttenteVisa}
           sub={t("dashboard.traitementHierarchique")}
+          color="#f59e0b"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
@@ -47,6 +49,7 @@ export const PerformanceOverview = () => {
           label={t("dashboard.enAttenteSignature")}
           value={stats.enAttenteSignature}
           sub={t("dashboard.traitementDirection")}
+          color="#f97316"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
@@ -54,6 +57,7 @@ export const PerformanceOverview = () => {
           label={t("dashboard.tauxValidation")}
           value={`${stats.tauxValidation}%`}
           sub={t("dashboard.demandesApprouvees")}
+          color="#10b981"
         />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
@@ -61,6 +65,7 @@ export const PerformanceOverview = () => {
           label={t("dashboard.tauxRejet")}
           value={`${stats.tauxRejet}%`}
           sub={t("dashboard.demandesRefusees")}
+          color="#ef4444"
         />
       </Grid>
     </Grid>
