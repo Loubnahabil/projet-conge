@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from "react-i18next";
 import {
@@ -81,6 +81,7 @@ export const UserFormModal: React.FC = () => {
     reset,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<UserFormInputs>({
     resolver: yupResolver(userValidationSchema),
@@ -89,8 +90,6 @@ export const UserFormModal: React.FC = () => {
 
   const watchedDirectionId = watch("directionId");
   const watchedDivisionId = watch("divisionId");
-  const watchedServiceId = watch("serviceId");
-  const watchedRoleId = watch("roleId");
 
   const prevDirectionId = useRef<number | undefined>(undefined);
   const prevDivisionId = useRef<number | undefined>(undefined);
@@ -249,83 +248,103 @@ export const UserFormModal: React.FC = () => {
             helperText={errors.dateDebutFonction?.message}
           />
 
-          <TextField
-            select
-            required
-            label={t("userForm.direction")}
-            size="small"
-            slotProps={{ select: { displayEmpty: true } }}
-            value={watchedDirectionId ?? ""}
-            {...register("directionId")}
-            error={!!errors.directionId}
-            helperText={errors.directionId?.message}
-            fullWidth
-          >
-            {directions.map((d) => (
-              <MenuItem key={d.id} value={d.id}>
-                {d.nom}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="directionId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                required
+                label={t("userForm.direction")}
+                size="small"
+                slotProps={{ select: { displayEmpty: true } }}
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+              >
+                {directions.map((d) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.nom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
-          <TextField
-            select
-            required
-            label={t("userForm.division")}
-            size="small"
-            slotProps={{ select: { displayEmpty: true } }}
-            value={watchedDivisionId ?? ""}
-            {...register("divisionId")}
-            error={!!errors.divisionId}
-            helperText={errors.divisionId?.message}
-            disabled={!watchedDirectionId}
-            fullWidth
-          >
-            {currentDivisions.map((d) => (
-              <MenuItem key={d.id} value={d.id}>
-                {d.nom}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="divisionId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                required
+                label={t("userForm.division")}
+                size="small"
+                slotProps={{ select: { displayEmpty: true } }}
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                disabled={!watchedDirectionId}
+                fullWidth
+              >
+                {currentDivisions.map((d) => (
+                  <MenuItem key={d.id} value={d.id}>
+                    {d.nom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
-          <TextField
-            select
-            required
-            label={t("userForm.service")}
-            size="small"
-            slotProps={{ select: { displayEmpty: true } }}
-            value={watchedServiceId ?? ""}
-            {...register("serviceId")}
-            error={!!errors.serviceId}
-            helperText={errors.serviceId?.message}
-            disabled={!watchedDivisionId}
-            fullWidth
-          >
-            {currentServices.map((s) => (
-              <MenuItem key={s.id} value={s.id}>
-                {s.nom}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="serviceId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                required
+                label={t("userForm.service")}
+                size="small"
+                slotProps={{ select: { displayEmpty: true } }}
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                disabled={!watchedDivisionId}
+                fullWidth
+              >
+                {currentServices.map((s) => (
+                  <MenuItem key={s.id} value={s.id}>
+                    {s.nom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
-          <TextField
-            select
-            required
-            label={t("userForm.role")}
-            size="small"
-            slotProps={{ select: { displayEmpty: true } }}
-            value={watchedRoleId ?? ""}
-            {...register("roleId")}
-            error={!!errors.roleId}
-            helperText={errors.roleId?.message}
-            fullWidth
-          >
-            {roles.map((r) => (
-              <MenuItem key={r.id} value={r.id}>
-                {formatRoleLabel(r.name)}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="roleId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                required
+                label={t("userForm.role")}
+                size="small"
+                slotProps={{ select: { displayEmpty: true } }}
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+                fullWidth
+              >
+                {roles.map((r) => (
+                  <MenuItem key={r.id} value={r.id}>
+                    {formatRoleLabel(r.name)}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
           {formError && (
             <Alert severity="error" sx={{ mt: 1 }}>
               {formError}
