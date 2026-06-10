@@ -17,7 +17,7 @@ export const userApi = {
     return axiosInstance
       .get<
         SpringPageWrapper<UserResponse>
-      >(`/api/users?${params.toString()}`)
+      >(`/users?${params.toString()}`)
       .then(
         (res: AxiosResponse<SpringPageWrapper<UserResponse>>) => res.data,
       );
@@ -25,28 +25,28 @@ export const userApi = {
 
   getById: (id: number) =>
     axiosInstance
-      .get<UserResponse>(`/api/users/${id}`)
+      .get<UserResponse>(`/users/${id}`)
       .then((res: AxiosResponse<UserResponse>) => res.data),
 
   create: (payload: UserRequest) =>
     axiosInstance
-      .post<UserResponse>("/api/users", payload)
+      .post<UserResponse>("/users", payload)
       .then((res) => res.data),
 
   update: (id: number, payload: UserRequest) =>
     axiosInstance
-      .put<UserResponse>(`/api/users/${id}`, payload)
+      .put<UserResponse>(`/users/${id}`, payload)
       .then((res) => res.data),
 
   toggleEnabled: (id: number) =>
     axiosInstance
-      .patch<UserResponse>(`/api/users/${id}/toggle`)
+      .patch<UserResponse>(`/users/${id}/toggle`)
       .then((res: AxiosResponse<UserResponse>) => res.data),
 
-  delete: (id: number) => axiosInstance.delete(`/api/users/${id}`),
+  delete: (id: number) => axiosInstance.delete(`/users/${id}`),
 
   getMyProfile: () =>
-    axiosInstance.get<UserResponse>("/api/users/me").then((res) => res.data),
+    axiosInstance.get<UserResponse>("/users/me").then((res) => res.data),
 
   updateMyProfile: (payload: {
     nom?: string;
@@ -56,6 +56,6 @@ export const userApi = {
     newPassword?: string;
   }) =>
     axiosInstance
-      .put<UserResponse>("/api/users/me", payload)
+      .put<UserResponse>("/users/me", payload)
       .then((res) => res.data),
 };

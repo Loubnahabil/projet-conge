@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Box, Typography, Grid, Skeleton } from "@mui/material";
+import { Box, Grid, Skeleton, Chip } from "@mui/material";
 import {
   BarChart,
   Bar,
@@ -14,7 +14,7 @@ import {
 } from "recharts";
 import { DashboardSection } from "@/components/molecules/DashboardSection";
 import type { RootState } from "@/store";
-import { STATUS_TKEY, TYPE_TKEY } from "@/constants/constants";
+import { STATUS_TKEY, TYPE_TKEY, STATUS_COLOR, TYPE_COLOR } from "@/constants/constants";
 
 export const AnalyticsCharts = () => {
   const { t } = useTranslation();
@@ -76,7 +76,7 @@ export const AnalyticsCharts = () => {
                 <Tooltip cursor={{ fill: "#f8fafc" }} />
                 <Bar
                   dataKey="Demandes"
-                  fill="#475569"
+                  fill="#3b82f6"
                   radius={[4, 4, 0, 0]}
                   barSize={24}
                 />
@@ -116,9 +116,9 @@ export const AnalyticsCharts = () => {
                 <Line
                   type="monotone"
                   dataKey="Demandes"
-                  stroke="#475569"
+                  stroke="#3b82f6"
                   strokeWidth={2}
-                  dot={{ r: 4 }}
+                  dot={{ r: 4, fill: "#3b82f6" }}
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -129,28 +129,33 @@ export const AnalyticsCharts = () => {
       {/* Nombre de demandes par état */}
       <Grid size={{ xs: 12, md: 6 }}>
         <DashboardSection title={t("analytics.nombreDemandesParEtat")}>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}>
             {Object.entries(stats.parStatut || {}).map(([key, val]) => (
               <Box
                 key={key}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  borderBottom: "1px dashed #f1f5f9",
-                  pb: 0.5,
+                  alignItems: "center",
                 }}
               >
-                <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {t(STATUS_TKEY[key] ?? key)}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "600", color: "#1e293b" }}
+                <Chip
+                  label={t(STATUS_TKEY[key] ?? key)}
+                  color={STATUS_COLOR[key]}
+                  size="small"
+                  variant="outlined"
+                />
+                <Box
+                  sx={{
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontSize: "0.9rem",
+                    minWidth: 32,
+                    textAlign: "right",
+                  }}
                 >
                   {val}
-                </Typography>
+                </Box>
               </Box>
             ))}
           </Box>
@@ -160,28 +165,33 @@ export const AnalyticsCharts = () => {
       {/* Demandes par Type de Congé */}
       <Grid size={{ xs: 12, md: 6 }}>
         <DashboardSection title={t("analytics.demandesParType")}>
-          <Box
-            sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2, pt: 0.5 }}>
             {Object.entries(stats.parTypeConge || {}).map(([key, val]) => (
               <Box
                 key={key}
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  borderBottom: "1px dashed #f1f5f9",
-                  pb: 0.5,
+                  alignItems: "center",
                 }}
               >
-                <Typography variant="body2" sx={{ color: "#475569" }}>
-                  {t(TYPE_TKEY[key] ?? key)}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: "600", color: "#1e293b" }}
+                <Chip
+                  label={t(TYPE_TKEY[key] ?? key)}
+                  color={TYPE_COLOR[key]}
+                  size="small"
+                  variant="outlined"
+                />
+                <Box
+                  sx={{
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    fontSize: "0.9rem",
+                    minWidth: 32,
+                    textAlign: "right",
+                  }}
                 >
                   {val}
-                </Typography>
+                </Box>
               </Box>
             ))}
           </Box>

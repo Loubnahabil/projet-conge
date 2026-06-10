@@ -2,6 +2,7 @@ import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse, DemandeRequest } from "@/types/Demande.types";
 import type { UserResponse, SpringPageWrapper } from "@/types/user.types";
 import type { HistoryRecord } from "@/types/Demande.types";
+import { downloadBlob } from "@/utils/fileUtils";
 
 export type UploadResponse = {
   id: number;
@@ -13,33 +14,33 @@ export type UploadResponse = {
 };
 
 export const demandeApi = {
-  // GET /api/demandes/my-requests
+  // GET /demandes/my-requests
   getMyDemandes: async (
     page: number,
     size: number,
   ): Promise<SpringPageWrapper<DemandeResponse>> => {
     const response = await axiosInstance.get<SpringPageWrapper<DemandeResponse>>(
-      "/api/demandes/my-requests",
+      "/demandes/my-requests",
       { params: { page, size } },
     );
     return response.data;
   },
 
-  // GET /api/demandes/a-viser (For Chef validation queues)
+  // GET /demandes/a-viser (For Chef validation queues)
   getDemandesAViser: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
-      "/api/demandes/a-viser",
+      "/demandes/a-viser",
     );
     return response.data;
   },
 
-  // POST /api/demandes?submit=true/false
+  // POST /demandes?submit=true/false
   create: async (
     payload: DemandeRequest,
     submit: boolean,
   ): Promise<DemandeResponse> => {
     const response = await axiosInstance.post<DemandeResponse>(
-      "/api/demandes",
+      "/demandes",
       payload,
       {
         params: { submit },
@@ -48,19 +49,19 @@ export const demandeApi = {
     return response.data;
   },
 
-  // PUT /api/demandes/{id}
+  // PUT /demandes/{id}
   update: async (
     id: number,
     payload: DemandeRequest,
   ): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
-      `/api/demandes/${id}`,
+      `/demandes/${id}`,
       payload,
     );
     return response.data;
   },
 
-  // POST /api/demandes/{id}/upload
+  // POST /demandes/{id}/upload
   uploadDocument: async (
     id: number,
     file: File,
@@ -71,7 +72,7 @@ export const demandeApi = {
     formData.append("typeDocument", typeDocument);
 
     const response = await axiosInstance.post<UploadResponse>(
-      `/api/demandes/${id}/upload`,
+      `/demandes/${id}/upload`,
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
@@ -81,14 +82,14 @@ export const demandeApi = {
     return response.data;
   },
 
-  // PUT /api/demandes/{id}/visa-chef?approve=true/false
+  // PUT /demandes/{id}/visa-chef?approve=true/false
   visaChef: async (
     id: number,
     approve: boolean,
     body?: { commentaire?: string },
   ): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
-      `/api/demandes/${id}/visa-chef`,
+      `/demandes/${id}/visa-chef`,
       body || {},
       {
         params: { approve },
@@ -97,59 +98,55 @@ export const demandeApi = {
     return response.data;
   },
 
-  // PUT /api/demandes/{id}/rejet-signataire
+  // PUT /demandes/{id}/rejet-signataire
   rejetSignataire: async (
     id: number,
     body: { commentaire: string },
   ): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
-      `/api/demandes/${id}/rejet-signataire`,
+      `/demandes/${id}/rejet-signataire`,
       body,
     );
     return response.data;
   },
 
-  // GET /api/users/colleagues
+  // GET /users/colleagues
   getSameServiceColleagues: async (): Promise<UserResponse[]> => {
     try {
       const response = await axiosInstance.get<UserResponse[]>(
-        "/api/users/colleagues",
+        "/users/colleagues",
       );
       return response.data;
-    } catch (error) {
-      console.error(
-        "Erreur lors du chargement des collègues de service:",
-        error,
-      );
+    } catch {
       return [];
     }
   },
 
-  // PUT /api/demandes/{id}/annuler
+  // PUT /demandes/{id}/annuler
   annulerDemande: async (id: number): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
-      `/api/demandes/${id}/annuler`,
+      `/demandes/${id}/annuler`,
     );
     return response.data;
   },
 
-  // GET /api/demandes/a-signer (For Signataire validation queues)
+  // GET /demandes/a-signer (For Signataire validation queues)
   getDemandesASigner: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
-      "/api/demandes/a-signer",
+      "/demandes/a-signer",
     );
     return response.data;
   },
 
   getDemandeHistory: async (id: number): Promise<HistoryRecord[]> => {
     const response = await axiosInstance.get<HistoryRecord[]>(
-      `/api/demandes/${id}/historique`,
+      `/demandes/${id}/historique`,
     );
     return response.data;
   },
   soumettre: async (id: number): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
-      `/api/demandes/${id}/soumettre`,
+      `/demandes/${id}/soumettre`,
     );
     return response.data;
   },
@@ -158,33 +155,24 @@ export const demandeApi = {
 
   getDemandesTraiteesChef: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
-      "/api/demandes/traitees-chef",
+      "/demandes/traitees-chef",
     );
     return response.data;
   },
 
   getDemandesTraiteesSignataire: async (): Promise<DemandeResponse[]> => {
     const response = await axiosInstance.get<DemandeResponse[]>(
-      "/api/demandes/traitees-signataire",
+      "/demandes/traitees-signataire",
     );
     return response.data;
   },
 
-  // GET /api/demandes/{id}/generate-pdf
+  // GET /demandes/{id}/generate-pdf
   generatePdf: async (id: number): Promise<void> => {
     const response = await axiosInstance.get(
-      `/api/demandes/${id}/generate-pdf`,
-      {
-        responseType: "blob",
-      },
+      `/demandes/${id}/generate-pdf`,
+      { responseType: "blob" },
     );
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `demande-${id}.pdf`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    downloadBlob(response.data, `demande-${id}.pdf`);
   },
 };

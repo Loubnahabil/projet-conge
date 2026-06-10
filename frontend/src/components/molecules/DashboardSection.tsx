@@ -1,4 +1,4 @@
-import { Paper, Typography } from "@mui/material";
+import { Paper, Typography, Divider } from "@mui/material";
 
 interface DashboardSectionProps {
   title: string;
@@ -12,9 +12,9 @@ export const DashboardSection = ({
   <Paper
     sx={{
       p: 3,
-      borderRadius: "14px",
+      borderRadius: "10px",
       border: "1px solid #e2e8f0",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
       height: "100%",
     }}
   >
@@ -22,15 +22,14 @@ export const DashboardSection = ({
       variant="subtitle1"
       sx={{
         fontWeight: 700,
-        color: "#1e293b",
-        mb: 2.5,
-        textTransform: "uppercase",
-        letterSpacing: "0.05em",
-        fontSize: "0.75rem",
+        color: "#0f172a",
+        mb: 1.5,
+        fontSize: "0.85rem",
       }}
     >
       {title}
     </Typography>
+    <Divider sx={{ mb: 2, borderColor: "#f1f5f9" }} />
     {children}
   </Paper>
 );

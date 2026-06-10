@@ -12,6 +12,8 @@ import { EmptyState } from "@/components/atoms/EmptyState";
 import { axiosInstance } from "@/api/axiosInstance";
 import type { DemandeResponse } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
+import { openBlobInNewTab } from "@/utils/fileUtils";
+import { TYPE_TKEY } from "@/constants/constants";
 
 interface Props {
   open: boolean;
@@ -25,11 +27,10 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
 
   const handleOpen = async (pieceId: number) => {
     const response = await axiosInstance.get(
-      `/api/demandes/${demande!.id}/pieces/${pieceId}`,
+      `/demandes/${demande!.id}/pieces/${pieceId}`,
       { responseType: "blob" },
     );
-    const url = window.URL.createObjectURL(response.data);
-    window.open(url, "_blank");
+    openBlobInNewTab(response.data);
   };
 
   return (
@@ -68,10 +69,7 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
           {[
             {
               label: t("detailDrawer.type"),
-              value:
-                demande.typeConge === "ANNUEL"
-                  ? t("leaveType.congeAnnuel")
-                  : t("leaveType.congeMaladie"),
+              value: t(TYPE_TKEY[demande.typeConge] ?? demande.typeConge),
             },
             { label: t("detailDrawer.dateDebut"), value: demande.dateDebut },
             { label: t("detailDrawer.dateFin"), value: demande.dateFin },

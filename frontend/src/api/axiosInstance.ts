@@ -9,7 +9,7 @@ export const injectStore = (_store: AppStore) => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: "http://localhost:8080/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -44,9 +44,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const isLoginRequest = originalRequest?.url?.includes("/api/auth/login");
+    const isLoginRequest = originalRequest?.url?.includes("/auth/login");
     const isRefreshRequest =
-      originalRequest?.url?.includes("/api/auth/refresh");
+      originalRequest?.url?.includes("/auth/refresh");
 
     // si 401 et c'est pas login/refresh → essaie de refresh le token
     if (
@@ -84,7 +84,7 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await axiosInstance.post("/api/auth/refresh", {
+        const res = await axiosInstance.post("/auth/refresh", {
           refreshToken,
         });
         const { accessToken, refreshToken: newRefresh } = res.data;

@@ -10,6 +10,7 @@ import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.DemandeMapper;
 import com.example.backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,16 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DemandeService {
+
+    private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
+            "application/pdf",
+            "image/jpeg",
+            "image/png"
+    );
+
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
     private final DemandeRepository demandeRepository;
     private final UserRepository userRepository;
@@ -71,6 +81,7 @@ public class DemandeService {
 
     @Transactional
     public DemandeResponseDTO createDemande(Long currentUserId, DemandeRequestDTO request, boolean submitInstantly) {
+        log.info("Création demande - userId={} type={} submit={}", currentUserId, request.getTypeConge(), submitInstantly);
         User applicant = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
 
@@ -167,6 +178,7 @@ public class DemandeService {
 
     @Transactional
     public DemandeResponseDTO visaChef(Long chefId, Long demandeId, ProcessWorkflowRequestDTO request, boolean approve) {
+        log.info("Visa chef - chefId={} demandeId={} approve={}", chefId, demandeId, approve);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
@@ -221,6 +233,7 @@ public class DemandeService {
     public PieceJustificativeResponseDTO uploadDocument(
             Long demandeId, MultipartFile file, String typeDocument, Long currentUserId) {
 
+        log.info("Upload document - demandeId={} type={} userId={}", demandeId, typeDocument, currentUserId);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
@@ -234,6 +247,17 @@ public class DemandeService {
 
             verifySignatoryDirection(demande.getUser(), currentUser);
             demande.setStatut(StatutDemande.SIGNEE_DIRECTEUR);
+        }
+
+        if (file.isEmpty()) {
+            throw new BusinessException("Le fichier est vide.");
+        }
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new BusinessException("Le fichier dépasse la taille maximale autorisée (5 Mo).");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+            throw new BusinessException("Format de fichier non autorisé. Formats acceptés : PDF, JPG, PNG.");
         }
 
         String fileUrl = documentStorageService.storeFile(file);
@@ -294,6 +318,7 @@ public class DemandeService {
 
     @Transactional
     public DemandeResponseDTO rejeterSignataire(Long signataireId, Long demandeId, ProcessWorkflowRequestDTO request) {
+        log.info("Rejet signataire - signataireId={} demandeId={}", signataireId, demandeId);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
@@ -433,6 +458,7 @@ public class DemandeService {
 
     @Transactional
     public DemandeResponseDTO annulerDemande(Long userId, Long demandeId) {
+        log.info("Annulation demande - userId={} demandeId={}", userId, demandeId);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
@@ -490,6 +516,7 @@ public class DemandeService {
 
     @Transactional
     public DemandeResponseDTO updateDemande(Long userId, Long demandeId, DemandeRequestDTO request) {
+        log.info("Modification demande - userId={} demandeId={}", userId, demandeId);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
@@ -536,6 +563,7 @@ public class DemandeService {
     }
     @Transactional
     public DemandeResponseDTO soumettreDemande(Long userId, Long demandeId) {
+        log.info("Soumission demande - userId={} demandeId={}", userId, demandeId);
         Demande demande = demandeRepository.findById(demandeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
