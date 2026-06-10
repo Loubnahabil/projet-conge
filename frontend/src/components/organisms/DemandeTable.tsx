@@ -49,7 +49,6 @@ interface DemandeTableProps {
 
 export const DemandeTable = ({
   demandes,
-  statutConfig,
   page,
   rowsPerPage,
   totalElements,
@@ -94,12 +93,24 @@ export const DemandeTable = ({
         <Table>
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.id")}</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.type")}</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.debut")}</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.fin")}</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.duree")}</TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>{t("common.status")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("demandeTable.id")}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("demandeTable.type")}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("demandeTable.debut")}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("demandeTable.fin")}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("demandeTable.duree")}
+              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>
+                {t("common.status")}
+              </TableCell>
               <TableCell align="right" sx={{ fontWeight: 600, pr: 3 }}>
                 {t("common.actions")}
               </TableCell>
@@ -122,7 +133,9 @@ export const DemandeTable = ({
                   <TableRow key={d.id} hover>
                     <TableCell>#{d.id}</TableCell>
                     <TableCell>
-                      {d.typeConge === "ANNUEL" ? t("leaveType.annuel") : t("leaveType.maladie")}
+                      {d.typeConge === "ANNUEL"
+                        ? t("leaveType.annuel")
+                        : t("leaveType.maladie")}
                     </TableCell>
                     <TableCell>{d.dateDebut}</TableCell>
                     <TableCell>{d.dateFin}</TableCell>

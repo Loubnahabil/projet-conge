@@ -11,7 +11,7 @@ import {
   Button,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { AppButton } from "@/components/atoms/AppButton";
 import { FormInput } from "@/components/molecules/FormInput";
@@ -60,7 +60,8 @@ export const DemandeForm = ({
   onFileChange,
 }: DemandeFormProps) => {
   const { t } = useTranslation();
-  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
+  const existingFileName =
+    editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
   const {
     register,
     handleSubmit,
@@ -130,18 +131,26 @@ export const DemandeForm = ({
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            select
-            label={t("demandeForm.typeConge")}
-            size="small"
-            fullWidth
-            {...register("typeConge")}
-            error={!!errors.typeConge}
-            helperText={errors.typeConge?.message}
-          >
-            <MenuItem value="ANNUEL">{t("leaveType.congeAnnuel")}</MenuItem>
-            <MenuItem value="MALADIE">{t("leaveType.congeMaladie")}</MenuItem>
-          </TextField>
+          <Controller
+            name="typeConge"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                label={t("demandeForm.typeConge")}
+                size="small"
+                fullWidth
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              >
+                <MenuItem value="ANNUEL">{t("leaveType.congeAnnuel")}</MenuItem>
+                <MenuItem value="MALADIE">
+                  {t("leaveType.congeMaladie")}
+                </MenuItem>
+              </TextField>
+            )}
+          />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
           <FormInput
@@ -172,21 +181,27 @@ export const DemandeForm = ({
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <TextField
-            select
-            label={t("demandeForm.interimaire")}
-            size="small"
-            fullWidth
-            {...register("interimId")}
-            error={!!errors.interimId}
-            helperText={errors.interimId?.message}
-          >
-            {colleagues.map((u) => (
-              <MenuItem key={u.id} value={u.id.toString()}>
-                {u.nom} {u.prenom}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="interimId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField
+                select
+                label={t("demandeForm.interimaire")}
+                size="small"
+                fullWidth
+                {...field}
+                error={!!fieldState.error}
+                helperText={fieldState.error?.message}
+              >
+                {colleagues.map((u) => (
+                  <MenuItem key={u.id} value={u.id.toString()}>
+                    {u.nom} {u.prenom}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
         </Grid>
         <Grid size={{ xs: 12 }}>
           <Typography
@@ -201,7 +216,11 @@ export const DemandeForm = ({
             )}
           </Typography>
 
-          <FileUploadField error={fileError} existingFileName={existingFileName} onChange={onFileChange} />
+          <FileUploadField
+            error={fileError}
+            existingFileName={existingFileName}
+            onChange={onFileChange}
+          />
         </Grid>
       </Grid>
 
