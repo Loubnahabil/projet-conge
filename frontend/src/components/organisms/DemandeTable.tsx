@@ -26,14 +26,7 @@ interface DemandeTableProps {
     string,
     {
       label: string;
-      color:
-        | "default"
-        | "primary"
-        | "secondary"
-        | "error"
-        | "info"
-        | "success"
-        | "warning";
+      color: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning";
     }
   >;
   page: number;
@@ -67,9 +60,7 @@ export const DemandeTable = ({
     onPageChange(newPage);
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     onRowsPerPageChange(parseInt(event.target.value, 10));
   };
 
@@ -94,24 +85,12 @@ export const DemandeTable = ({
         <Table>
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("demandeTable.id")}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("demandeTable.type")}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("demandeTable.debut")}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("demandeTable.fin")}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("demandeTable.duree")}
-              </TableCell>
-              <TableCell sx={{ fontWeight: 600 }}>
-                {t("common.status")}
-              </TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.id")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.type")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.debut")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.fin")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("demandeTable.duree")}</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>{t("common.status")}</TableCell>
               <TableCell align="right" sx={{ fontWeight: 600, pr: 3 }}>
                 {t("common.actions")}
               </TableCell>
@@ -133,9 +112,7 @@ export const DemandeTable = ({
                 return (
                   <TableRow key={d.id} hover>
                     <TableCell>#{d.id}</TableCell>
-                    <TableCell>
-                      {t(TYPE_TKEY[d.typeConge] ?? d.typeConge)}
-                    </TableCell>
+                    <TableCell>{t(TYPE_TKEY[d.typeConge] ?? d.typeConge)}</TableCell>
                     <TableCell>{d.dateDebut}</TableCell>
                     <TableCell>{d.dateFin}</TableCell>
                     <TableCell>{d.duree} j</TableCell>
@@ -143,28 +120,16 @@ export const DemandeTable = ({
                       <StatusChip statut={d.statut} />
                     </TableCell>
                     <TableCell align="right" sx={{ pr: 2 }}>
-                      <Stack
-                        direction="row"
-                        spacing={0.5}
-                        sx={{ justifyContent: "flex-end" }}
-                      >
+                      <Stack direction="row" spacing={0.5} sx={{ justifyContent: "flex-end" }}>
                         <Tooltip title={t("demandeTable.voirDetails")}>
-                          <IconButton
-                            color="info"
-                            onClick={() => onOpenDetail(d)}
-                            size="small"
-                          >
+                          <IconButton color="info" onClick={() => onOpenDetail(d)} size="small">
                             <Visibility fontSize="small" />
                           </IconButton>
                         </Tooltip>
 
                         {canEdit && (
                           <Tooltip title={t("demandeTable.modifier")}>
-                            <IconButton
-                              color="primary"
-                              onClick={() => onOpenEdit(d)}
-                              size="small"
-                            >
+                            <IconButton color="primary" onClick={() => onOpenEdit(d)} size="small">
                               <Edit fontSize="small" />
                             </IconButton>
                           </Tooltip>

@@ -15,10 +15,7 @@ export const MainLayout = () => {
       <Sidebar />
 
       {/* Central App Pages Wrapper */}
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, bgcolor: "#f9f9f9", p: 3, minHeight: "100vh" }}
-      >
+      <Box component="main" sx={{ flexGrow: 1, bgcolor: "#f9f9f9", p: 3, minHeight: "100vh" }}>
         <Toolbar />
 
         {/* Children routes load dynamically here */}

@@ -8,9 +8,7 @@ import type {
 
 export const statsApi = {
   getDashboard: async (): Promise<DashboardStatsResponse> => {
-    const response = await axiosInstance.get<DashboardStatsResponse>(
-      "/statistiques/dashboard",
-    );
+    const response = await axiosInstance.get<DashboardStatsResponse>("/statistiques/dashboard");
     return response.data;
   },
 
@@ -22,9 +20,7 @@ export const statsApi = {
   },
 
   getChefDashboard: async (): Promise<ChefDashboardStats> => {
-    const response = await axiosInstance.get<ChefDashboardStats>(
-      "/statistiques/chef-dashboard",
-    );
+    const response = await axiosInstance.get<ChefDashboardStats>("/statistiques/chef-dashboard");
     return response.data;
   },
 

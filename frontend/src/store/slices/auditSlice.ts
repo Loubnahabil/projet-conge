@@ -25,10 +25,7 @@ const initialState: AuditState = {
 
 export const fetchJournalAuditThunk = createAsyncThunk(
   "audit/fetchJournal",
-  async (
-    { page, size }: { page: number; size: number },
-    { rejectWithValue },
-  ) => {
+  async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
     try {
       return await auditApi.getJournalAudit(page, size);
     } catch {
@@ -65,8 +62,7 @@ const auditSlice = createSlice({
       })
       .addCase(fetchJournalAuditThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error =
-          (action.payload as string) || i18next.t("errors.operationError");
+        state.error = (action.payload as string) || i18next.t("errors.operationError");
       });
   },
 });

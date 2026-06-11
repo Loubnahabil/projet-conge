@@ -41,16 +41,10 @@ export const fetchUsersListThunk = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     const { users } = getState() as { users: UserState };
     try {
-      const data = await userApi.getAll(
-        users.searchQuery,
-        users.page,
-        users.rowsPerPage,
-      );
+      const data = await userApi.getAll(users.searchQuery, users.page, users.rowsPerPage);
       return data;
     } catch {
-      return rejectWithValue(
-        i18next.t("errors.loadUsers"),
-      );
+      return rejectWithValue(i18next.t("errors.loadUsers"));
     }
   },
 );
@@ -62,19 +56,14 @@ export const toggleUserStatusThunk = createAsyncThunk(
       await userApi.toggleEnabled(id);
       dispatch(fetchUsersListThunk());
     } catch {
-      return rejectWithValue(
-        i18next.t("errors.toggleUserStatus"),
-      );
+      return rejectWithValue(i18next.t("errors.toggleUserStatus"));
     }
   },
 );
 
 export const saveUserThunk = createAsyncThunk(
   "users/save",
-  async (
-    { payload, id }: { payload: UserRequest; id?: number },
-    { dispatch, rejectWithValue },
-  ) => {
+  async ({ payload, id }: { payload: UserRequest; id?: number }, { dispatch, rejectWithValue }) => {
     try {
       if (id) {
         await userApi.update(id, payload);
@@ -87,9 +76,7 @@ export const saveUserThunk = createAsyncThunk(
         response?: { data?: { message?: string; error?: string } };
       };
       const message =
-        e.response?.data?.message ||
-        e.response?.data?.error ||
-        i18next.t("errors.saveUser");
+        e.response?.data?.message || e.response?.data?.error || i18next.t("errors.saveUser");
       return rejectWithValue(message);
     }
   },
@@ -102,9 +89,7 @@ export const deleteUserThunk = createAsyncThunk(
       await userApi.delete(id);
       dispatch(fetchUsersListThunk());
     } catch {
-      return rejectWithValue(
-        i18next.t("errors.deleteUserDependencies"),
-      );
+      return rejectWithValue(i18next.t("errors.deleteUserDependencies"));
     }
   },
 );
@@ -113,10 +98,7 @@ const userSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
-    setPagination: (
-      state,
-      action: PayloadAction<{ page: number; rowsPerPage: number }>,
-    ) => {
+    setPagination: (state, action: PayloadAction<{ page: number; rowsPerPage: number }>) => {
       state.page = action.payload.page;
       state.rowsPerPage = action.payload.rowsPerPage;
     },
@@ -176,11 +158,6 @@ const userSlice = createSlice({
   },
 });
 
-export const {
-  setPagination,
-  setSearchQuery,
-  openPopup,
-  closePopup,
-  clearError,
-} = userSlice.actions;
+export const { setPagination, setSearchQuery, openPopup, closePopup, clearError } =
+  userSlice.actions;
 export default userSlice.reducer;

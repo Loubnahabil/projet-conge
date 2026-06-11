@@ -10,15 +10,8 @@ import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
 import { useExportUsers } from "@/hooks/useExportUsers"; // 👈 Ajout du hook d'export
 import type { RootState, AppDispatch } from "@/store";
-import {
-  fetchUsersListThunk,
-  setSearchQuery,
-  openPopup,
-} from "@/store/slices/userSlice";
-import {
-  fetchDirectionsThunk,
-  fetchRolesThunk,
-} from "@/store/slices/structureSlice";
+import { fetchUsersListThunk, setSearchQuery, openPopup } from "@/store/slices/userSlice";
+import { fetchDirectionsThunk, fetchRolesThunk } from "@/store/slices/structureSlice";
 import { useTranslation } from "react-i18next";
 
 export const UserPage = () => {

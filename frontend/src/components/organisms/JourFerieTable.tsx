@@ -20,10 +20,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete, EventNote } from "@mui/icons-material";
 import type { RootState, AppDispatch } from "@/store";
-import {
-  deleteHolidayThunk,
-  openHolidayPopup,
-} from "@/store/slices/jourFerieSlice";
+import { deleteHolidayThunk, openHolidayPopup } from "@/store/slices/jourFerieSlice";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 export const JourFerieTable: React.FC = () => {
@@ -33,9 +30,7 @@ export const JourFerieTable: React.FC = () => {
 
   // States to manage the custom confirmation dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [selectedHolidayId, setSelectedHolidayId] = useState<number | null>(
-    null,
-  );
+  const [selectedHolidayId, setSelectedHolidayId] = useState<number | null>(null);
 
   const handleOpenConfirm = (id: number) => {
     setSelectedHolidayId(id);
@@ -80,10 +75,7 @@ export const JourFerieTable: React.FC = () => {
               <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
                 {t("jourFerie.libelle")}
               </TableCell>
-              <TableCell
-                align="right"
-                sx={{ fontWeight: 600, color: "#475569", pr: 3 }}
-              >
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#475569", pr: 3 }}>
                 {t("common.actions")}
               </TableCell>
             </TableRow>
@@ -91,37 +83,22 @@ export const JourFerieTable: React.FC = () => {
           <TableBody>
             {holidays.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={3}
-                  align="center"
-                  sx={{ py: 6, color: "#64748b" }}
-                >
-                  <EventNote
-                    sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
-                  />
-                  <Typography variant="body2">
-                    {t("jourFerie.noData")}
-                  </Typography>
+                <TableCell colSpan={3} align="center" sx={{ py: 6, color: "#64748b" }}>
+                  <EventNote sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }} />
+                  <Typography variant="body2">{t("jourFerie.noData")}</Typography>
                 </TableCell>
               </TableRow>
             ) : (
               holidays.map((item: JourFerieResponse) => (
-                <TableRow
-                  key={item.id}
-                  sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
-                >
+                <TableRow key={item.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
                   <TableCell sx={{ fontWeight: "500", color: "#1e293b" }}>
                     {formatDateString(item.date)}
                   </TableCell>
-                  <TableCell sx={{ color: "#334155" }}>
-                    {item.libelle}
-                  </TableCell>
+                  <TableCell sx={{ color: "#334155" }}>{item.libelle}</TableCell>
                   <TableCell align="right" sx={{ pr: 2 }}>
                     <IconButton
                       size="small"
-                      onClick={() =>
-                        dispatch(openHolidayPopup({ mode: "edit", item }))
-                      }
+                      onClick={() => dispatch(openHolidayPopup({ mode: "edit", item }))}
                       sx={{ color: "#1976d2", mr: 1 }}
                     >
                       <Edit fontSize="small" />

@@ -18,9 +18,7 @@ import { STATUS_TKEY, TYPE_TKEY, STATUS_COLOR, TYPE_COLOR } from "@/constants/co
 
 export const AnalyticsCharts = () => {
   const { t } = useTranslation();
-  const { data: stats, loading } = useSelector(
-    (state: RootState) => state.stats,
-  );
+  const { data: stats, loading } = useSelector((state: RootState) => state.stats);
 
   if (loading || !stats) {
     return (
@@ -52,34 +50,12 @@ export const AnalyticsCharts = () => {
         <DashboardSection title={t("analytics.demandesParDirection")}>
           <Box sx={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
-              <BarChart
-                data={directionData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#f1f5f9"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="name"
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                  allowDecimals={false}
-                />
+              <BarChart data={directionData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} allowDecimals={false} />
                 <Tooltip cursor={{ fill: "#f8fafc" }} />
-                <Bar
-                  dataKey="Demandes"
-                  fill="#3b82f6"
-                  radius={[4, 4, 0, 0]}
-                  barSize={24}
-                />
+                <Bar dataKey="Demandes" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
@@ -91,27 +67,10 @@ export const AnalyticsCharts = () => {
         <DashboardSection title={t("analytics.statistiquesMensuelles")}>
           <Box sx={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
-              <LineChart
-                data={moisData}
-                margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#f1f5f9"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="name"
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                />
-                <YAxis
-                  stroke="#94a3b8"
-                  fontSize={11}
-                  tickLine={false}
-                  allowDecimals={false}
-                />
+              <LineChart data={moisData} margin={{ top: 10, right: 10, left: -20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} allowDecimals={false} />
                 <Tooltip />
                 <Line
                   type="monotone"

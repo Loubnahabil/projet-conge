@@ -6,18 +6,13 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { JourFerieTable } from "@/components/organisms/JourFerieTable";
 import { JourFerieFormModal } from "@/components/organisms/JourFerieFormModal";
 import type { RootState, AppDispatch } from "@/store";
-import {
-  fetchHolidaysThunk,
-  openHolidayPopup,
-} from "@/store/slices/jourFerieSlice";
+import { fetchHolidaysThunk, openHolidayPopup } from "@/store/slices/jourFerieSlice";
 import { useTranslation } from "react-i18next";
 
 export const JourFeriePage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { globalLoading, error } = useSelector(
-    (state: RootState) => state.jourFerie,
-  );
+  const { globalLoading, error } = useSelector((state: RootState) => state.jourFerie);
 
   useEffect(() => {
     dispatch(fetchHolidaysThunk());

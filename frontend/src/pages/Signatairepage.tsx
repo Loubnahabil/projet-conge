@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  Box,
-  Typography,
-  Alert,
-  Tabs,
-  Tab,
-  Grid,
-} from "@mui/material";
+import { Box, Typography, Alert, Tabs, Tab, Grid } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { statsApi } from "@/api/Statsapi";
 import { SignataireDemandeTable } from "@/components/organisms/SignataireDemandeTable";
@@ -36,8 +29,7 @@ export const SignatairePage = () => {
   const [tab, setTab] = useState(0);
   const [loadingTraitees, setLoadingTraitees] = useState(false);
   const [traiteesFetched, setTraiteesFetched] = useState(false);
-  const [dashboardStats, setDashboardStats] =
-    useState<SignataireDashboardStats | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<SignataireDashboardStats | null>(null);
   const [uploadTargetId, setUploadTargetId] = useState<number | null>(null);
   const [rejectDialog, setRejectDialog] = useState<{
     open: boolean;
@@ -78,9 +70,7 @@ export const SignatairePage = () => {
   const handleReject = async (commentaire: string) => {
     if (!rejectDialog.targetId) return;
     try {
-      await dispatch(
-        signataireRejectThunk({ id: rejectDialog.targetId, commentaire }),
-      ).unwrap();
+      await dispatch(signataireRejectThunk({ id: rejectDialog.targetId, commentaire })).unwrap();
       setTraiteesFetched(false);
       setRejectDialog({ open: false, targetId: null });
     } catch {
@@ -88,9 +78,7 @@ export const SignatairePage = () => {
     }
   };
 
-  const pendingDemandes = pendingSignatures.filter(
-    (d) => d.statut === "VISEE_CHEF",
-  );
+  const pendingDemandes = pendingSignatures.filter((d) => d.statut === "VISEE_CHEF");
 
   if (signataireLoading && pendingSignatures.length === 0) {
     return (
@@ -109,10 +97,7 @@ export const SignatairePage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
-      >
+      <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}>
         {t("signataire.title")}
       </Typography>
 

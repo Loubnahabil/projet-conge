@@ -43,7 +43,7 @@ export const SignataireDecisionModal = ({
   };
 
   return (
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
         {t("signataire.confirmerRejetDirection")}
       </DialogTitle>
@@ -75,11 +75,7 @@ export const SignataireDecisionModal = ({
           disabled={actionLoading}
         />
 
-        <AppButton
-          text={t("signataire.rejeter")}
-          onClick={handleSubmit}
-          loading={actionLoading}
-        />
+        <AppButton text={t("signataire.rejeter")} onClick={handleSubmit} loading={actionLoading} />
       </DialogActions>
     </Dialog>
   );

@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.13-alter-table-users-add-login-attempts
+      author: opencode
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  name: failed_attempts
+                  type: INT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: lock_time
+                  type: datetime2(3)
+                  constraints:
+                    nullable: true

@@ -11,28 +11,19 @@ import {
   deleteStructureNodeThunk,
   openStructurePopup,
 } from "@/store/slices/structureSlice";
-import type {
-  FullDirection,
-  FullDivision,
-  FullService,
-} from "@/types/structure.types";
+import type { FullDirection, FullDivision, FullService } from "@/types/structure.types";
 import { useTranslation } from "react-i18next";
 
 export const StructurePage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { treeData, loading, error } = useSelector(
-    (state: RootState) => state.structure,
-  );
+  const { treeData, loading, error } = useSelector((state: RootState) => state.structure);
 
   useEffect(() => {
     dispatch(fetchStructureDependenciesThunk());
   }, [dispatch]);
 
-  const handleDeleteItem = (
-    type: "direction" | "division" | "service",
-    id: number,
-  ) => {
+  const handleDeleteItem = (type: "direction" | "division" | "service", id: number) => {
     if (window.confirm(`${t("structure.confirmDelete")} ${type} ?`)) {
       dispatch(deleteStructureNodeThunk({ type, id }));
     }
@@ -69,9 +60,7 @@ export const StructurePage = () => {
         </Typography>
         <AppButton
           text={t("structure.addDirection")}
-          onClick={() =>
-            dispatch(openStructurePopup({ mode: "create", type: "direction" }))
-          }
+          onClick={() => dispatch(openStructurePopup({ mode: "create", type: "direction" }))}
         />
       </Box>
 
@@ -89,8 +78,7 @@ export const StructurePage = () => {
             title={dir.nom}
             type="direction"
             badgeText={`${dir.divisions?.length || 0} divisions · ${
-              dir.divisions?.flatMap((d: FullDivision) => d.services || [])
-                .length || 0
+              dir.divisions?.flatMap((d: FullDivision) => d.services || []).length || 0
             } services`}
             onAddChild={() =>
               dispatch(

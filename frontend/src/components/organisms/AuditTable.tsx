@@ -15,10 +15,7 @@ import {
 import HistoryIcon from "@mui/icons-material/History";
 import { StatusChip } from "@/components/atoms/StatusChip";
 import type { RootState, AppDispatch } from "@/store";
-import {
-  setAuditPage,
-  setAuditRowsPerPage,
-} from "@/store/slices/auditSlice";
+import { setAuditPage, setAuditRowsPerPage } from "@/store/slices/auditSlice";
 import { ROLE_TKEY } from "@/constants/constants";
 import { formatDateFR } from "@/utils/dateUtils";
 
@@ -33,9 +30,7 @@ export const AuditTable = () => {
     dispatch(setAuditPage(newPage));
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch(setAuditRowsPerPage(parseInt(event.target.value, 10)));
   };
 
@@ -58,16 +53,8 @@ export const AuditTable = () => {
           <Typography variant="body2" sx={{ color: "#64748b" }}>
             {t("audit.total")}
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 700, color: "#0f172a" }}
-          >
-            {totalElements}{" "}
-            {t(
-              totalElements !== 1
-                ? "common.entries_plural"
-                : "common.entries",
-            )}
+          <Typography variant="body2" sx={{ fontWeight: 700, color: "#0f172a" }}>
+            {totalElements} {t(totalElements !== 1 ? "common.entries_plural" : "common.entries")}
           </Typography>
         </Paper>
       </Box>
@@ -83,47 +70,26 @@ export const AuditTable = () => {
         <Table>
           <TableHead sx={{ bgcolor: "#f8fafc" }}>
             <TableRow>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Date / Heure
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Utilisateur
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Rôle
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Demande #
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Action
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-                Commentaire
-              </TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Date / Heure</TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Utilisateur</TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Rôle</TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Demande #</TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Action</TableCell>
+              <TableCell sx={{ fontWeight: "600", color: "#475569" }}>Commentaire</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {entries.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={6}
-                  align="center"
-                  sx={{ py: 6, color: "#64748b" }}
-                >
-                  <HistoryIcon
-                    sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }}
-                  />
+                <TableCell colSpan={6} align="center" sx={{ py: 6, color: "#64748b" }}>
+                  <HistoryIcon sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }} />
                   <Typography variant="body2">{t("audit.noData")}</Typography>
                 </TableCell>
               </TableRow>
             ) : (
               entries.map((entry) => {
                 return (
-                  <TableRow
-                    key={entry.id}
-                    sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
-                  >
+                  <TableRow key={entry.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
                     <TableCell
                       sx={{
                         color: "#475569",
@@ -136,10 +102,7 @@ export const AuditTable = () => {
 
                     <TableCell>
                       <Box>
-                        <Typography
-                          variant="body2"
-                          sx={{ fontWeight: "600", color: "#1e293b" }}
-                        >
+                        <Typography variant="body2" sx={{ fontWeight: "600", color: "#1e293b" }}>
                           {entry.acteurNom.toUpperCase()} {entry.acteurPrenom}
                         </Typography>
                         <Typography variant="caption" sx={{ color: "#64748b" }}>

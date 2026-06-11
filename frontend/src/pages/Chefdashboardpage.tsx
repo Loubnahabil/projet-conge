@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  Box,
-  Typography,
-  Alert,
-  Tabs,
-  Tab,
-  Grid,
-} from "@mui/material";
+import { Box, Typography, Alert, Tabs, Tab, Grid } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { statsApi } from "@/api/Statsapi";
 import { ChefDemandeTable } from "@/components/organisms/ChefDemandeTable";
@@ -27,14 +20,14 @@ import { useTranslation } from "react-i18next";
 export const ChefDashboardPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { pendingChefVisas, traiteesChef, chefLoading, actionLoading, error } =
-    useSelector((state: RootState) => state.demande);
+  const { pendingChefVisas, traiteesChef, chefLoading, actionLoading, error } = useSelector(
+    (state: RootState) => state.demande,
+  );
 
   const [tab, setTab] = useState(0);
   const [loadingTraitees, setLoadingTraitees] = useState(false);
   const [traiteesFetched, setTraiteesFetched] = useState(false);
-  const [dashboardStats, setDashboardStats] =
-    useState<ChefDashboardStats | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<ChefDashboardStats | null>(null);
   const [dialog, setDialog] = useState<{
     open: boolean;
     mode: "approve" | "reject" | null;
@@ -61,10 +54,7 @@ export const ChefDashboardPage = () => {
     }
   };
 
-  const handleOpenDecisionWorkflow = (
-    mode: "approve" | "reject",
-    id: number,
-  ) => {
+  const handleOpenDecisionWorkflow = (mode: "approve" | "reject", id: number) => {
     setDialog({ open: true, mode, targetId: id });
   };
 
@@ -104,10 +94,7 @@ export const ChefDashboardPage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
-      >
+      <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}>
         {t("chef.title")}
       </Typography>
 

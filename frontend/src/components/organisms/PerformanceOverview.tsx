@@ -6,20 +6,14 @@ import type { RootState } from "@/store";
 
 export const PerformanceOverview = () => {
   const { t } = useTranslation();
-  const { data: stats, loading } = useSelector(
-    (state: RootState) => state.stats,
-  );
+  const { data: stats, loading } = useSelector((state: RootState) => state.stats);
 
   if (loading || !stats) {
     return (
       <Grid container spacing={2}>
         {[1, 2, 3, 4, 5].map((i) => (
           <Grid size={{ xs: 12, sm: 6, md: 2.4 }} key={i}>
-            <Skeleton
-              variant="rounded"
-              height={90}
-              sx={{ borderRadius: "8px" }}
-            />
+            <Skeleton variant="rounded" height={90} sx={{ borderRadius: "8px" }} />
           </Grid>
         ))}
       </Grid>

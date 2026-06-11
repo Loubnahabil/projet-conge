@@ -1,11 +1,7 @@
 import { axiosInstance } from "@/api/axiosInstance";
 import type { AxiosResponse } from "axios";
 
-import type {
-  UserResponse,
-  SpringPageWrapper,
-  UserRequest,
-} from "@/types/user.types";
+import type { UserResponse, SpringPageWrapper, UserRequest } from "@/types/user.types";
 
 export const userApi = {
   getAll: (search = "", page = 0, size = 10) => {
@@ -15,12 +11,8 @@ export const userApi = {
     params.append("size", size.toString());
 
     return axiosInstance
-      .get<
-        SpringPageWrapper<UserResponse>
-      >(`/users?${params.toString()}`)
-      .then(
-        (res: AxiosResponse<SpringPageWrapper<UserResponse>>) => res.data,
-      );
+      .get<SpringPageWrapper<UserResponse>>(`/users?${params.toString()}`)
+      .then((res: AxiosResponse<SpringPageWrapper<UserResponse>>) => res.data);
   },
 
   getById: (id: number) =>
@@ -29,14 +21,10 @@ export const userApi = {
       .then((res: AxiosResponse<UserResponse>) => res.data),
 
   create: (payload: UserRequest) =>
-    axiosInstance
-      .post<UserResponse>("/users", payload)
-      .then((res) => res.data),
+    axiosInstance.post<UserResponse>("/users", payload).then((res) => res.data),
 
   update: (id: number, payload: UserRequest) =>
-    axiosInstance
-      .put<UserResponse>(`/users/${id}`, payload)
-      .then((res) => res.data),
+    axiosInstance.put<UserResponse>(`/users/${id}`, payload).then((res) => res.data),
 
   toggleEnabled: (id: number) =>
     axiosInstance
@@ -45,8 +33,7 @@ export const userApi = {
 
   delete: (id: number) => axiosInstance.delete(`/users/${id}`),
 
-  getMyProfile: () =>
-    axiosInstance.get<UserResponse>("/users/me").then((res) => res.data),
+  getMyProfile: () => axiosInstance.get<UserResponse>("/users/me").then((res) => res.data),
 
   updateMyProfile: (payload: {
     nom?: string;
@@ -54,8 +41,5 @@ export const userApi = {
     email?: string;
     currentPassword?: string;
     newPassword?: string;
-  }) =>
-    axiosInstance
-      .put<UserResponse>("/users/me", payload)
-      .then((res) => res.data),
+  }) => axiosInstance.put<UserResponse>("/users/me", payload).then((res) => res.data),
 };

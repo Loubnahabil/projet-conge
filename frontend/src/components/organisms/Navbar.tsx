@@ -1,13 +1,5 @@
 import { useTranslation } from "react-i18next";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, Tooltip } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -39,32 +31,21 @@ export const Navbar = () => {
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         {/* Left Side: App Title */}
-        <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{ fontWeight: "bold" }}
-        >
+        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: "bold" }}>
           {t("navbar.title")}
         </Typography>
 
         {/* Right Side: Welcome message, Profile Icon, and Logout Button */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {user && (
-            <Typography
-              variant="body1"
-              sx={{ fontWeight: "500", color: "#fff" }}
-            >
+            <Typography variant="body1" sx={{ fontWeight: "500", color: "#fff" }}>
               {`${t("navbar.bonjour")} ${user.prenom} ${user.nom}`}
             </Typography>
           )}
 
           {/* Profile Icon Button */}
           <Tooltip title={t("navbar.monProfil")}>
-            <IconButton
-              onClick={() => navigate("/profile")}
-              sx={{ color: "#fff" }}
-            >
+            <IconButton onClick={() => navigate("/profile")} sx={{ color: "#fff" }}>
               <AccountCircle />
             </IconButton>
           </Tooltip>

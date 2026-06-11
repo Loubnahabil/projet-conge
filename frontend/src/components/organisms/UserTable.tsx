@@ -44,9 +44,7 @@ export const UserTable: React.FC = () => {
     dispatch(fetchUsersListThunk());
   };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const updatedSize = parseInt(event.target.value, 10);
     dispatch(setPagination({ page: 0, rowsPerPage: updatedSize }));
     dispatch(fetchUsersListThunk());
@@ -78,9 +76,7 @@ export const UserTable: React.FC = () => {
       <Table>
         <TableHead sx={{ bgcolor: "#f8fafc" }}>
           <TableRow>
-            <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
-              {t("userTable.ppr")}
-            </TableCell>
+            <TableCell sx={{ fontWeight: "600", color: "#475569" }}>{t("userTable.ppr")}</TableCell>
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
               {t("userTable.fonctionnaire")}
             </TableCell>
@@ -93,10 +89,7 @@ export const UserTable: React.FC = () => {
             <TableCell sx={{ fontWeight: "600", color: "#475569" }}>
               {t("userTable.actif")}
             </TableCell>
-            <TableCell
-              align="right"
-              sx={{ fontWeight: "600", color: "#475569", pr: 4 }}
-            >
+            <TableCell align="right" sx={{ fontWeight: "600", color: "#475569", pr: 4 }}>
               {t("common.actions")}
             </TableCell>
           </TableRow>
@@ -104,32 +97,18 @@ export const UserTable: React.FC = () => {
         <TableBody>
           {filteredUsers.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={6}
-                align="center"
-                sx={{ py: 6, color: "#64748b" }}
-              >
+              <TableCell colSpan={6} align="center" sx={{ py: 6, color: "#64748b" }}>
                 <Person sx={{ fontSize: "2.5rem", mb: 1, color: "#94a3b8" }} />
-                <Typography variant="body2">
-                  {t("userTable.noUsers")}
-                </Typography>
+                <Typography variant="body2">{t("userTable.noUsers")}</Typography>
               </TableCell>
             </TableRow>
           ) : (
             filteredUsers.map((user: UserResponse) => (
-              <TableRow
-                key={user.id}
-                sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}
-              >
-                <TableCell sx={{ fontWeight: "bold", color: "#1976d2" }}>
-                  {user.ppr}
-                </TableCell>
+              <TableRow key={user.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
+                <TableCell sx={{ fontWeight: "bold", color: "#1976d2" }}>{user.ppr}</TableCell>
                 <TableCell>
                   <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: "600", color: "#1e293b" }}
-                    >
+                    <Typography variant="body2" sx={{ fontWeight: "600", color: "#1e293b" }}>
                       {user.nom.toUpperCase()} {user.prenom}
                     </Typography>
                     <Typography variant="caption" sx={{ color: "#64748b" }}>
@@ -142,10 +121,7 @@ export const UserTable: React.FC = () => {
                     <Typography variant="body2" sx={{ color: "#334155" }}>
                       {user.directionNom}
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "#64748b", display: "block" }}
-                    >
+                    <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
                       {user.divisionNom} &bull; {user.serviceNom}
                     </Typography>
                   </Box>

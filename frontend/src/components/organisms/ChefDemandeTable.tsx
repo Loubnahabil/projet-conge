@@ -50,32 +50,17 @@ export const ChefDemandeTable = ({
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
               {t("chef.fonctionnaire")}
             </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("chef.service")}
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("common.type")}
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("chef.dateDebut")}
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("chef.dateFin")}
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("chef.dureeJ")}
-            </TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("chef.service")}</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("common.type")}</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("chef.dateDebut")}</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("chef.dateFin")}</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("chef.dureeJ")}</TableCell>
             {showActions ? (
-              <TableCell
-                align="right"
-                sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
-              >
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#475569", pr: 4 }}>
                 {t("common.actions")}
               </TableCell>
             ) : (
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                {t("common.status")}
-              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("common.status")}</TableCell>
             )}
           </TableRow>
         </TableHead>
@@ -93,9 +78,7 @@ export const ChefDemandeTable = ({
                   <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
                     {d.userNomComplet}
                   </TableCell>
-                  <TableCell sx={{ color: "#475569" }}>
-                    {d.userServiceNom}
-                  </TableCell>
+                  <TableCell sx={{ color: "#475569" }}>{d.userServiceNom}</TableCell>
                   <TableCell>
                     <TypeCongeChip typeConge={d.typeConge} />
                   </TableCell>
@@ -135,10 +118,7 @@ export const ChefDemandeTable = ({
                     </TableCell>
                   ) : (
                     <TableCell>
-                      <Stack
-                        direction="row"
-                        sx={{ alignItems: "center", gap: 1 }}
-                      >
+                      <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
                         <StatusChip statut={d.statut} />
                         <Tooltip title={t("demandeTable.voirDetailsShort")}>
                           <IconButton

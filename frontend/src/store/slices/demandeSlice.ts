@@ -3,11 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import { demandeApi } from "@/api/demandeApi";
-import type {
-  DemandeResponse,
-  DemandeRequest,
-  HistoryRecord,
-} from "@/types/Demande.types";
+import type { DemandeResponse, DemandeRequest, HistoryRecord } from "@/types/Demande.types";
 import type { UserResponse } from "@/types/user.types";
 
 interface DemandeState {
@@ -52,17 +48,11 @@ const initialState: DemandeState = {
 
 export const fetchMyDemandesThunk = createAsyncThunk(
   "demande/fetchMyDemandes",
-  async (
-    { page, size }: { page: number; size: number },
-    { rejectWithValue },
-  ) => {
+  async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
     try {
       return await demandeApi.getMyDemandes(page, size);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.loadDemandes");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadDemandes");
       return rejectWithValue(message);
     }
   },
@@ -74,10 +64,7 @@ export const fetchEligibleInterimsThunk = createAsyncThunk(
     try {
       return await demandeApi.getSameServiceColleagues();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.signatureError");
+      const message = err instanceof Error ? err.message : i18next.t("errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -92,10 +79,7 @@ export const createDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.create(payload, submit);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.createDemande");
+      const message = err instanceof Error ? err.message : i18next.t("errors.createDemande");
       return rejectWithValue(message);
     }
   },
@@ -103,17 +87,11 @@ export const createDemandeThunk = createAsyncThunk(
 
 export const updateDemandeThunk = createAsyncThunk(
   "demande/update",
-  async (
-    { id, payload }: { id: number; payload: DemandeRequest },
-    { rejectWithValue },
-  ) => {
+  async ({ id, payload }: { id: number; payload: DemandeRequest }, { rejectWithValue }) => {
     try {
       return await demandeApi.update(id, payload);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.updateDemande");
+      const message = err instanceof Error ? err.message : i18next.t("errors.updateDemande");
       return rejectWithValue(message);
     }
   },
@@ -125,8 +103,7 @@ export const soumettreDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.soumettre(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.submitDemande");
+      const message = err instanceof Error ? err.message : i18next.t("errors.submitDemande");
       return rejectWithValue(message);
     }
   },
@@ -138,8 +115,7 @@ export const annulerDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.annulerDemande(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.cancelDemande");
+      const message = err instanceof Error ? err.message : i18next.t("errors.cancelDemande");
       return rejectWithValue(message);
     }
   },
@@ -151,10 +127,7 @@ export const fetchDemandeHistoryThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandeHistory(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.loadHistorique");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadHistorique");
       return rejectWithValue(message);
     }
   },
@@ -168,8 +141,7 @@ export const fetchPendingChefVisasThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesAViser();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.loadData");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -181,8 +153,7 @@ export const fetchTraiteesChefThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesTraiteesChef();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.loadData");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -197,8 +168,7 @@ export const visaChefThunk = createAsyncThunk(
     try {
       return await demandeApi.visaChef(id, approve, { commentaire });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.visaError");
+      const message = err instanceof Error ? err.message : i18next.t("errors.visaError");
       return rejectWithValue(message);
     }
   },
@@ -212,8 +182,7 @@ export const fetchPendingSignaturesThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesASigner();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.loadData");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -225,8 +194,7 @@ export const fetchTraiteesSignataireThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesTraiteesSignataire();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.loadData");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -234,15 +202,11 @@ export const fetchTraiteesSignataireThunk = createAsyncThunk(
 
 export const signataireApproveThunk = createAsyncThunk(
   "demande/signataireApprove",
-  async (
-    { id, file }: { id: number; file: File },
-    { rejectWithValue },
-  ) => {
+  async ({ id, file }: { id: number; file: File }, { rejectWithValue }) => {
     try {
       return await demandeApi.uploadDocument(id, file, "DECISION_SIGNEE");
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.signatureError");
+      const message = err instanceof Error ? err.message : i18next.t("errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -250,15 +214,11 @@ export const signataireApproveThunk = createAsyncThunk(
 
 export const signataireRejectThunk = createAsyncThunk(
   "demande/signataireReject",
-  async (
-    { id, commentaire }: { id: number; commentaire: string },
-    { rejectWithValue },
-  ) => {
+  async ({ id, commentaire }: { id: number; commentaire: string }, { rejectWithValue }) => {
     try {
       return await demandeApi.rejetSignataire(id, { commentaire });
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.rejetError");
+      const message = err instanceof Error ? err.message : i18next.t("errors.rejetError");
       return rejectWithValue(message);
     }
   },
@@ -329,13 +289,10 @@ const demandeSlice = createSlice({
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(
-        createDemandeThunk.fulfilled,
-        (state, action: PayloadAction<DemandeResponse>) => {
-          state.actionLoading = false;
-          state.demandes.unshift(action.payload); // Add new to top of tracking list
-        },
-      )
+      .addCase(createDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+        state.actionLoading = false;
+        state.demandes.unshift(action.payload); // Add new to top of tracking list
+      })
       .addCase(createDemandeThunk.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
@@ -346,31 +303,21 @@ const demandeSlice = createSlice({
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(
-        updateDemandeThunk.fulfilled,
-        (state, action: PayloadAction<DemandeResponse>) => {
-          state.actionLoading = false;
-          const idx = state.demandes.findIndex(
-            (d) => d.id === action.payload.id,
-          );
-          if (idx !== -1) state.demandes[idx] = action.payload;
-        },
-      )
+      .addCase(updateDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+        state.actionLoading = false;
+        const idx = state.demandes.findIndex((d) => d.id === action.payload.id);
+        if (idx !== -1) state.demandes[idx] = action.payload;
+      })
       .addCase(updateDemandeThunk.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       })
 
       // Soumettre Demande
-      .addCase(
-        soumettreDemandeThunk.fulfilled,
-        (state, action: PayloadAction<DemandeResponse>) => {
-          const idx = state.demandes.findIndex(
-            (d) => d.id === action.payload.id,
-          );
-          if (idx !== -1) state.demandes[idx] = action.payload;
-        },
-      )
+      .addCase(soumettreDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+        const idx = state.demandes.findIndex((d) => d.id === action.payload.id);
+        if (idx !== -1) state.demandes[idx] = action.payload;
+      })
 
       // Annuler Demande
       .addCase(annulerDemandeThunk.fulfilled, (state, action) => {
@@ -378,9 +325,7 @@ const demandeSlice = createSlice({
         if (idx !== -1) {
           state.demandes[idx] = action.payload;
         } else {
-          state.demandes = state.demandes.filter(
-            (d) => d.id !== action.meta.arg,
-          );
+          state.demandes = state.demandes.filter((d) => d.id !== action.meta.arg);
         }
       })
 
@@ -414,9 +359,7 @@ const demandeSlice = createSlice({
       })
       .addCase(visaChefThunk.fulfilled, (state, action) => {
         state.actionLoading = false;
-        state.pendingChefVisas = state.pendingChefVisas.filter(
-          (d) => d.id !== action.payload.id,
-        );
+        state.pendingChefVisas = state.pendingChefVisas.filter((d) => d.id !== action.payload.id);
       })
       .addCase(visaChefThunk.rejected, (state, action) => {
         state.actionLoading = false;
@@ -459,9 +402,7 @@ const demandeSlice = createSlice({
       })
       .addCase(signataireRejectThunk.fulfilled, (state, action) => {
         state.actionLoading = false;
-        state.pendingSignatures = state.pendingSignatures.filter(
-          (d) => d.id !== action.payload.id,
-        );
+        state.pendingSignatures = state.pendingSignatures.filter((d) => d.id !== action.payload.id);
       })
       .addCase(signataireRejectThunk.rejected, (state, action) => {
         state.actionLoading = false;
@@ -470,5 +411,6 @@ const demandeSlice = createSlice({
   },
 });
 
-export const { clearDemandeError, clearSelectedHistory, setDemandePage, setDemandeRowsPerPage } = demandeSlice.actions;
+export const { clearDemandeError, clearSelectedHistory, setDemandePage, setDemandeRowsPerPage } =
+  demandeSlice.actions;
 export default demandeSlice.reducer;

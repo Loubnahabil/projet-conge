@@ -17,8 +17,7 @@ const axiosInstance = axios.create({
 
 // REQUEST interceptor — injecte le token dans chaque requête
 axiosInstance.interceptors.request.use((config) => {
-  const token =
-    store?.getState().auth?.accessToken || localStorage.getItem("accessToken");
+  const token = store?.getState().auth?.accessToken || localStorage.getItem("accessToken");
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -45,8 +44,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     const isLoginRequest = originalRequest?.url?.includes("/auth/login");
-    const isRefreshRequest =
-      originalRequest?.url?.includes("/auth/refresh");
+    const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
 
     // si 401 et c'est pas login/refresh → essaie de refresh le token
     if (
@@ -58,8 +56,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       const refreshToken =
-        store?.getState().auth?.refreshToken ||
-        localStorage.getItem("refreshToken");
+        store?.getState().auth?.refreshToken || localStorage.getItem("refreshToken");
 
       // pas de refresh token → logout direct
       if (!refreshToken) {
@@ -94,9 +91,7 @@ axiosInstance.interceptors.response.use(
         localStorage.setItem("refreshToken", newRefresh);
 
         // met à jour Redux
-        store?.dispatch(
-          updateTokens({ accessToken, refreshToken: newRefresh }),
-        );
+        store?.dispatch(updateTokens({ accessToken, refreshToken: newRefresh }));
 
         // relance toutes les requêtes en attente
         processQueue(null, accessToken);
@@ -118,15 +113,7 @@ axiosInstance.interceptors.response.use(
       console.error("CRITICAL BACKEND ERROR DATA:", error.response.data);
     }
 
-    const backendMessage =
-      error.response?.data?.message || error.response?.data || error.message;
-    return Promise.reject(
-      new Error(
-        typeof backendMessage === "string"
-          ? backendMessage
-          : JSON.stringify(backendMessage),
-      ),
-    );
+    return Promise.reject(error);
   },
 );
 

@@ -34,8 +34,7 @@ export const OrgNode = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const getIcon = () => {
-    if (type === "direction")
-      return <Business sx={{ color: "#1976d2", mr: 1 }} />;
+    if (type === "direction") return <Business sx={{ color: "#1976d2", mr: 1 }} />;
     if (type === "division") return <Folder sx={{ color: "#e4a11b", mr: 1 }} />;
     return <Settings sx={{ color: "#2e7d32", mr: 1, fontSize: "1.1rem" }} />;
   };

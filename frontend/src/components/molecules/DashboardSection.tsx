@@ -5,10 +5,7 @@ interface DashboardSectionProps {
   children: React.ReactNode;
 }
 
-export const DashboardSection = ({
-  title,
-  children,
-}: DashboardSectionProps) => (
+export const DashboardSection = ({ title, children }: DashboardSectionProps) => (
   <Paper
     sx={{
       p: 3,

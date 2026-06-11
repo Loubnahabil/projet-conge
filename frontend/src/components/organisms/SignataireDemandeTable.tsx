@@ -57,9 +57,7 @@ export const SignataireDemandeTable = ({
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
               {t("signataire.service")}
             </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-              {t("common.type")}
-            </TableCell>
+            <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("common.type")}</TableCell>
             <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
               {t("signataire.dateDebut")}
             </TableCell>
@@ -71,16 +69,11 @@ export const SignataireDemandeTable = ({
             </TableCell>
 
             {showActions ? (
-              <TableCell
-                align="right"
-                sx={{ fontWeight: 600, color: "#475569", pr: 4 }}
-              >
+              <TableCell align="right" sx={{ fontWeight: 600, color: "#475569", pr: 4 }}>
                 {t("common.actions")}
               </TableCell>
             ) : (
-              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>
-                {t("common.status")}
-              </TableCell>
+              <TableCell sx={{ fontWeight: 600, color: "#475569" }}>{t("common.status")}</TableCell>
             )}
           </TableRow>
         </TableHead>
@@ -94,16 +87,13 @@ export const SignataireDemandeTable = ({
             </TableRow>
           ) : (
             data.map((d) => {
-
               return (
                 <TableRow key={d.id} sx={{ "&:hover": { bgcolor: "#fcfdfe" } }}>
                   <TableCell sx={{ fontWeight: 600, color: "#1e293b" }}>
                     {d.userNomComplet}
                   </TableCell>
 
-                  <TableCell sx={{ color: "#475569" }}>
-                    {d.userServiceNom}
-                  </TableCell>
+                  <TableCell sx={{ color: "#475569" }}>{d.userServiceNom}</TableCell>
 
                   <TableCell>
                     <TypeCongeChip typeConge={d.typeConge} />
@@ -157,10 +147,7 @@ export const SignataireDemandeTable = ({
                     </TableCell>
                   ) : (
                     <TableCell>
-                      <Stack
-                        direction="row"
-                        sx={{ alignItems: "center", gap: 1 }}
-                      >
+                      <Stack direction="row" sx={{ alignItems: "center", gap: 1 }}>
                         <StatusChip statut={d.statut} />
                         <Tooltip title={t("signataire.voirDetails")}>
                           <IconButton

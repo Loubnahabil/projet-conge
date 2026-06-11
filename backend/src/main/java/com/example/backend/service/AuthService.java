@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,8 +29,8 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtUtils jwtUtils;
-    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final LoginAttemptService loginAttemptService;
 
     @Value("${app.jwt.refresh-expiration}")
     private long refreshExpiration;
@@ -38,20 +38,31 @@ public class AuthService {
     @Transactional
     public LoginResponseDTO login(LoginRequestDTO request) {
         log.info("Tentative connexion - email={}", request.getEmail());
-        // this throws BadCredentialsException automatically if wrong
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword()));
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (user != null) {
+            loginAttemptService.checkAndResetIfExpired(user);
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(), request.getPassword()));
+        } catch (BadCredentialsException e) {
+            if (user != null) {
+                loginAttemptService.registerFailedAttempt(user);
+            }
+            throw e;
+        }
+
+        loginAttemptService.resetAttempts(user);
 
         String accessToken = jwtUtils.generateAccessToken(user.getEmail());
         String refreshTokenStr = jwtUtils.generateRefreshToken(user.getEmail());
 
-        // delete old refresh token if exists
         refreshTokenRepository.deleteByUser(user);
 
-        // save new refresh token
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(refreshTokenStr)
                 .user(user)

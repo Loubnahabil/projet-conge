@@ -1,9 +1,5 @@
 import i18next from "i18next";
-import {
-  createSlice,
-  createAsyncThunk,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 import authApi from "@/api/authApi";
 import type { AuthState, LoginRequest } from "@/types/auth.types";
 import axios from "axios";
@@ -26,9 +22,7 @@ export const loginThunk = createAsyncThunk(
     } catch (error: unknown) {
       // ✅ Use Axios type guard to cleanly extract the backend error message
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(
-          error.response?.data?.error || i18next.t("errors.loginError"),
-        );
+        return rejectWithValue(error.response?.data?.error || i18next.t("errors.loginError"));
       }
 
       // Fallback for generic/network errors
@@ -55,10 +49,7 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    updateTokens: (
-      state,
-      action: PayloadAction<{ accessToken: string; refreshToken: string }>,
-    ) => {
+    updateTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
       state.accessToken = action.payload.accessToken; // ← lowercase a
       state.refreshToken = action.payload.refreshToken;
     },

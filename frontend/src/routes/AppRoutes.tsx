@@ -1,8 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/index";
 import LoginPage from "@/pages/LoginPage";
@@ -35,14 +31,8 @@ const ChefRoute = ({ children }: { children: React.ReactNode }) => {
   const accessToken = useSelector((state: RootState) => state.auth.accessToken);
   if (!accessToken) return <Navigate to="/login" replace />;
   // CHEF_HIERARCHIE, CHEF_SERVICE, CHEF_DIVISION, DIRECTEUR all count as chef
-  const chefRoles = [
-    "CHEF_HIERARCHIE",
-    "CHEF_SERVICE",
-    "CHEF_DIVISION",
-    "DIRECTEUR",
-  ];
-  if (!role || !chefRoles.includes(role))
-    return <Navigate to="/dashboard" replace />;
+  const chefRoles = ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"];
+  if (!role || !chefRoles.includes(role)) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 };
 

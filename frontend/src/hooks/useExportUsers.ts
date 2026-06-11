@@ -30,9 +30,7 @@ export function useExportUsers(users: UserResponse[]) {
   // ── EXCEL ──────────────────────────────────────────────────────────
   const exportExcel = () => {
     const rows = users.map((u) =>
-      Object.fromEntries(
-        COLUMNS.map(({ header, key }) => [header, formatValue(key, u)]),
-      ),
+      Object.fromEntries(COLUMNS.map(({ header, key }) => [header, formatValue(key, u)])),
     );
 
     const ws = XLSX.utils.json_to_sheet(rows);
@@ -50,7 +48,11 @@ export function useExportUsers(users: UserResponse[]) {
     doc.text(i18next.t("export.pdfTitle"), 14, 15);
     doc.setFontSize(9);
     doc.setTextColor(120);
-    doc.text(`${i18next.t("export.pdfExportDate")} ${new Date().toLocaleDateString("fr-FR")}`, 14, 21);
+    doc.text(
+      `${i18next.t("export.pdfExportDate")} ${new Date().toLocaleDateString("fr-FR")}`,
+      14,
+      21,
+    );
 
     autoTable(doc, {
       startY: 26,

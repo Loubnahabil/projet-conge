@@ -43,7 +43,7 @@ const statsSlice = createSlice({
       .addCase(fetchDashboardStatsThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || i18next.t("errors.operationError");
-      })
+      });
   },
 });
 
