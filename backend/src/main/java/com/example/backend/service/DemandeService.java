@@ -129,9 +129,10 @@ public class DemandeService {
             initialStatus = StatutDemande.BROUILLON;
         }
 
+        int targetYear = request.getDateDebut().getYear();
+
         // 8. Quota check
         if (request.getTypeConge() == TypeConge.ANNUEL) {
-            int targetYear = request.getDateDebut().getYear();
             Quota quota = quotaRepository.findByUserIdAndAnnee(currentUserId, targetYear)
                     .orElseThrow(() -> new BusinessException("Aucun quota annuel configuré pour l'année administrative " + targetYear));
             if (quota.getJoursRestants() < businessDaysDuration) {
@@ -146,6 +147,7 @@ public class DemandeService {
                 .dateDebut(request.getDateDebut())
                 .dateFin(request.getDateFin())
                 .duree(businessDaysDuration)
+                .annee(targetYear)
                 .typeConge(request.getTypeConge())
                 .statut(initialStatus)
                 .build();
@@ -278,7 +280,7 @@ public class DemandeService {
             logCommentaire = "Décision signée déposée par le signataire. Demande validée et clôturée automatiquement.";
 
             if (demande.getTypeConge() == TypeConge.ANNUEL) {
-                int targetYear = demande.getDateDebut().getYear();
+                int targetYear = demande.getAnnee();
                 Quota quota = quotaRepository.findByUserIdAndAnnee(demande.getUser().getId(), targetYear)
                         .orElseThrow(() -> new BusinessException("Profil quota introuvable pour cette année administrative."));
 

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.14-alter-table-demandes-add-annee
+      author: opencode
+      changes:
+        - addColumn:
+            tableName: demandes
+            columns:
+              - column:
+                  name: annee
+                  type: INT
+                  defaultValueNumeric: 2025
+                  constraints:
+                    nullable: false

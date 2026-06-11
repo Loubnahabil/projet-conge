@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Typography,
@@ -21,7 +22,8 @@ import type { UserResponse } from "@/types/user.types";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
 import { useTranslation } from "react-i18next";
 import { calculerJoursOuvrables } from "@/services/leave.service";
-import { jourFerieApi } from "@/api/jourFerieApi";
+import { fetchHolidaysThunk } from "@/store/slices/jourFerieSlice";
+import type { AppDispatch, RootState } from "@/store";
 
 interface FormInputs {
   dateDebut: string;
@@ -51,14 +53,16 @@ export const DemandeForm = ({
   onFileChange,
 }: DemandeFormProps) => {
   const { t } = useTranslation();
-  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
-  const [holidays, setHolidays] = useState<string[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const holidays = useSelector((state: RootState) =>
+    state.jourFerie.list.map((h) => h.date),
+  );
 
   useEffect(() => {
-    jourFerieApi.getAll().then((list) => {
-      setHolidays(list.map((h) => h.date));
-    });
-  }, []);
+    dispatch(fetchHolidaysThunk());
+  }, [dispatch]);
+
+  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
 
   const {
     register,

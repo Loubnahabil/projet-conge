@@ -39,6 +39,9 @@ public class Demande {
     @Column(nullable = false)
     private int duree;
 
+    @Column(nullable = false)
+    private int annee;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "type_conge", nullable = false, length = 50)
     private TypeConge typeConge;

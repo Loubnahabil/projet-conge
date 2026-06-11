@@ -18,5 +18,6 @@
     <include file="db/changelog/migrations/v1/1/1.1.11-create-table-pieces-justificatives.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.12-create-table-demande-historiques.yml"/>
     <include file="db/changelog/migrations/v1/1/1.1.13-alter-table-users-add-login-attempts.yml"/>
+    <include file="db/changelog/migrations/v1/1/1.1.14-alter-table-demandes-add-annee.yml"/>
 
 </databaseChangeLog>

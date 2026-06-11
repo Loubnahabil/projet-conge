@@ -22,28 +22,19 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  // ── Admin Dashboard ────────────────────────────────────────────────────────
   { labelKey: "dashboard", path: "/dashboard", roles: ["ADMIN"] },
-
-  // ── Fonctionnaire Roles ────────────────────────────────────────────────────
   { labelKey: "dashboard", path: "/fonctionnaire/dashboard", roles: ["FONCTIONNAIRE"] },
   { labelKey: "myRequests", path: "/mes-demandes", roles: ["FONCTIONNAIRE"] },
-
-  // ── Chef roles ────────────────────────────────────────────────────────────
   {
     labelKey: "dashboard",
     path: "/chef/demandes",
     roles: ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"],
   },
-
-  // ── Signataire ────────────────────────────────────────────────────────────
   {
     labelKey: "dashboard",
     path: "/signataire/demandes",
     roles: ["SIGNATAIRE"],
   },
-
-  // ── Admin Management Links ────────────────────────────────────────────────
   {
     labelKey: "structure",
     path: "/admin/structure",

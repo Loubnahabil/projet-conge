@@ -67,7 +67,7 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
             { label: t("detailDrawer.dateFin"), value: demande.dateFin },
             {
               label: t("detailDrawer.duree"),
-              value: `${demande.duree} ${t("demandeTable.joursOuvrables")}`,
+              value: `${demande.duree} ${t("demandeTable.joursOuvrables", { count: demande.duree })}`,
             },
             { label: t("detailDrawer.interim"), value: demande.interimNomComplet ?? "—" },
           ].map((row) => (
