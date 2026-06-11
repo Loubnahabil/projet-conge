@@ -28,56 +28,33 @@ export const demandeApi = {
 
   // GET /demandes/a-viser (For Chef validation queues)
   getDemandesAViser: async (): Promise<DemandeResponse[]> => {
-    const response = await axiosInstance.get<DemandeResponse[]>(
-      "/demandes/a-viser",
-    );
+    const response = await axiosInstance.get<DemandeResponse[]>("/demandes/a-viser");
     return response.data;
   },
 
   // POST /demandes?submit=true/false
-  create: async (
-    payload: DemandeRequest,
-    submit: boolean,
-  ): Promise<DemandeResponse> => {
-    const response = await axiosInstance.post<DemandeResponse>(
-      "/demandes",
-      payload,
-      {
-        params: { submit },
-      },
-    );
+  create: async (payload: DemandeRequest, submit: boolean): Promise<DemandeResponse> => {
+    const response = await axiosInstance.post<DemandeResponse>("/demandes", payload, {
+      params: { submit },
+    });
     return response.data;
   },
 
   // PUT /demandes/{id}
-  update: async (
-    id: number,
-    payload: DemandeRequest,
-  ): Promise<DemandeResponse> => {
-    const response = await axiosInstance.put<DemandeResponse>(
-      `/demandes/${id}`,
-      payload,
-    );
+  update: async (id: number, payload: DemandeRequest): Promise<DemandeResponse> => {
+    const response = await axiosInstance.put<DemandeResponse>(`/demandes/${id}`, payload);
     return response.data;
   },
 
   // POST /demandes/{id}/upload
-  uploadDocument: async (
-    id: number,
-    file: File,
-    typeDocument: string,
-  ): Promise<UploadResponse> => {
+  uploadDocument: async (id: number, file: File, typeDocument: string): Promise<UploadResponse> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("typeDocument", typeDocument);
 
-    const response = await axiosInstance.post<UploadResponse>(
-      `/demandes/${id}/upload`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      },
-    );
+    const response = await axiosInstance.post<UploadResponse>(`/demandes/${id}/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
     return response.data;
   },
@@ -99,10 +76,7 @@ export const demandeApi = {
   },
 
   // PUT /demandes/{id}/rejet-signataire
-  rejetSignataire: async (
-    id: number,
-    body: { commentaire: string },
-  ): Promise<DemandeResponse> => {
+  rejetSignataire: async (id: number, body: { commentaire: string }): Promise<DemandeResponse> => {
     const response = await axiosInstance.put<DemandeResponse>(
       `/demandes/${id}/rejet-signataire`,
       body,
@@ -113,9 +87,7 @@ export const demandeApi = {
   // GET /users/colleagues
   getSameServiceColleagues: async (): Promise<UserResponse[]> => {
     try {
-      const response = await axiosInstance.get<UserResponse[]>(
-        "/users/colleagues",
-      );
+      const response = await axiosInstance.get<UserResponse[]>("/users/colleagues");
       return response.data;
     } catch {
       return [];
@@ -124,55 +96,42 @@ export const demandeApi = {
 
   // PUT /demandes/{id}/annuler
   annulerDemande: async (id: number): Promise<DemandeResponse> => {
-    const response = await axiosInstance.put<DemandeResponse>(
-      `/demandes/${id}/annuler`,
-    );
+    const response = await axiosInstance.put<DemandeResponse>(`/demandes/${id}/annuler`);
     return response.data;
   },
 
   // GET /demandes/a-signer (For Signataire validation queues)
   getDemandesASigner: async (): Promise<DemandeResponse[]> => {
-    const response = await axiosInstance.get<DemandeResponse[]>(
-      "/demandes/a-signer",
-    );
+    const response = await axiosInstance.get<DemandeResponse[]>("/demandes/a-signer");
     return response.data;
   },
 
   getDemandeHistory: async (id: number): Promise<HistoryRecord[]> => {
-    const response = await axiosInstance.get<HistoryRecord[]>(
-      `/demandes/${id}/historique`,
-    );
+    const response = await axiosInstance.get<HistoryRecord[]>(`/demandes/${id}/historique`);
     return response.data;
   },
   soumettre: async (id: number): Promise<DemandeResponse> => {
-    const response = await axiosInstance.put<DemandeResponse>(
-      `/demandes/${id}/soumettre`,
-    );
+    const response = await axiosInstance.put<DemandeResponse>(`/demandes/${id}/soumettre`);
     return response.data;
   },
 
   // Add to demandeApi object:
 
   getDemandesTraiteesChef: async (): Promise<DemandeResponse[]> => {
-    const response = await axiosInstance.get<DemandeResponse[]>(
-      "/demandes/traitees-chef",
-    );
+    const response = await axiosInstance.get<DemandeResponse[]>("/demandes/traitees-chef");
     return response.data;
   },
 
   getDemandesTraiteesSignataire: async (): Promise<DemandeResponse[]> => {
-    const response = await axiosInstance.get<DemandeResponse[]>(
-      "/demandes/traitees-signataire",
-    );
+    const response = await axiosInstance.get<DemandeResponse[]>("/demandes/traitees-signataire");
     return response.data;
   },
 
   // GET /demandes/{id}/generate-pdf
   generatePdf: async (id: number): Promise<void> => {
-    const response = await axiosInstance.get(
-      `/demandes/${id}/generate-pdf`,
-      { responseType: "blob" },
-    );
+    const response = await axiosInstance.get(`/demandes/${id}/generate-pdf`, {
+      responseType: "blob",
+    });
     downloadBlob(response.data, `demande-${id}.pdf`);
   },
 };

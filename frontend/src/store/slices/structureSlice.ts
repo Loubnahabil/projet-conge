@@ -13,10 +13,10 @@ import type {
 
 interface StructureState {
   directions: DirectionResponse[];
-  divisions: DirectionResponse[];  // kept for StructurePage (full tree)
-  services: ServiceResponse[];     // kept for StructurePage (full tree)
-  currentDivisions: DivisionResponse[];  // lazy-loaded for UserFormModal
-  currentServices: ServiceResponse[];    // lazy-loaded for UserFormModal
+  divisions: DirectionResponse[]; // kept for StructurePage (full tree)
+  services: ServiceResponse[]; // kept for StructurePage (full tree)
+  currentDivisions: DivisionResponse[]; // lazy-loaded for UserFormModal
+  currentServices: ServiceResponse[]; // lazy-loaded for UserFormModal
   roles: { id: number; name: string }[];
   treeData: FullDirection[];
   loading: boolean;
@@ -124,15 +124,13 @@ export const saveStructureNodeThunk = createAsyncThunk(
 
     try {
       if (mode === "create") {
-        if (type === "direction")
-          await structureApi.createDirection(payload.nom);
+        if (type === "direction") await structureApi.createDirection(payload.nom);
         else if (type === "division" && parentId)
           await structureApi.createDivision(parentId, payload.nom);
         else if (type === "service" && parentId)
           await structureApi.createService(parentId, payload.nom);
       } else if (mode === "edit" && targetId) {
-        if (type === "direction")
-          await structureApi.updateDirection(targetId, payload.nom);
+        if (type === "direction") await structureApi.updateDirection(targetId, payload.nom);
         else if (type === "division" && parentId)
           await structureApi.updateDivision(targetId, parentId, payload.nom);
         else if (type === "service" && parentId)
@@ -140,10 +138,7 @@ export const saveStructureNodeThunk = createAsyncThunk(
       }
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.saveStructure");
+      const message = err instanceof Error ? err.message : i18next.t("errors.saveStructure");
       return rejectWithValue(message);
     }
   },
@@ -156,18 +151,12 @@ export const deleteStructureNodeThunk = createAsyncThunk(
     { dispatch, rejectWithValue },
   ) => {
     try {
-      if (payload.type === "direction")
-        await structureApi.deleteDirection(payload.id);
-      if (payload.type === "division")
-        await structureApi.deleteDivision(payload.id);
-      if (payload.type === "service")
-        await structureApi.deleteService(payload.id);
+      if (payload.type === "direction") await structureApi.deleteDirection(payload.id);
+      if (payload.type === "division") await structureApi.deleteDivision(payload.id);
+      if (payload.type === "service") await structureApi.deleteService(payload.id);
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.deleteStructure");
+      const message = err instanceof Error ? err.message : i18next.t("errors.deleteStructure");
       return rejectWithValue(message);
     }
   },
@@ -245,26 +234,21 @@ const structureSlice = createSlice({
 
       // Matchers for action handling
       .addMatcher(
-        (action) =>
-          action.type.endsWith("/pending") &&
-          !action.type.includes("fetchDependencies"),
+        (action) => action.type.endsWith("/pending") && !action.type.includes("fetchDependencies"),
         (state) => {
           state.actionLoading = true;
         },
       )
       .addMatcher(
         (action) =>
-          action.type.endsWith("/fulfilled") &&
-          !action.type.includes("fetchDependencies"),
+          action.type.endsWith("/fulfilled") && !action.type.includes("fetchDependencies"),
         (state) => {
           state.actionLoading = false;
           state.popup = initialState.popup;
         },
       )
       .addMatcher(
-        (action) =>
-          action.type.endsWith("/rejected") &&
-          !action.type.includes("fetchDependencies"),
+        (action) => action.type.endsWith("/rejected") && !action.type.includes("fetchDependencies"),
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
           state.error = action.payload || i18next.t("errors.operationImpossible");
@@ -273,6 +257,5 @@ const structureSlice = createSlice({
   },
 });
 
-export const { openStructurePopup, closeStructurePopup } =
-  structureSlice.actions;
+export const { openStructurePopup, closeStructurePopup } = structureSlice.actions;
 export default structureSlice.reducer;

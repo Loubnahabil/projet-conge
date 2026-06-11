@@ -1,12 +1,4 @@
-import {
-  Box,
-  Typography,
-  Paper,
-  IconButton,
-  Button,
-  Grid,
-  Stack,
-} from "@mui/material";
+import { Box, Typography, Paper, IconButton, Button, Grid, Stack } from "@mui/material";
 import { ArrowBack, Cancel } from "@mui/icons-material";
 import { StatusChip } from "@/components/atoms/StatusChip";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
@@ -26,14 +18,7 @@ interface DemandeDetailProps {
     string,
     {
       label: string;
-      color:
-        | "default"
-        | "primary"
-        | "secondary"
-        | "error"
-        | "info"
-        | "success"
-        | "warning";
+      color: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning";
     }
   >;
   onBack: () => void;
@@ -54,14 +39,12 @@ export const DemandeDetail = ({
 }: DemandeDetailProps) => {
   const { t } = useTranslation();
   const isCancelable =
-    selectedDemande.statut === "BROUILLON" ||
-    selectedDemande.statut === "SOUMISE";
+    selectedDemande.statut === "BROUILLON" || selectedDemande.statut === "SOUMISE";
 
   const handleOpenPiece = async (pieceId: number) => {
-    const response = await axiosInstance.get(
-      `/demandes/${selectedDemande.id}/pieces/${pieceId}`,
-      { responseType: "blob" },
-    );
+    const response = await axiosInstance.get(`/demandes/${selectedDemande.id}/pieces/${pieceId}`, {
+      responseType: "blob",
+    });
     openBlobInNewTab(response.data);
   };
 
@@ -78,11 +61,7 @@ export const DemandeDetail = ({
         }}
       >
         <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-          <IconButton
-            onClick={onBack}
-            size="small"
-            sx={{ border: "1px solid #cbd5e1" }}
-          >
+          <IconButton onClick={onBack} size="small" sx={{ border: "1px solid #cbd5e1" }}>
             <ArrowBack fontSize="small" />
           </IconButton>
           <Box>
@@ -90,15 +69,8 @@ export const DemandeDetail = ({
               DEM-2026-00{selectedDemande.id} —{" "}
               {t(TYPE_TKEY[selectedDemande.typeConge] ?? selectedDemande.typeConge)}
             </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ mt: 0.5, alignItems: "center" }}
-            >
-              <StatusChip
-                statut={selectedDemande.statut}
-                sx={{ fontWeight: 700 }}
-              />
+            <Stack direction="row" spacing={1} sx={{ mt: 0.5, alignItems: "center" }}>
+              <StatusChip statut={selectedDemande.statut} sx={{ fontWeight: 700 }} />
               <Typography variant="caption" color="textSecondary">
                 {t("demandeDetail.enAttente")}
               </Typography>
@@ -125,14 +97,8 @@ export const DemandeDetail = ({
         <Grid size={{ xs: 12, md: 7 }}>
           {selectedDemande.piecesJustificatives &&
             selectedDemande.piecesJustificatives.length > 0 && (
-              <Paper
-                variant="outlined"
-                sx={{ p: 3, borderRadius: "12px", mb: 3 }}
-              >
-                <Typography
-                  variant="subtitle1"
-                  sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
-                >
+              <Paper variant="outlined" sx={{ p: 3, borderRadius: "12px", mb: 3 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}>
                   {t("demandeDetail.documentsSignes")}
                 </Typography>
                 <Stack spacing={1}>
@@ -146,14 +112,8 @@ export const DemandeDetail = ({
                 </Stack>
               </Paper>
             )}
-          <Paper
-            variant="outlined"
-            sx={{ p: 3, borderRadius: "12px", bgcolor: "#f8fafc" }}
-          >
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}
-            >
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: "12px", bgcolor: "#f8fafc" }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1e293b", mb: 2 }}>
               {t("demandeDetail.infosDossier")}
             </Typography>
             <Stack spacing={2}>
@@ -181,8 +141,7 @@ export const DemandeDetail = ({
                   sx={{
                     display: "flex",
                     justifyContent: "space-between",
-                    borderBottom:
-                      i < arr.length - 1 ? "1px solid #e2e8f0" : "none",
+                    borderBottom: i < arr.length - 1 ? "1px solid #e2e8f0" : "none",
                     pb: i < arr.length - 1 ? 1 : 0,
                   }}
                 >
@@ -206,14 +165,8 @@ export const DemandeDetail = ({
 
         {/* Right Card: Tracks */}
         <Grid size={{ xs: 12, md: 5 }}>
-          <Paper
-            variant="outlined"
-            sx={{ p: 3, borderRadius: "12px", minHeight: "100%" }}
-          >
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
-            >
+          <Paper variant="outlined" sx={{ p: 3, borderRadius: "12px", minHeight: "100%" }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}>
               {t("demandeDetail.historiqueEtats")}
             </Typography>
 
@@ -271,14 +224,10 @@ export const DemandeDetail = ({
                         mt: 0.2,
                       }}
                     >
-                      {statutConfig[log.statutAction]?.label ||
-                        log.statutAction}
+                      {statutConfig[log.statutAction]?.label || log.statutAction}
                     </Typography>
                     {log.acteurNom && (
-                      <Typography
-                        variant="caption"
-                        sx={{ color: "#64748b", display: "block" }}
-                      >
+                      <Typography variant="caption" sx={{ color: "#64748b", display: "block" }}>
                         {t("demandeDetail.par")} {log.acteurPrenom} {log.acteurNom}
                         {log.acteurRole ? ` (${log.acteurRole})` : ""}
                       </Typography>
@@ -289,17 +238,13 @@ export const DemandeDetail = ({
                         sx={{
                           mt: 0.5,
                           p: 1,
-                          bgcolor: log.statutAction?.startsWith("REJETEE")
-                            ? "#fef2f2"
-                            : "#f8fafc",
+                          bgcolor: log.statutAction?.startsWith("REJETEE") ? "#fef2f2" : "#f8fafc",
                           borderRadius: "6px",
                           border: "1px solid",
                           borderColor: log.statutAction?.startsWith("REJETEE")
                             ? "#fecaca"
                             : "#e2e8f0",
-                          color: log.statutAction?.startsWith("REJETEE")
-                            ? "#991b1b"
-                            : "#475569",
+                          color: log.statutAction?.startsWith("REJETEE") ? "#991b1b" : "#475569",
                           fontSize: "0.8rem",
                         }}
                       >

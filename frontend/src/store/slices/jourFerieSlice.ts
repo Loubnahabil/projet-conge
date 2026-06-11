@@ -36,10 +36,7 @@ export const fetchHolidaysThunk = createAsyncThunk(
     try {
       return await jourFerieApi.getAll();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : i18next.t("errors.loadHolidays");
+      const message = err instanceof Error ? err.message : i18next.t("errors.loadHolidays");
 
       return rejectWithValue(message);
     }
@@ -48,18 +45,14 @@ export const fetchHolidaysThunk = createAsyncThunk(
 
 export const createHolidayThunk = createAsyncThunk(
   "jourFerie/create",
-  async (
-    payload: { date: string; libelle: string },
-    { dispatch, rejectWithValue },
-  ) => {
+  async (payload: { date: string; libelle: string }, { dispatch, rejectWithValue }) => {
     try {
       const response = await jourFerieApi.create(payload.date, payload.libelle);
 
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.createHoliday");
+      const message = err instanceof Error ? err.message : i18next.t("errors.createHoliday");
 
       return rejectWithValue(message);
     }
@@ -68,22 +61,14 @@ export const createHolidayThunk = createAsyncThunk(
 
 export const updateHolidayThunk = createAsyncThunk(
   "jourFerie/update",
-  async (
-    payload: { id: number; date: string; libelle: string },
-    { dispatch, rejectWithValue },
-  ) => {
+  async (payload: { id: number; date: string; libelle: string }, { dispatch, rejectWithValue }) => {
     try {
-      const response = await jourFerieApi.update(
-        payload.id,
-        payload.date,
-        payload.libelle,
-      );
+      const response = await jourFerieApi.update(payload.id, payload.date, payload.libelle);
 
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.updateHoliday");
+      const message = err instanceof Error ? err.message : i18next.t("errors.updateHoliday");
 
       return rejectWithValue(message);
     }
@@ -98,8 +83,7 @@ export const deleteHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return id;
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : i18next.t("errors.deleteHoliday");
+      const message = err instanceof Error ? err.message : i18next.t("errors.deleteHoliday");
 
       return rejectWithValue(message);
     }
@@ -150,17 +134,14 @@ const jourFerieSlice = createSlice({
 
       // Generic loading for create/update/delete
       .addMatcher(
-        (action) =>
-          action.type.endsWith("/pending") && !action.type.includes("fetchAll"),
+        (action) => action.type.endsWith("/pending") && !action.type.includes("fetchAll"),
         (state) => {
           state.actionLoading = true;
         },
       )
 
       .addMatcher(
-        (action) =>
-          action.type.endsWith("/fulfilled") &&
-          !action.type.includes("fetchAll"),
+        (action) => action.type.endsWith("/fulfilled") && !action.type.includes("fetchAll"),
         (state) => {
           state.actionLoading = false;
           state.popup.isOpen = false;
@@ -169,19 +150,15 @@ const jourFerieSlice = createSlice({
       )
 
       .addMatcher(
-        (action) =>
-          action.type.endsWith("/rejected") &&
-          !action.type.includes("fetchAll"),
+        (action) => action.type.endsWith("/rejected") && !action.type.includes("fetchAll"),
         (state, action: PayloadAction<string | undefined>) => {
           state.actionLoading = false;
-          state.error =
-            action.payload || i18next.t("errors.operationalError");
+          state.error = action.payload || i18next.t("errors.operationalError");
         },
       );
   },
 });
 
-export const { openHolidayPopup, closeHolidayPopup, clearHolidayError } =
-  jourFerieSlice.actions;
+export const { openHolidayPopup, closeHolidayPopup, clearHolidayError } = jourFerieSlice.actions;
 
 export default jourFerieSlice.reducer;

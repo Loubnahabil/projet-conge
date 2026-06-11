@@ -39,8 +39,7 @@ export const fetchQuotasPageThunk = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const data: SpringPageWrapper<QuotaResponse> =
-        await quotaApi.getQuotasPage(year, page, size);
+      const data: SpringPageWrapper<QuotaResponse> = await quotaApi.getQuotasPage(year, page, size);
       return data;
     } catch {
       return rejectWithValue(i18next.t("errors.loadQuotas"));
@@ -95,10 +94,7 @@ const quotaSlice = createSlice({
       })
       .addCase(
         fetchQuotasPageThunk.fulfilled,
-        (
-          state,
-          action: PayloadAction<SpringPageWrapper<QuotaResponse>>,
-        ) => {
+        (state, action: PayloadAction<SpringPageWrapper<QuotaResponse>>) => {
           state.globalLoading = false;
           state.list = action.payload.content;
           state.totalElements = action.payload.totalElements;
@@ -131,6 +127,5 @@ const quotaSlice = createSlice({
   },
 });
 
-export const { clearFeedback, setQuotaPage, setQuotaRowsPerPage } =
-  quotaSlice.actions;
+export const { clearFeedback, setQuotaPage, setQuotaRowsPerPage } = quotaSlice.actions;
 export default quotaSlice.reducer;

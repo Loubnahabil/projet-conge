@@ -14,9 +14,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
   window.URL.revokeObjectURL(url);
 }
 
-export async function fetchBlob(
-  apiCall: () => Promise<{ data: Blob }>,
-): Promise<Blob> {
+export async function fetchBlob(apiCall: () => Promise<{ data: Blob }>): Promise<Blob> {
   const response = await apiCall();
   return response.data;
 }

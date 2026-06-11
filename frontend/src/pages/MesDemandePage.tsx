@@ -30,11 +30,7 @@ import {
 } from "@/store/slices/demandeSlice";
 import { demandeApi } from "@/api/demandeApi";
 import type { AppDispatch, RootState } from "@/store";
-import type {
-  DemandeResponse,
-  DemandeRequest,
-  TypeConge,
-} from "@/types/Demande.types";
+import type { DemandeResponse, DemandeRequest, TypeConge } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
 import { STATUS_COLOR, STATUS_TKEY } from "@/constants/constants";
 import { formatDateFR } from "@/utils/dateUtils";
@@ -54,10 +50,7 @@ export const MesDemandePage = () => {
       acc[key] = { label: t(STATUS_TKEY[key]), color: STATUS_COLOR[key] };
       return acc;
     },
-    {} as Record<
-      string,
-      { label: string; color: (typeof STATUS_COLOR)[string] }
-    >,
+    {} as Record<string, { label: string; color: (typeof STATUS_COLOR)[string] }>,
   );
 
   const dispatch = useDispatch<AppDispatch>();
@@ -73,17 +66,12 @@ export const MesDemandePage = () => {
   } = useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
-  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(
-    null,
-  );
-  const [selectedDemande, setSelectedDemande] =
-    useState<DemandeResponse | null>(null);
+  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(null);
+  const [selectedDemande, setSelectedDemande] = useState<DemandeResponse | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
-  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(
-    null,
-  );
+  const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchMyDemandesThunk({ page, size: rowsPerPage }));
@@ -116,10 +104,7 @@ export const MesDemandePage = () => {
     setFileError(null);
   };
 
-  const saveDemandeWorkflow = async (
-    data: FormInputs,
-    submitInstantly: boolean,
-  ) => {
+  const saveDemandeWorkflow = async (data: FormInputs, submitInstantly: boolean) => {
     if (data.typeConge === "MALADIE" && submitInstantly && !selectedFile) {
       setFileError(t("demandeForm.maladieRequiresDoc"));
       return;
@@ -148,11 +133,7 @@ export const MesDemandePage = () => {
       }
 
       if (selectedFile && activeDemandeId) {
-        await demandeApi.uploadDocument(
-          activeDemandeId,
-          selectedFile,
-          "CERTIFICAT_MEDICAL",
-        );
+        await demandeApi.uploadDocument(activeDemandeId, selectedFile, "CERTIFICAT_MEDICAL");
       }
 
       dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
@@ -284,10 +265,7 @@ export const MesDemandePage = () => {
         )}
       </Paper>
 
-      <Dialog
-        open={cancelDialogOpen}
-        onClose={() => setCancelDialogOpen(false)}
-      >
+      <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)}>
         <DialogTitle>{t("annulation.title")}</DialogTitle>
         <DialogContent>
           <DialogContentText>{t("annulation.message")}</DialogContentText>
@@ -296,11 +274,7 @@ export const MesDemandePage = () => {
           <Button onClick={() => setCancelDialogOpen(false)} color="inherit">
             {t("common.ignore")}
           </Button>
-          <Button
-            onClick={handleConfirmCancellation}
-            color="error"
-            variant="contained"
-          >
+          <Button onClick={handleConfirmCancellation} color="error" variant="contained">
             {t("annulation.confirm")}
           </Button>
         </DialogActions>

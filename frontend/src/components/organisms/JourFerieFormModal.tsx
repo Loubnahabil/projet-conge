@@ -1,13 +1,7 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "@/components/molecules/FormInput";
@@ -28,9 +22,7 @@ interface FormInputs {
 export const JourFerieFormModal: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { actionLoading, popup } = useSelector(
-    (state: RootState) => state.jourFerie,
-  );
+  const { actionLoading, popup } = useSelector((state: RootState) => state.jourFerie);
 
   const {
     register,
@@ -81,12 +73,8 @@ export const JourFerieFormModal: React.FC = () => {
         },
       }}
     >
-      <DialogTitle
-        sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}
-      >
-        {popup.mode === "create"
-          ? t("jourFerie.addTitle")
-          : t("jourFerie.editTitle")}
+      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}>
+        {popup.mode === "create" ? t("jourFerie.addTitle") : t("jourFerie.editTitle")}
       </DialogTitle>
 
       <DialogContent>
@@ -119,11 +107,7 @@ export const JourFerieFormModal: React.FC = () => {
           onClick={() => dispatch(closeHolidayPopup())}
           disabled={actionLoading}
         />
-        <AppButton
-          text={t("common.save")}
-          onClick={handleSubmit(onSave)}
-          loading={actionLoading}
-        />
+        <AppButton text={t("common.save")} onClick={handleSubmit(onSave)} loading={actionLoading} />
       </DialogActions>
     </Dialog>
   );

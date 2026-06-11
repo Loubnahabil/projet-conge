@@ -8,10 +8,7 @@ interface YearSelectorProps {
   onChange: (year: number) => void;
 }
 
-export const YearSelector: React.FC<YearSelectorProps> = ({
-  value,
-  onChange,
-}) => {
+export const YearSelector: React.FC<YearSelectorProps> = ({ value, onChange }) => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const yearsList = [currentYear - 1, currentYear, currentYear + 1];

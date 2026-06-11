@@ -10,9 +10,7 @@ import { useTranslation } from "react-i18next";
 export const AuditPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error, page, rowsPerPage } = useSelector(
-    (state: RootState) => state.audit,
-  );
+  const { loading, error, page, rowsPerPage } = useSelector((state: RootState) => state.audit);
 
   useEffect(() => {
     dispatch(fetchJournalAuditThunk({ page, size: rowsPerPage }));

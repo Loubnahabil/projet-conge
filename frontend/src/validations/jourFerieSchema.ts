@@ -6,8 +6,7 @@ interface JourFerieFormInputs {
   libelle: string;
 }
 
-export const jourFerieValidationSchema: yup.ObjectSchema<JourFerieFormInputs> =
-  yup.object({
-    date: yup.string().required(() => i18next.t("validation.dateRequired")),
-    libelle: yup.string().required(() => i18next.t("validation.libelleRequired")),
-  });
+export const jourFerieValidationSchema: yup.ObjectSchema<JourFerieFormInputs> = yup.object({
+  date: yup.string().required(() => i18next.t("validation.dateRequired")),
+  libelle: yup.string().required(() => i18next.t("validation.libelleRequired")),
+});

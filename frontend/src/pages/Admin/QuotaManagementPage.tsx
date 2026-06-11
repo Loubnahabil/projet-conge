@@ -16,12 +16,11 @@ export default function QuotaManagementPage() {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear(),
-  );
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  const { feedback, page, rowsPerPage, totalElements } =
-    useSelector((state: RootState) => state.quotas);
+  const { feedback, page, rowsPerPage, totalElements } = useSelector(
+    (state: RootState) => state.quotas,
+  );
 
   useEffect(() => {
     dispatch(

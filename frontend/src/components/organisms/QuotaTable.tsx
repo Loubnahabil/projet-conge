@@ -28,9 +28,7 @@ interface QuotaTableProps {
   rowsPerPage: number;
   totalElements: number;
   onPageChange: (event: unknown, newPage: number) => void;
-  onRowsPerPageChange: (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => void;
+  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 export const QuotaTable: React.FC<QuotaTableProps> = ({
@@ -43,9 +41,11 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  const { list: quotas, globalLoading, actionLoading } = useSelector(
-    (state: RootState) => state.quotas,
-  );
+  const {
+    list: quotas,
+    globalLoading,
+    actionLoading,
+  } = useSelector((state: RootState) => state.quotas);
 
   const [editingRowId, setEditingRowId] = useState<number | null>(null);
   const [editAlloues, setEditAlloues] = useState<number>(30);
@@ -99,11 +99,7 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
   return (
     <Box>
       {localError && (
-        <Typography
-          color="error"
-          variant="body2"
-          sx={{ mb: 2, fontWeight: "bold" }}
-        >
+        <Typography color="error" variant="body2" sx={{ mb: 2, fontWeight: "bold" }}>
           {localError}
         </Typography>
       )}
@@ -166,9 +162,7 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
                         variant="outlined"
                         value={editUtilises}
                         disabled={actionLoading}
-                        onChange={(e) =>
-                          setEditUtilises(Number(e.target.value))
-                        }
+                        onChange={(e) => setEditUtilises(Number(e.target.value))}
                         slotProps={{ htmlInput: { min: 0 } }}
                         sx={{ width: 90 }}
                       />
@@ -179,15 +173,11 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
 
                   <TableCell>
                     {isEditing ? (
-                      <Typography
-                        sx={{ fontWeight: "bold", color: "#757575" }}
-                      >
+                      <Typography sx={{ fontWeight: "bold", color: "#757575" }}>
                         {editAlloues - editUtilises} {t("quota.jrsCalcule")}
                       </Typography>
                     ) : (
-                      <Typography
-                        sx={{ fontWeight: "bold", color: "#2e7d32" }}
-                      >
+                      <Typography sx={{ fontWeight: "bold", color: "#2e7d32" }}>
                         {row.joursRestants} {t("quota.jrs")}
                       </Typography>
                     )}
@@ -212,10 +202,7 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
                         </IconButton>
                       </Box>
                     ) : (
-                      <IconButton
-                        color="primary"
-                        onClick={() => startEditingRow(row)}
-                      >
+                      <IconButton color="primary" onClick={() => startEditingRow(row)}>
                         <EditIcon />
                       </IconButton>
                     )}

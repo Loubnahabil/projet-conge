@@ -51,8 +51,7 @@ export const DemandeForm = ({
   onFileChange,
 }: DemandeFormProps) => {
   const { t } = useTranslation();
-  const existingFileName =
-    editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
+  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
   const [holidays, setHolidays] = useState<string[]>([]);
 
   useEffect(() => {
@@ -129,9 +128,7 @@ export const DemandeForm = ({
                 helperText={fieldState.error?.message}
               >
                 <MenuItem value="ANNUEL">{t("leaveType.congeAnnuel")}</MenuItem>
-                <MenuItem value="MALADIE">
-                  {t("leaveType.congeMaladie")}
-                </MenuItem>
+                <MenuItem value="MALADIE">{t("leaveType.congeMaladie")}</MenuItem>
               </TextField>
             )}
           />
@@ -188,15 +185,10 @@ export const DemandeForm = ({
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 600, color: "#475569", mb: 1 }}
-          >
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#475569", mb: 1 }}>
             {t("demandeForm.piecesJustificatives")}{" "}
             {watchTypeConge === "MALADIE" && (
-              <span style={{ color: "#ef4444" }}>
-                {t("demandeForm.maladieObligatoire")}
-              </span>
+              <span style={{ color: "#ef4444" }}>{t("demandeForm.maladieObligatoire")}</span>
             )}
           </Typography>
 
@@ -208,11 +200,7 @@ export const DemandeForm = ({
         </Grid>
       </Grid>
 
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ mt: 5, justifyContent: "flex-end" }}
-      >
+      <Stack direction="row" spacing={2} sx={{ mt: 5, justifyContent: "flex-end" }}>
         <AppButton
           text={t("common.cancel")}
           variant="outlined"

@@ -1,12 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Typography, IconButton } from "@mui/material";
-import {
-  CloudUpload,
-  Close,
-  InsertDriveFile,
-  Image,
-} from "@mui/icons-material";
+import { CloudUpload, Close, InsertDriveFile, Image } from "@mui/icons-material";
 
 interface FileUploadFieldProps {
   accept?: string;
@@ -33,8 +28,7 @@ export const FileUploadField = ({
 
   const validate = (f: File): string | null => {
     const ext = f.name.substring(f.name.lastIndexOf(".")).toLowerCase();
-    if (!ALLOWED_EXTENSIONS.includes(ext))
-      return t("upload.formatNotAllowed");
+    if (!ALLOWED_EXTENSIONS.includes(ext)) return t("upload.formatNotAllowed");
     if (f.size > MAX_SIZE)
       return t("upload.fileTooHeavy", { size: (f.size / 1024 / 1024).toFixed(1) });
     return null;
@@ -84,13 +78,7 @@ export const FileUploadField = ({
 
   return (
     <Box>
-      <input
-        ref={inputRef}
-        type="file"
-        hidden
-        accept={accept}
-        onChange={handleChange}
-      />
+      <input ref={inputRef} type="file" hidden accept={accept} onChange={handleChange} />
 
       {!file && !existingFileName && (
         <Box
@@ -211,10 +199,7 @@ export const FileUploadField = ({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <InsertDriveFile sx={{ color: "#ef4444", fontSize: 32 }} />
             <Box>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 600, color: "#1e293b" }}
-              >
+              <Typography variant="body2" sx={{ fontWeight: 600, color: "#1e293b" }}>
                 {file.name}
               </Typography>
               <Typography variant="caption" sx={{ color: "#64748b" }}>
@@ -236,11 +221,7 @@ export const FileUploadField = ({
       )}
 
       {displayError && (
-        <Typography
-          variant="caption"
-          color="error"
-          sx={{ mt: 0.5, display: "block" }}
-        >
+        <Typography variant="caption" color="error" sx={{ mt: 0.5, display: "block" }}>
           {displayError}
         </Typography>
       )}

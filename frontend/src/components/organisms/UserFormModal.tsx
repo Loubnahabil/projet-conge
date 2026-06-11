@@ -64,12 +64,8 @@ interface UserFormInputs {
 export const UserFormModal: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { isOpen, mode, targetUser } = useSelector(
-    (state: RootState) => state.users.popup,
-  );
-  const actionLoading = useSelector(
-    (state: RootState) => state.users.actionLoading,
-  );
+  const { isOpen, mode, targetUser } = useSelector((state: RootState) => state.users.popup);
+  const actionLoading = useSelector((state: RootState) => state.users.actionLoading);
   const { directions, currentDivisions, currentServices, roles } = useSelector(
     (state: RootState) => state.structure,
   );
@@ -160,16 +156,9 @@ export const UserFormModal: React.FC = () => {
   };
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={() => dispatch(closePopup())}
-      maxWidth="sm"
-      fullWidth
-    >
+    <Dialog open={isOpen} onClose={() => dispatch(closePopup())} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
-        {mode === "create"
-          ? t("userForm.titleCreate")
-          : t("userForm.titleEdit")}
+        {mode === "create" ? t("userForm.titleCreate") : t("userForm.titleEdit")}
       </DialogTitle>
       <DialogContent dividers>
         <Box
@@ -234,10 +223,7 @@ export const UserFormModal: React.FC = () => {
             />
           </Box>
 
-          <Typography
-            variant="caption"
-            sx={{ color: "#475569", mb: -1, fontWeight: "500" }}
-          >
+          <Typography variant="caption" sx={{ color: "#475569", mb: -1, fontWeight: "500" }}>
             {t("userForm.dateDebutFonction")}
           </Typography>
           <FormInput

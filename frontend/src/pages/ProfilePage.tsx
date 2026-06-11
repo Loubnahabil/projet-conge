@@ -88,18 +88,14 @@ export const ProfilePage = () => {
         }, 1500);
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : t("profile.updateError");
+      const message = err instanceof Error ? err.message : t("profile.updateError");
       setError(message);
     } finally {
       setSaving(false);
     }
   };
 
-  const roleColors: Record<
-    string,
-    "default" | "primary" | "warning" | "success" | "error"
-  > = {
+  const roleColors: Record<string, "default" | "primary" | "warning" | "success" | "error"> = {
     ADMIN: "error",
     CHEF_HIERARCHIE: "warning",
     SIGNATAIRE: "success",
@@ -116,13 +112,9 @@ export const ProfilePage = () => {
   return (
     <Box sx={{ p: 3, maxWidth: 700, mx: "auto" }}>
       {/* Header card */}
-      <Paper
-        sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}
-      >
+      <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
         <Stack direction="row" spacing={3} sx={{ alignItems: "center" }}>
-          <Avatar
-            sx={{ width: 72, height: 72, bgcolor: "#1976d2", fontSize: 28 }}
-          >
+          <Avatar sx={{ width: 72, height: 72, bgcolor: "#1976d2", fontSize: 28 }}>
             {profile?.prenom?.[0]}
             {profile?.nom?.[0]}
           </Avatar>
@@ -143,9 +135,7 @@ export const ProfilePage = () => {
       </Paper>
 
       {/* Read-only info */}
-      <Paper
-        sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}
-      >
+      <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
           <Badge sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
@@ -199,9 +189,7 @@ export const ProfilePage = () => {
       </Paper>
 
       {/* Editable info */}
-      <Paper
-        sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}
-      >
+      <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
           <Person sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
@@ -236,9 +224,7 @@ export const ProfilePage = () => {
       </Paper>
 
       {/* Password change */}
-      <Paper
-        sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}
-      >
+      <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
         <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
           <Lock sx={{ color: "#1976d2" }} />
           <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
@@ -290,11 +276,7 @@ export const ProfilePage = () => {
       <Divider sx={{ mb: 3 }} />
 
       <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
-        <AppButton
-          text={t("profile.saveButton")}
-          onClick={handleSave}
-          loading={saving}
-        />
+        <AppButton text={t("profile.saveButton")} onClick={handleSave} loading={saving} />
       </Stack>
     </Box>
   );

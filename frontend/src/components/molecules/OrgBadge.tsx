@@ -18,10 +18,7 @@ export const OrgBadge = ({ text }: OrgBadgeProps) => {
         ml: 2,
       }}
     >
-      <Typography
-        variant="caption"
-        sx={{ fontWeight: "500", fontSize: "0.75rem" }}
-      >
+      <Typography variant="caption" sx={{ fontWeight: "500", fontSize: "0.75rem" }}>
         {text}
       </Typography>
     </Box>

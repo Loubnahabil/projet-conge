@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Alert,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Box, Alert } from "@mui/material";
 import { AppButton } from "@/components/atoms/AppButton";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
 

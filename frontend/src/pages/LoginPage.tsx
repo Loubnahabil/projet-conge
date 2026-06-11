@@ -21,9 +21,7 @@ const LoginPage = () => {
       const role = result.payload.role;
       if (role === "ADMIN") navigate("/dashboard");
       else if (role === "FONCTIONNAIRE") navigate("/fonctionnaire/dashboard");
-      else if (
-        ["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"].includes(role)
-      )
+      else if (["CHEF_HIERARCHIE", "CHEF_SERVICE", "CHEF_DIVISION", "DIRECTEUR"].includes(role))
         navigate("/chef/demandes");
       else if (role === "SIGNATAIRE") navigate("/signataire/demandes");
       else navigate("/dashboard");
@@ -42,10 +40,7 @@ const LoginPage = () => {
       }}
     >
       {/* Paper gives us that nice, clean white card look with shadows */}
-      <Paper
-        elevation={3}
-        sx={{ padding: 4, width: 400, borderRadius: "12px" }}
-      >
+      <Paper elevation={3} sx={{ padding: 4, width: 400, borderRadius: "12px" }}>
         {/* Title text */}
         <Typography
           sx={{
@@ -59,11 +54,7 @@ const LoginPage = () => {
         </Typography>
 
         {/* We place our finished Organism inside the card layout */}
-        <LoginForm
-          onSubmit={handleLoginSubmit}
-          loading={loading}
-          error={error}
-        />
+        <LoginForm onSubmit={handleLoginSubmit} loading={loading} error={error} />
       </Paper>
     </Box>
   );

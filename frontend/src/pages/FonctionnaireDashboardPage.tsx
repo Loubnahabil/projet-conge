@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Grid,
-  Button,
-  Alert,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, Grid, Button, Alert, Paper } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { EmptyState } from "@/components/atoms/EmptyState";
 import { statsApi } from "@/api/Statsapi";
@@ -48,10 +41,7 @@ const FonctionnaireDashboardPage = () => {
 
   return (
     <Box sx={{ p: 3, minHeight: "100vh" }}>
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}
-      >
+      <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b", mb: 3 }}>
         {t("dashboard.fonctionnaireTitle")}
       </Typography>
 
@@ -110,11 +100,7 @@ const FonctionnaireDashboardPage = () => {
             >
               {t("dashboard.faireDemande")}
             </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              onClick={() => navigate("/mes-demandes")}
-            >
+            <Button variant="outlined" size="large" onClick={() => navigate("/mes-demandes")}>
               {t("dashboard.voirMesDemandes")}
             </Button>
           </Box>
@@ -126,10 +112,7 @@ const FonctionnaireDashboardPage = () => {
               border: "1px solid #e2e8f0",
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 600, color: "#1e293b", mb: 2 }}
-            >
+            <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b", mb: 2 }}>
               {t("dashboard.demandesRecentes")}
             </Typography>
             {stats.demandesRecentes.length === 0 ? (
@@ -148,10 +131,7 @@ const FonctionnaireDashboardPage = () => {
                       }}
                       onClick={() => navigate("/mes-demandes")}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600, color: "#0f172a" }}
-                      >
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: "#0f172a" }}>
                         {t(TYPE_TKEY[demande.typeConge] ?? demande.typeConge)}
                       </Typography>
                       <Typography variant="caption" sx={{ color: "#64748b" }}>
@@ -170,8 +150,7 @@ const FonctionnaireDashboardPage = () => {
                               : demande.statut === "REJETEE_CHEF" ||
                                   demande.statut === "REJETEE_DIRECTEUR"
                                 ? "#dc2626"
-                                : demande.statut === "SOUMISE" ||
-                                    demande.statut === "VISEE_CHEF"
+                                : demande.statut === "SOUMISE" || demande.statut === "VISEE_CHEF"
                                   ? "#ca8a04"
                                   : "#64748b",
                         }}
@@ -179,11 +158,9 @@ const FonctionnaireDashboardPage = () => {
                         {demande.statut === "BROUILLON" && t("status.brouillon")}
                         {demande.statut === "SOUMISE" && t("status.soumise")}
                         {demande.statut === "VISEE_CHEF" && t("status.viseeChef")}
-                        {demande.statut === "SIGNEE_DIRECTEUR" &&
-                          t("status.signeeDirecteur")}
+                        {demande.statut === "SIGNEE_DIRECTEUR" && t("status.signeeDirecteur")}
                         {demande.statut === "REJETEE_CHEF" && t("status.rejeteeChef")}
-                        {demande.statut === "REJETEE_DIRECTEUR" &&
-                          t("status.rejeteeDirecteur")}
+                        {demande.statut === "REJETEE_DIRECTEUR" && t("status.rejeteeDirecteur")}
                         {demande.statut === "ANNULEE" && t("status.annulee")}
                       </Typography>
                     </Paper>

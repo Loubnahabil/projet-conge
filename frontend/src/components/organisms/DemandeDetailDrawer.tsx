@@ -1,11 +1,4 @@
-import {
-  Drawer,
-  Box,
-  Typography,
-  Stack,
-  Divider,
-  IconButton,
-} from "@mui/material";
+import { Drawer, Box, Typography, Stack, Divider, IconButton } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { DocumentFileLink } from "@/components/atoms/DocumentFileLink";
 import { EmptyState } from "@/components/atoms/EmptyState";
@@ -26,10 +19,9 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
   if (!demande) return null;
 
   const handleOpen = async (pieceId: number) => {
-    const response = await axiosInstance.get(
-      `/demandes/${demande!.id}/pieces/${pieceId}`,
-      { responseType: "blob" },
-    );
+    const response = await axiosInstance.get(`/demandes/${demande!.id}/pieces/${pieceId}`, {
+      responseType: "blob",
+    });
     openBlobInNewTab(response.data);
   };
 
@@ -73,14 +65,13 @@ export const DemandeDetailDrawer = ({ open, demande, onClose }: Props) => {
             },
             { label: t("detailDrawer.dateDebut"), value: demande.dateDebut },
             { label: t("detailDrawer.dateFin"), value: demande.dateFin },
-            { label: t("detailDrawer.duree"), value: `${demande.duree} ${t("demandeTable.joursOuvrables")}` },
+            {
+              label: t("detailDrawer.duree"),
+              value: `${demande.duree} ${t("demandeTable.joursOuvrables")}`,
+            },
             { label: t("detailDrawer.interim"), value: demande.interimNomComplet ?? "—" },
           ].map((row) => (
-            <Stack
-              key={row.label}
-              direction="row"
-              sx={{ justifyContent: "space-between" }}
-            >
+            <Stack key={row.label} direction="row" sx={{ justifyContent: "space-between" }}>
               <Typography variant="body2" color="textSecondary">
                 {row.label}
               </Typography>

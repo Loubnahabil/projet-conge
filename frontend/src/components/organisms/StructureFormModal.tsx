@@ -1,22 +1,13 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
-import {
-  closeStructurePopup,
-  saveStructureNodeThunk,
-} from "@/store/slices/structureSlice";
+import { closeStructurePopup, saveStructureNodeThunk } from "@/store/slices/structureSlice";
 import { structureValidationSchema } from "@/validations/structureSchema";
 
 interface FormInputs {
@@ -26,9 +17,7 @@ interface FormInputs {
 export const StructureFormModal: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { actionLoading, popup } = useSelector(
-    (state: RootState) => state.structure,
-  );
+  const { actionLoading, popup } = useSelector((state: RootState) => state.structure);
 
   const {
     register,
@@ -70,21 +59,14 @@ export const StructureFormModal: React.FC = () => {
         },
       }}
     >
-      <DialogTitle
-        sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}
-      >
+      <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}>
         {popup.mode === "create"
           ? `${t("structure.addTitle")} ${popup.type}`
           : `${t("structure.editTitle")} ${popup.type}`}
       </DialogTitle>
 
       <DialogContent>
-        <Box
-          component="form"
-          onSubmit={handleSubmit(onSave)}
-          noValidate
-          sx={{ mt: 1 }}
-        >
+        <Box component="form" onSubmit={handleSubmit(onSave)} noValidate sx={{ mt: 1 }}>
           <FormInput
             label={`${t("structure.nomField")} ${popup.type} *`}
             registration={register("nom")}
@@ -101,11 +83,7 @@ export const StructureFormModal: React.FC = () => {
           onClick={() => dispatch(closeStructurePopup())}
           disabled={actionLoading}
         />
-        <AppButton
-          text={t("common.save")}
-          onClick={handleSubmit(onSave)}
-          loading={actionLoading}
-        />
+        <AppButton text={t("common.save")} onClick={handleSubmit(onSave)} loading={actionLoading} />
       </DialogActions>
     </Dialog>
   );

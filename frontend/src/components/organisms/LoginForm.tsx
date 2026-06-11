@@ -52,18 +52,8 @@ export const LoginForm = ({ onSubmit, loading, error }: LoginFormProps) => {
       />
 
       {/* Submit Button */}
-      <Button
-        fullWidth
-        type="submit"
-        variant="contained"
-        disabled={loading}
-        sx={{ mt: 3 }}
-      >
-        {loading ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : (
-          t("auth.loginButton")
-        )}
+      <Button fullWidth type="submit" variant="contained" disabled={loading} sx={{ mt: 3 }}>
+        {loading ? <CircularProgress size={24} color="inherit" /> : t("auth.loginButton")}
       </Button>
     </Box>
   );

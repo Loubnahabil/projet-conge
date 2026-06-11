@@ -5,10 +5,7 @@ const authApi = {
   // makes POST /auth/login
   // returns tokens + user info
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await axiosInstance.post<LoginResponse>(
-      "/auth/login",
-      credentials,
-    );
+    const response = await axiosInstance.post<LoginResponse>("/auth/login", credentials);
     return response.data;
   },
 

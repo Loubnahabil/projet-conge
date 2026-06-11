@@ -1,9 +1,5 @@
 import { axiosInstance } from "@/api/axiosInstance";
-import type {
-  DirectionResponse,
-  DivisionResponse,
-  ServiceResponse,
-} from "@/types/structure.types";
+import type { DirectionResponse, DivisionResponse, ServiceResponse } from "@/types/structure.types";
 import type { AxiosResponse } from "axios";
 
 export const structureApi = {
@@ -89,8 +85,7 @@ export const structureApi = {
       })
       .then((res: AxiosResponse<ServiceResponse>) => res.data),
 
-  deleteDirection: (id: number) =>
-    axiosInstance.delete(`/directions/${id}`),
+  deleteDirection: (id: number) => axiosInstance.delete(`/directions/${id}`),
   deleteDivision: (id: number) => axiosInstance.delete(`/divisions/${id}`),
   deleteService: (id: number) => axiosInstance.delete(`/services/${id}`),
 };

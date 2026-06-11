@@ -68,9 +68,7 @@ export const ChefDecisionModal = ({
           {activeError && <Alert severity="error">{activeError}</Alert>}
 
           <TextField
-            label={
-              mode === "reject" ? t("chef.motifRejet") : t("chef.commentaire")
-            }
+            label={mode === "reject" ? t("chef.motifRejet") : t("chef.commentaire")}
             multiline
             rows={3}
             size="small"
