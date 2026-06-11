@@ -30,12 +30,10 @@ export const Navbar = () => {
       sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, bgcolor: "#1976d2" }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Left Side: App Title */}
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: "bold" }}>
           {t("navbar.title")}
         </Typography>
 
-        {/* Right Side: Welcome message, Profile Icon, and Logout Button */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           {user && (
             <Typography variant="body1" sx={{ fontWeight: "500", color: "#fff" }}>
@@ -43,14 +41,12 @@ export const Navbar = () => {
             </Typography>
           )}
 
-          {/* Profile Icon Button */}
           <Tooltip title={t("navbar.monProfil")}>
             <IconButton onClick={() => navigate("/profile")} sx={{ color: "#fff" }}>
               <AccountCircle />
             </IconButton>
           </Tooltip>
 
-          {/* Logout Button */}
           <Button
             color="inherit"
             onClick={handleLogout}

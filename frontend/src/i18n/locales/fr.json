@@ -133,7 +133,8 @@
     "annulerSupprimer": "Annuler (Supprimer)",
     "annulerDemande": "Annuler la demande",
     "jours": "jours",
-    "joursOuvrables": "jours ouvrables"
+    "joursOuvrables": "jour ouvrable",
+    "joursOuvrables_plural": "jours ouvrables"
   },
   "demandeDetail": {
     "enAttente": "En attente de traitement par le circuit administratif",
@@ -408,6 +409,7 @@
     "type": "Type",
     "dateDebut": "Date début",
     "dateFin": "Date fin",
+    "duree": "Durée",
     "interim": "Intérim",
     "piecesJustificatives": "Pièces justificatives",
     "aucunFichier": "Aucun fichier joint."

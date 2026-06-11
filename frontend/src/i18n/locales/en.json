@@ -133,7 +133,8 @@
     "annulerSupprimer": "Cancel (Delete)",
     "annulerDemande": "Cancel request",
     "jours": "days",
-    "joursOuvrables": "working days"
+    "joursOuvrables": "working day",
+    "joursOuvrables_plural": "working days"
   },
   "demandeDetail": {
     "enAttente": "Pending processing by the administrative workflow",
@@ -408,6 +409,7 @@
     "type": "Type",
     "dateDebut": "Start Date",
     "dateFin": "End Date",
+    "duree": "Duration",
     "interim": "Interim",
     "piecesJustificatives": "Supporting Documents",
     "aucunFichier": "No files attached."

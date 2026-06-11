@@ -126,7 +126,7 @@ export const DemandeDetail = ({
                 { label: t("demandeDetail.dateRetour"), value: selectedDemande.dateFin },
                 {
                   label: t("demandeDetail.dureeAccordee"),
-                  value: `${selectedDemande.duree} ${t("demandeTable.joursOuvrables")}`,
+                  value: `${selectedDemande.duree} ${t("demandeTable.joursOuvrables", { count: selectedDemande.duree })}`,
                   bold: true,
                 },
                 { label: t("demandeDetail.anneeAdministrative"), value: "2026" },

@@ -18,6 +18,7 @@ public class DemandeResponseDTO {
     private LocalDate dateDebut;
     private LocalDate dateFin;
     private int duree;
+    private int annee;
     private TypeConge typeConge;
     private StatutDemande statut;
     private List<PieceJustificativeResponseDTO> piecesJustificatives;
