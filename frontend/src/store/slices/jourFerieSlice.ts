@@ -2,6 +2,7 @@ import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+import { AxiosError } from "axios";
 import { jourFerieApi } from "@/api/jourFerieApi";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
@@ -36,7 +37,10 @@ export const fetchHolidaysThunk = createAsyncThunk(
     try {
       return await jourFerieApi.getAll();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : i18next.t("errors.loadHolidays");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.loadHolidays");
 
       return rejectWithValue(message);
     }
@@ -52,7 +56,10 @@ export const createHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : i18next.t("errors.createHoliday");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.createHoliday");
 
       return rejectWithValue(message);
     }
@@ -68,7 +75,10 @@ export const updateHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : i18next.t("errors.updateHoliday");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.updateHoliday");
 
       return rejectWithValue(message);
     }
@@ -83,7 +93,10 @@ export const deleteHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return id;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : i18next.t("errors.deleteHoliday");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.deleteHoliday");
 
       return rejectWithValue(message);
     }

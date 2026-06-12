@@ -19,6 +19,7 @@ import { logout } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { UserResponse } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
+import { AxiosError } from "axios";
 
 export const ProfilePage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -88,7 +89,7 @@ export const ProfilePage = () => {
         }, 1500);
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t("profile.updateError");
+      const message = err instanceof AxiosError ? (err.response?.data?.error as string) : t("profile.updateError");
       setError(message);
     } finally {
       setSaving(false);

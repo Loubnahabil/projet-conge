@@ -78,7 +78,12 @@ export const MesDemandePage = () => {
     dispatch(fetchEligibleInterimsThunk());
   }, [dispatch, page, rowsPerPage]);
 
+  useEffect(() => {
+    if (view === "LIST") dispatch(clearDemandeError());
+  }, [view, dispatch]);
+
   const handleOpenCreateForm = () => {
+    dispatch(clearDemandeError());
     setEditingDemande(null);
     setSelectedFile(null);
     setFileError(null);
@@ -86,6 +91,7 @@ export const MesDemandePage = () => {
   };
 
   const handleOpenEditForm = (d: DemandeResponse) => {
+    dispatch(clearDemandeError());
     setEditingDemande(d);
     setSelectedFile(null);
     setFileError(null);
