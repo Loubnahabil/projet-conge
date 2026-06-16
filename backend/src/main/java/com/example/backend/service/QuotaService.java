@@ -1,6 +1,5 @@
 package com.example.backend.service;
 
-import com.example.backend.dto.request.QuotaRequestDTO;
 import com.example.backend.dto.response.QuotaResponseDTO;
 import com.example.backend.entity.Quota;
 import com.example.backend.entity.User;
@@ -25,7 +24,6 @@ public class QuotaService {
     private final QuotaMapper quotaMapper;
     private final UserRepository userRepository;
 
-    // Get a specific user's quota profile for a particular year
     @Transactional(readOnly = true)
     public QuotaResponseDTO getByUserIdAndAnnee(Long userId, int annee) {
         Quota quota = quotaRepository.findByUserIdAndAnnee(userId, annee)
@@ -36,19 +34,15 @@ public class QuotaService {
         return dto;
     }
 
-    // Returns a paginated list of all users with their quota for the given year
     @Transactional(readOnly = true)
     public Page<QuotaResponseDTO> getQuotasPage(int annee, Pageable pageable) {
-        // 1. Fetch one page of users
         Page<User> usersPage = userRepository.findAll(pageable);
         List<Long> userIds = usersPage.getContent().stream().map(User::getId).toList();
 
-        // 2. Batch-fetch quotas for all users on this page (1 query instead of N)
         List<Quota> existingQuotas = quotaRepository.findByUserIdInAndAnnee(userIds, annee);
         Map<Long, Quota> quotaByUserId = existingQuotas.stream()
                 .collect(Collectors.toMap(q -> q.getUser().getId(), q -> q));
 
-        // 3. Build rows: real quota if exists, default placeholder if not
         return usersPage.map(user -> {
             Quota q = quotaByUserId.get(user.getId());
             if (q != null) {
@@ -75,22 +69,5 @@ public class QuotaService {
                         .build();
             }
         });
-    }
-
-    // Allows Admin to manually adjust allocated and used days
-    @Transactional
-    public QuotaResponseDTO updateQuota(Long id, QuotaRequestDTO request) {
-        Quota quota = quotaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Quota introuvable avec l'id: " + id));
-
-        quota.setJoursAlloues(request.getJoursAlloues());
-        quota.setJoursUtilises(request.getJoursUtilises());
-
-        // Dynamic structural update formula: remaining = allocated - used
-        quota.setJoursRestants(request.getJoursAlloues() - request.getJoursUtilises());
-
-        QuotaResponseDTO dto = quotaMapper.toDTO(quotaRepository.save(quota));
-        dto.setGrade(quota.getUser().getGrade());
-        return dto;
     }
 }

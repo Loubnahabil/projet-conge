@@ -1,15 +1,10 @@
-2026-06-12 10:25:17.744 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-06-12 10:25:49.981 [http-nio-8080-exec-1] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [testuser@gmail.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+2026-06-16 11:36:05.192 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-16 11:36:35.495 [http-nio-8080-exec-8] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
 	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
 	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
 
-2026-06-12 10:40:32.420 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-06-12 10:43:09.465 [http-nio-8080-exec-3] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [testuser@gmail.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
-	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
-	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
-
-2026-06-12 10:49:51.126 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-06-12 10:50:00.570 [http-nio-8080-exec-5] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [testuser@gmail.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+2026-06-16 12:16:23.613 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-16 12:16:29.029 [http-nio-8080-exec-7] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
 	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
 	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
 

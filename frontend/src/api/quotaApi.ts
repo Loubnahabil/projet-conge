@@ -12,11 +12,6 @@ export interface QuotaResponse {
   joursRestants: number;
 }
 
-export interface QuotaRequest {
-  joursAlloues: number;
-  joursUtilises: number;
-}
-
 export const quotaApi = {
   // GET /quotas/user/{userId}/year/{annee}
   getQuotaByUserAndYear: async (userId: number, annee: number) => {
@@ -33,12 +28,6 @@ export const quotaApi = {
     const response = await axiosInstance.get<SpringPageWrapper<QuotaResponse>>("/quotas", {
       params: { year, page, size },
     });
-    return response.data;
-  },
-
-  // PUT /quotas/{id}
-  updateQuota: async (id: number, data: QuotaRequest) => {
-    const response = await axiosInstance.put<QuotaResponse>(`/quotas/${id}`, data);
     return response.data;
   },
 };
