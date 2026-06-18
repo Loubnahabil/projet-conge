@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Paper,
@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { Person, Lock, Badge, ArrowBack } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
 import type { RootState, AppDispatch } from "@/store";
 import { userApi } from "@/api/userApi";
 import { AppButton } from "@/components/atoms/AppButton";
@@ -35,35 +36,54 @@ export const ProfilePage = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [email, setEmail] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  interface ProfileForm {
+    nom: string;
+    prenom: string;
+    email: string;
+    currentPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ProfileForm>({
+    defaultValues: {
+      nom: "",
+      prenom: "",
+      email: "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
 
   useEffect(() => {
     userApi
       .getMyProfile()
       .then((data) => {
         setProfile(data);
-        setNom(data.nom);
-        setPrenom(data.prenom);
-        setEmail(data.email);
+        reset({
+          nom: data.nom,
+          prenom: data.prenom,
+          email: data.email,
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
       })
       .catch(() => setError(t("profile.loadError")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [reset]);
 
-  const handleSave = async () => {
+  const onSubmit = async (data: ProfileForm) => {
     setError(null);
     setSuccess(null);
 
-    if (newPassword && newPassword !== confirmPassword) {
-      setError(t("profile.passwordMismatch"));
-      return;
-    }
-    if (newPassword && !currentPassword) {
+    if (data.newPassword && !data.currentPassword) {
       setError(t("profile.passwordRequired"));
       return;
     }
@@ -71,25 +91,33 @@ export const ProfilePage = () => {
     setSaving(true);
     try {
       await userApi.updateMyProfile({
-        nom,
-        prenom,
-        email,
-        ...(newPassword ? { currentPassword, newPassword } : {}),
+        nom: data.nom,
+        prenom: data.prenom,
+        email: data.email,
+        ...(data.newPassword
+          ? { currentPassword: data.currentPassword, newPassword: data.newPassword }
+          : {}),
       });
 
       setSuccess(t("profile.updateSuccess"));
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      reset((prev) => ({
+        ...prev,
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      }));
 
-      if (email !== authUser?.email) {
+      if (data.email !== authUser?.email) {
         setTimeout(() => {
           dispatch(logout());
           navigate("/login");
         }, 1500);
       }
     } catch (err: unknown) {
-      const message = err instanceof AxiosError ? (err.response?.data?.error as string) : t("profile.updateError");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : t("profile.updateError");
       setError(message);
     } finally {
       setSaving(false);
@@ -123,8 +151,12 @@ export const ProfilePage = () => {
 
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Paper sx={{ p: 4, borderRadius: "16px", border: "1px solid #e2e8f0", textAlign: "center" }}>
-            <Avatar sx={{ width: 96, height: 96, bgcolor: "#1976d2", fontSize: 36, mx: "auto", mb: 2 }}>
+          <Paper
+            sx={{ p: 4, borderRadius: "16px", border: "1px solid #e2e8f0", textAlign: "center" }}
+          >
+            <Avatar
+              sx={{ width: 96, height: 96, bgcolor: "#1976d2", fontSize: 36, mx: "auto", mb: 2 }}
+            >
               {profile?.prenom?.[0]}
               {profile?.nom?.[0]}
             </Avatar>
@@ -143,90 +175,177 @@ export const ProfilePage = () => {
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
-          <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
-              <Badge sx={{ color: "#1976d2" }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-                {t("profile.infoAdmin")}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+            <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
+                <Badge sx={{ color: "#1976d2" }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
+                  {t("profile.infoAdmin")}
+                </Typography>
+              </Stack>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.ppr")}
+                    value={profile?.ppr ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.grade")}
+                    value={profile?.grade ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.direction")}
+                    value={profile?.directionNom ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.division")}
+                    value={profile?.divisionNom ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.service")}
+                    value={profile?.serviceNom ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.dateDebutFonction")}
+                    value={profile?.dateDebutFonction ?? "—"}
+                    disabled
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+
+            <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
+                <Person sx={{ color: "#1976d2" }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
+                  {t("profile.infoPerso")}
+                </Typography>
+              </Stack>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.nom")}
+                    {...register("nom")}
+                    error={!!errors.nom}
+                    helperText={errors.nom?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.prenom")}
+                    {...register("prenom")}
+                    error={!!errors.prenom}
+                    helperText={errors.prenom?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    label={t("profile.email")}
+                    {...register("email")}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+
+            <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
+                <Lock sx={{ color: "#1976d2" }} />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
+                  {t("profile.changerMotDePasse")}
+                </Typography>
+              </Stack>
+              <Typography variant="body2" sx={{ color: "#64748b", mb: 3 }}>
+                {t("profile.mdpLeaveEmpty")}
               </Typography>
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.mdpActuel")}
+                    type="password"
+                    {...register("currentPassword")}
+                    error={!!errors.currentPassword}
+                    helperText={errors.currentPassword?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                  <TextField
+                    label={t("profile.nouveauMdp")}
+                    type="password"
+                    {...register("newPassword")}
+                    error={!!errors.newPassword}
+                    helperText={errors.newPassword?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    label={t("profile.confirmerNouveauMdp")}
+                    type="password"
+                    {...register("confirmPassword")}
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword?.message}
+                    size="small"
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
+
+            <Divider sx={{ mb: 3 }} />
+
+            <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
+              <AppButton text={t("profile.saveButton")} type="submit" loading={saving} />
             </Stack>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.ppr")} value={profile?.ppr ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.grade")} value={profile?.grade ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.direction")} value={profile?.directionNom ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.division")} value={profile?.divisionNom ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.service")} value={profile?.serviceNom ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.dateDebutFonction")} value={profile?.dateDebutFonction ?? "—"} disabled size="small" fullWidth />
-              </Grid>
-            </Grid>
-          </Paper>
-
-          <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 3 }}>
-              <Person sx={{ color: "#1976d2" }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-                {t("profile.infoPerso")}
-              </Typography>
-            </Stack>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.nom")} value={nom} onChange={(e) => setNom(e.target.value)} size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.prenom")} value={prenom} onChange={(e) => setPrenom(e.target.value)} size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <TextField label={t("profile.email")} value={email} onChange={(e) => setEmail(e.target.value)} size="small" fullWidth />
-              </Grid>
-            </Grid>
-          </Paper>
-
-          <Paper sx={{ p: 4, borderRadius: "16px", mb: 3, border: "1px solid #e2e8f0" }}>
-            <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1 }}>
-              <Lock sx={{ color: "#1976d2" }} />
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#1e293b" }}>
-                {t("profile.changerMotDePasse")}
-              </Typography>
-            </Stack>
-            <Typography variant="body2" sx={{ color: "#64748b", mb: 3 }}>
-              {t("profile.mdpLeaveEmpty")}
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.mdpActuel")} type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <TextField label={t("profile.nouveauMdp")} type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} size="small" fullWidth />
-              </Grid>
-              <Grid size={{ xs: 12 }}>
-                <TextField label={t("profile.confirmerNouveauMdp")} type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} size="small" fullWidth />
-              </Grid>
-            </Grid>
-          </Paper>
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
-          )}
-          {success && (
-            <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>
-          )}
-
-          <Divider sx={{ mb: 3 }} />
-
-          <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
-            <AppButton text={t("profile.saveButton")} onClick={handleSave} loading={saving} />
-          </Stack>
+          </Box>
         </Grid>
       </Grid>
     </Box>

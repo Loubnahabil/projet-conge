@@ -10,18 +10,18 @@ routes:
     - pattern: /demandes/*
       method: PUT
       roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
-    - pattern: /demandes/**
-      roles: [ FONCTIONNAIRE ]
-    - pattern: /demandes/my-requests
-      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
-    - pattern: /demandes/*/historique
-      roles: [ ADMIN, FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
-    - pattern: /demandes/*/pieces/**
-      method: GET
-      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE, ADMIN ]
     - pattern: /demandes/*/upload
       method: POST
       roles: [ FONCTIONNAIRE, SIGNATAIRE ]
+    - pattern: /demandes/*/pieces/**
+      method: GET
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE, ADMIN ]
+    - pattern: /demandes/*/historique
+      roles: [ ADMIN, FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
+    - pattern: /demandes/my-requests
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
+    - pattern: /demandes/**
+      roles: [ FONCTIONNAIRE ]
 
   fonctionnaire-urls:
     - pattern: /demandes/*/soumettre

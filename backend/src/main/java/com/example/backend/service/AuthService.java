@@ -9,6 +9,7 @@ import com.example.backend.exception.BusinessException;
 import com.example.backend.repository.RefreshTokenRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,8 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
+    private final EntityManager entityManager;
+
 
     @Value("${app.jwt.refresh-expiration}")
     private long refreshExpiration;
@@ -62,6 +65,7 @@ public class AuthService {
         String refreshTokenStr = jwtUtils.generateRefreshToken(user.getEmail());
 
         refreshTokenRepository.deleteByUser(user);
+        entityManager.flush();
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(refreshTokenStr)
@@ -101,8 +105,9 @@ public class AuthService {
         String newAccessToken = jwtUtils.generateAccessToken(user.getEmail());
         String newRefreshToken = jwtUtils.generateRefreshToken(user.getEmail());
 
-        // rotate: delete old, save new
-        refreshTokenRepository.delete(stored);
+        // rotate: delete all existing and flush before inserting new one
+        refreshTokenRepository.deleteByUser(user);
+        entityManager.flush();
         RefreshToken newStored = RefreshToken.builder()
                 .token(newRefreshToken)
                 .user(user)
