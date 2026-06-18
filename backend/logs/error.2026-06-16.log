@@ -1,0 +1,12 @@
+2026-06-16 11:36:05.192 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-16 11:36:35.495 [http-nio-8080-exec-8] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-16 12:16:23.613 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-16 12:16:29.029 [http-nio-8080-exec-7] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-16 15:43:37.023 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-16 15:57:54.408 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
