@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
@@ -9,19 +9,75 @@ import type { RootState, AppDispatch } from "@/store";
 import {
   fetchStructureDependenciesThunk,
   deleteStructureNodeThunk,
-  openStructurePopup,
+  saveStructureNodeThunk,
 } from "@/store/slices/structureSlice";
 import type { FullDirection, FullDivision, FullService } from "@/types/structure.types";
 import { useTranslation } from "react-i18next";
 
+interface StructurePopupState {
+  isOpen: boolean;
+  mode: "create" | "edit";
+  type: "direction" | "division" | "service";
+  parentId: number | null;
+  targetId: number | null;
+  currentText: string;
+}
+
+const initialPopup: StructurePopupState = {
+  isOpen: false,
+  mode: "create",
+  type: "direction",
+  parentId: null,
+  targetId: null,
+  currentText: "",
+};
+
 export const StructurePage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { treeData, loading, error } = useSelector((state: RootState) => state.structure);
+  const { treeData, loading, error, actionLoading } = useSelector(
+    (state: RootState) => state.structure,
+  );
+
+  const [popup, setPopup] = useState<StructurePopupState>(initialPopup);
 
   useEffect(() => {
     dispatch(fetchStructureDependenciesThunk());
   }, [dispatch]);
+
+  const openPopup = (params: {
+    mode: "create" | "edit";
+    type: "direction" | "division" | "service";
+    parentId?: number | null;
+    targetId?: number | null;
+    currentText?: string;
+  }) => {
+    setPopup({
+      isOpen: true,
+      mode: params.mode,
+      type: params.type,
+      parentId: params.parentId ?? null,
+      targetId: params.targetId ?? null,
+      currentText: params.currentText ?? "",
+    });
+  };
+
+  const closePopup = () => {
+    setPopup(initialPopup);
+  };
+
+  const handleSave = async (nom: string) => {
+    await dispatch(
+      saveStructureNodeThunk({
+        nom,
+        mode: popup.mode,
+        type: popup.type,
+        parentId: popup.parentId,
+        targetId: popup.targetId,
+      }),
+    );
+    closePopup();
+  };
 
   const handleDeleteItem = (type: "direction" | "division" | "service", id: number) => {
     if (window.confirm(`${t("structure.confirmDelete")} ${type} ?`)) {
@@ -46,7 +102,6 @@ export const StructurePage = () => {
 
   return (
     <Box sx={{ p: 1, minHeight: "100vh", bgcolor: "transparent" }}>
-      {/* Header Container */}
       <Box
         sx={{
           display: "flex",
@@ -60,7 +115,7 @@ export const StructurePage = () => {
         </Typography>
         <AppButton
           text={t("structure.addDirection")}
-          onClick={() => dispatch(openStructurePopup({ mode: "create", type: "direction" }))}
+          onClick={() => openPopup({ mode: "create", type: "direction" })}
         />
       </Box>
 
@@ -70,7 +125,6 @@ export const StructurePage = () => {
         </Alert>
       )}
 
-      {/* Hierarchical Organizational Tree Rendering */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
         {treeData.map((dir: FullDirection) => (
           <OrgNode
@@ -81,23 +135,19 @@ export const StructurePage = () => {
               dir.divisions?.flatMap((d: FullDivision) => d.services || []).length || 0
             } services`}
             onAddChild={() =>
-              dispatch(
-                openStructurePopup({
-                  mode: "create",
-                  type: "division",
-                  parentId: dir.id,
-                }),
-              )
+              openPopup({
+                mode: "create",
+                type: "division",
+                parentId: dir.id,
+              })
             }
             onEdit={() =>
-              dispatch(
-                openStructurePopup({
-                  mode: "edit",
-                  type: "direction",
-                  targetId: dir.id,
-                  currentText: dir.nom,
-                }),
-              )
+              openPopup({
+                mode: "edit",
+                type: "direction",
+                targetId: dir.id,
+                currentText: dir.nom,
+              })
             }
             onDelete={() => handleDeleteItem("direction", dir.id)}
           >
@@ -108,24 +158,20 @@ export const StructurePage = () => {
                 type="division"
                 badgeText={`${div.services?.length || 0} services`}
                 onAddChild={() =>
-                  dispatch(
-                    openStructurePopup({
-                      mode: "create",
-                      type: "service",
-                      parentId: div.id,
-                    }),
-                  )
+                  openPopup({
+                    mode: "create",
+                    type: "service",
+                    parentId: div.id,
+                  })
                 }
                 onEdit={() =>
-                  dispatch(
-                    openStructurePopup({
-                      mode: "edit",
-                      type: "division",
-                      parentId: dir.id,
-                      targetId: div.id,
-                      currentText: div.nom,
-                    }),
-                  )
+                  openPopup({
+                    mode: "edit",
+                    type: "division",
+                    parentId: dir.id,
+                    targetId: div.id,
+                    currentText: div.nom,
+                  })
                 }
                 onDelete={() => handleDeleteItem("division", div.id)}
               >
@@ -135,15 +181,13 @@ export const StructurePage = () => {
                     title={ser.nom}
                     type="service"
                     onEdit={() =>
-                      dispatch(
-                        openStructurePopup({
-                          mode: "edit",
-                          type: "service",
-                          parentId: ser.divisionId,
-                          targetId: ser.id,
-                          currentText: ser.nom,
-                        }),
-                      )
+                      openPopup({
+                        mode: "edit",
+                        type: "service",
+                        parentId: ser.divisionId,
+                        targetId: ser.id,
+                        currentText: ser.nom,
+                      })
                     }
                     onDelete={() => handleDeleteItem("service", ser.id)}
                   />
@@ -154,8 +198,15 @@ export const StructurePage = () => {
         ))}
       </Box>
 
-      {/* 🧬 Tree Manipulation Form Modal Organism */}
-      <StructureFormModal />
+      <StructureFormModal
+        isOpen={popup.isOpen}
+        mode={popup.mode}
+        type={popup.type}
+        currentText={popup.currentText}
+        actionLoading={actionLoading}
+        onClose={closePopup}
+        onSave={handleSave}
+      />
     </Box>
   );
 };

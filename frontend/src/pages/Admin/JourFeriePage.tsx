@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
@@ -6,17 +6,56 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { JourFerieTable } from "@/components/organisms/JourFerieTable";
 import { JourFerieFormModal } from "@/components/organisms/JourFerieFormModal";
 import type { RootState, AppDispatch } from "@/store";
-import { fetchHolidaysThunk, openHolidayPopup } from "@/store/slices/jourFerieSlice";
+import {
+  fetchHolidaysThunk,
+  createHolidayThunk,
+  updateHolidayThunk,
+} from "@/store/slices/jourFerieSlice";
+import type { JourFerieResponse } from "@/types/jourFerie.types";
 import { useTranslation } from "react-i18next";
 
 export const JourFeriePage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { globalLoading, error } = useSelector((state: RootState) => state.jourFerie);
+  const { globalLoading, error, actionLoading } = useSelector(
+    (state: RootState) => state.jourFerie,
+  );
+
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupMode, setPopupMode] = useState<"create" | "edit">("create");
+  const [editingHoliday, setEditingHoliday] = useState<JourFerieResponse | null>(null);
 
   useEffect(() => {
     dispatch(fetchHolidaysThunk());
   }, [dispatch]);
+
+  const handleOpenCreate = () => {
+    setPopupMode("create");
+    setEditingHoliday(null);
+    setPopupOpen(true);
+  };
+
+  const handleOpenEdit = (item: JourFerieResponse) => {
+    setPopupMode("edit");
+    setEditingHoliday(item);
+    setPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+    setEditingHoliday(null);
+  };
+
+  const handleSave = async (data: { date: string; libelle: string }) => {
+    if (popupMode === "create") {
+      await dispatch(createHolidayThunk({ date: data.date, libelle: data.libelle }));
+    } else if (editingHoliday) {
+      await dispatch(
+        updateHolidayThunk({ id: editingHoliday.id, date: data.date, libelle: data.libelle }),
+      );
+    }
+    handleClosePopup();
+  };
 
   if (globalLoading) {
     return (
@@ -35,7 +74,6 @@ export const JourFeriePage = () => {
 
   return (
     <Box sx={{ p: 1, minHeight: "100vh", bgcolor: "transparent" }}>
-      {/* Upper Header Layout */}
       <Box
         sx={{
           display: "flex",
@@ -47,10 +85,7 @@ export const JourFeriePage = () => {
         <Typography variant="h5" sx={{ fontWeight: "700", color: "#1e293b" }}>
           {t("jourFerie.title")}
         </Typography>
-        <AppButton
-          text={t("jourFerie.addButton")}
-          onClick={() => dispatch(openHolidayPopup({ mode: "create" }))}
-        />
+        <AppButton text={t("jourFerie.addButton")} onClick={handleOpenCreate} />
       </Box>
 
       {error && (
@@ -59,11 +94,16 @@ export const JourFeriePage = () => {
         </Alert>
       )}
 
-      {/* 🧬 Grid Collection Organism */}
-      <JourFerieTable />
+      <JourFerieTable onEdit={handleOpenEdit} />
 
-      {/* 🧬 Input Modal Popover Form Organism */}
-      <JourFerieFormModal />
+      <JourFerieFormModal
+        isOpen={popupOpen}
+        mode={popupMode}
+        targetItem={editingHoliday}
+        actionLoading={actionLoading}
+        onClose={handleClosePopup}
+        onSave={handleSave}
+      />
     </Box>
   );
 };

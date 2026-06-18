@@ -22,15 +22,17 @@ import {
   setPagination,
   fetchUsersListThunk,
   toggleUserStatusThunk,
-  openPopup,
 } from "@/store/slices/userSlice";
 import type { UserResponse } from "@/types/user.types";
 
-export const UserTable: React.FC = () => {
+interface UserTableProps {
+  onEditUser: (user: UserResponse) => void;
+}
+
+export const UserTable: React.FC<UserTableProps> = ({ onEditUser }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  // ⚡ Pulling states straight out of your users slice state
   const {
     list: users,
     totalElements,
@@ -138,7 +140,7 @@ export const UserTable: React.FC = () => {
                 <TableCell align="right" sx={{ pr: 3 }}>
                   <IconButton
                     size="small"
-                    onClick={() => dispatch(openPopup({ mode: "edit", user }))}
+                    onClick={() => onEditUser(user)}
                     sx={{ color: "#1976d2" }}
                   >
                     <Edit fontSize="small" />
