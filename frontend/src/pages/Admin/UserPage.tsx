@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { FileDownload } from "@mui/icons-material";
@@ -8,25 +8,29 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { SearchBar } from "@/components/molecules/SearchBar";
 import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
-import { useExportUsers } from "@/hooks/useExportUsers"; // 👈 Ajout du hook d'export
+import { useExportUsers } from "@/utils/useExportUsers";
 import type { RootState, AppDispatch } from "@/store";
-import { fetchUsersListThunk, setSearchQuery, openPopup } from "@/store/slices/userSlice";
+import { fetchUsersListThunk, setSearchQuery, saveUserThunk } from "@/store/slices/userSlice";
 import { fetchDirectionsThunk, fetchRolesThunk } from "@/store/slices/structureSlice";
+import type { UserResponse, UserRequest } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 
 export const UserPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
 
-  // ⚡ Récupération de globalLoading, searchQuery et list (users) depuis Redux
   const {
     globalLoading,
     searchQuery,
     list: users,
+    actionLoading,
   } = useSelector((state: RootState) => state.users);
 
-  // ⚡ Hook d'export — reçoit la liste des utilisateurs
   const { exportExcel, exportPDF } = useExportUsers(users);
+
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupMode, setPopupMode] = useState<"create" | "edit">("create");
+  const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
 
   useEffect(() => {
     dispatch(fetchUsersListThunk());
@@ -36,6 +40,28 @@ export const UserPage = () => {
 
   const handleSearch = (value: string) => {
     dispatch(setSearchQuery(value));
+  };
+
+  const handleOpenCreate = () => {
+    setPopupMode("create");
+    setEditingUser(null);
+    setPopupOpen(true);
+  };
+
+  const handleOpenEdit = (user: UserResponse) => {
+    setPopupMode("edit");
+    setEditingUser(user);
+    setPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+    setEditingUser(null);
+  };
+
+  const handleSave = async (data: UserRequest) => {
+    await dispatch(saveUserThunk({ payload: data, id: editingUser?.id }));
+    handleClosePopup();
   };
 
   if (globalLoading) {
@@ -55,7 +81,6 @@ export const UserPage = () => {
 
   return (
     <Box sx={{ p: 1, minHeight: "100vh", bgcolor: "transparent" }}>
-      {/* Upper Structural Header Section */}
       <Box
         sx={{
           display: "flex",
@@ -68,7 +93,6 @@ export const UserPage = () => {
           {t("userTable.title")}
         </Typography>
 
-        {/* 📦 Groupe de boutons d'action (Export + Ajout) */}
         <Box sx={{ display: "flex", gap: 1.5 }}>
           <AppButton
             text={t("userTable.exportExcel")}
@@ -84,14 +108,10 @@ export const UserPage = () => {
             variant="outlined"
             color="error"
           />
-          <AppButton
-            text={t("userTable.addButton")}
-            onClick={() => dispatch(openPopup({ mode: "create" }))}
-          />
+          <AppButton text={t("userTable.addButton")} onClick={handleOpenCreate} />
         </Box>
       </Box>
 
-      {/* 🧪 Reusable Search Molecule */}
       <Box sx={{ mb: 3, display: "flex", gap: 2 }}>
         <SearchBar
           placeholder={t("userTable.searchPlaceholder")}
@@ -100,11 +120,16 @@ export const UserPage = () => {
         />
       </Box>
 
-      {/* 🧬 Grid Collection Organism */}
-      <UserTable />
+      <UserTable onEditUser={handleOpenEdit} />
 
-      {/* 🧬 Action Popover Form Modal Organism */}
-      <UserFormModal />
+      <UserFormModal
+        isOpen={popupOpen}
+        mode={popupMode}
+        targetUser={editingUser}
+        actionLoading={actionLoading}
+        onClose={handleClosePopup}
+        onSave={handleSave}
+      />
     </Box>
   );
 };

@@ -1,28 +1,36 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Box } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
-import type { RootState, AppDispatch } from "@/store";
-import {
-  createHolidayThunk,
-  updateHolidayThunk,
-  closeHolidayPopup,
-} from "@/store/slices/jourFerieSlice";
 import { jourFerieValidationSchema } from "@/validations/jourFerieSchema";
+import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 interface FormInputs {
   date: string;
   libelle: string;
 }
 
-export const JourFerieFormModal: React.FC = () => {
+interface JourFerieFormModalProps {
+  isOpen: boolean;
+  mode: "create" | "edit";
+  targetItem: JourFerieResponse | null;
+  actionLoading: boolean;
+  onClose: () => void;
+  onSave: (data: { date: string; libelle: string }) => Promise<void>;
+}
+
+export const JourFerieFormModal: React.FC<JourFerieFormModalProps> = ({
+  isOpen,
+  mode,
+  targetItem,
+  actionLoading,
+  onClose,
+  onSave,
+}) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch<AppDispatch>();
-  const { actionLoading, popup } = useSelector((state: RootState) => state.jourFerie);
 
   const {
     register,
@@ -35,32 +43,18 @@ export const JourFerieFormModal: React.FC = () => {
   });
 
   useEffect(() => {
-    if (popup.isOpen && popup.mode === "edit" && popup.targetItem) {
-      setValue("date", popup.targetItem.date);
-      setValue("libelle", popup.targetItem.libelle);
+    if (isOpen && mode === "edit" && targetItem) {
+      setValue("date", targetItem.date);
+      setValue("libelle", targetItem.libelle);
     } else {
       reset();
     }
-  }, [popup.isOpen, popup.mode, popup.targetItem, setValue, reset]);
-
-  const onSave = async (data: FormInputs) => {
-    if (popup.mode === "create") {
-      dispatch(createHolidayThunk({ date: data.date, libelle: data.libelle }));
-    } else if (popup.mode === "edit" && popup.targetItem) {
-      dispatch(
-        updateHolidayThunk({
-          id: popup.targetItem.id,
-          date: data.date,
-          libelle: data.libelle,
-        }),
-      );
-    }
-  };
+  }, [isOpen, mode, targetItem, setValue, reset]);
 
   return (
     <Dialog
-      open={popup.isOpen}
-      onClose={() => !actionLoading && dispatch(closeHolidayPopup())}
+      open={isOpen}
+      onClose={() => !actionLoading && onClose()}
       slotProps={{
         paper: {
           sx: {
@@ -74,7 +68,7 @@ export const JourFerieFormModal: React.FC = () => {
       }}
     >
       <DialogTitle sx={{ fontWeight: "bold", fontSize: "1.1rem", color: "#1e293b" }}>
-        {popup.mode === "create" ? t("jourFerie.addTitle") : t("jourFerie.editTitle")}
+        {mode === "create" ? t("jourFerie.addTitle") : t("jourFerie.editTitle")}
       </DialogTitle>
 
       <DialogContent>
@@ -104,7 +98,7 @@ export const JourFerieFormModal: React.FC = () => {
         <AppButton
           text={t("common.cancel")}
           variant="outlined"
-          onClick={() => dispatch(closeHolidayPopup())}
+          onClick={onClose}
           disabled={actionLoading}
         />
         <AppButton text={t("common.save")} onClick={handleSubmit(onSave)} loading={actionLoading} />

@@ -13,11 +13,6 @@ interface UserState {
   globalLoading: boolean;
   actionLoading: boolean;
   error: string | null;
-  popup: {
-    isOpen: boolean;
-    mode: "create" | "edit";
-    targetUser: UserResponse | null;
-  };
 }
 
 const initialState: UserState = {
@@ -29,11 +24,6 @@ const initialState: UserState = {
   globalLoading: true,
   actionLoading: false,
   error: null,
-  popup: {
-    isOpen: false,
-    mode: "create",
-    targetUser: null,
-  },
 };
 
 export const fetchUsersListThunk = createAsyncThunk(
@@ -106,17 +96,6 @@ const userSlice = createSlice({
       state.searchQuery = action.payload;
       state.page = 0;
     },
-    openPopup: (state, action) => {
-      state.popup.isOpen = true;
-      state.popup.mode = action.payload.mode;
-      state.popup.targetUser = action.payload.user || null;
-      state.error = null; // ← add this
-    },
-    closePopup: (state) => {
-      state.popup.isOpen = false;
-      state.popup.targetUser = null;
-      state.error = null; // ← add this
-    },
     clearError: (state) => {
       state.error = null;
     },
@@ -141,8 +120,6 @@ const userSlice = createSlice({
       })
       .addCase(saveUserThunk.fulfilled, (state) => {
         state.actionLoading = false;
-        state.popup.isOpen = false;
-        state.popup.targetUser = null;
       })
       .addCase(saveUserThunk.rejected, (state, action) => {
         state.actionLoading = false;
@@ -158,6 +135,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setPagination, setSearchQuery, openPopup, closePopup, clearError } =
-  userSlice.actions;
+export const { setPagination, setSearchQuery, clearError } = userSlice.actions;
 export default userSlice.reducer;

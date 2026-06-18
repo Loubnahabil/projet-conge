@@ -14,23 +14,15 @@ import type {
 
 interface StructureState {
   directions: DirectionResponse[];
-  divisions: DirectionResponse[]; // kept for StructurePage (full tree)
-  services: ServiceResponse[]; // kept for StructurePage (full tree)
-  currentDivisions: DivisionResponse[]; // lazy-loaded for UserFormModal
-  currentServices: ServiceResponse[]; // lazy-loaded for UserFormModal
+  divisions: DirectionResponse[];
+  services: ServiceResponse[];
+  currentDivisions: DivisionResponse[];
+  currentServices: ServiceResponse[];
   roles: { id: number; name: string }[];
   treeData: FullDirection[];
   loading: boolean;
   actionLoading: boolean;
   error: string | null;
-  popup: {
-    isOpen: boolean;
-    type: "direction" | "division" | "service" | null;
-    mode: "create" | "edit";
-    parentId: number | null;
-    targetId: number | null;
-    currentText: string;
-  };
 }
 
 const initialState: StructureState = {
@@ -44,14 +36,6 @@ const initialState: StructureState = {
   loading: false,
   actionLoading: false,
   error: null,
-  popup: {
-    isOpen: false,
-    type: null,
-    mode: "create",
-    parentId: null,
-    targetId: null,
-    currentText: "",
-  },
 };
 
 export const fetchStructureDependenciesThunk = createAsyncThunk(
@@ -119,27 +103,36 @@ export const fetchServicesByDivisionThunk = createAsyncThunk(
 
 export const saveStructureNodeThunk = createAsyncThunk(
   "structure/saveNode",
-  async (payload: { nom: string }, { getState, dispatch, rejectWithValue }) => {
-    const { structure } = getState() as { structure: StructureState };
-    const { mode, type, parentId, targetId } = structure.popup;
+  async (
+    payload: {
+      nom: string;
+      mode: "create" | "edit";
+      type: "direction" | "division" | "service";
+      parentId?: number | null;
+      targetId?: number | null;
+    },
+    { dispatch, rejectWithValue },
+  ) => {
+    const { nom, mode, type, parentId, targetId } = payload;
 
     try {
       if (mode === "create") {
-        if (type === "direction") await structureApi.createDirection(payload.nom);
-        else if (type === "division" && parentId)
-          await structureApi.createDivision(parentId, payload.nom);
-        else if (type === "service" && parentId)
-          await structureApi.createService(parentId, payload.nom);
+        if (type === "direction") await structureApi.createDirection(nom);
+        else if (type === "division" && parentId) await structureApi.createDivision(parentId, nom);
+        else if (type === "service" && parentId) await structureApi.createService(parentId, nom);
       } else if (mode === "edit" && targetId) {
-        if (type === "direction") await structureApi.updateDirection(targetId, payload.nom);
+        if (type === "direction") await structureApi.updateDirection(targetId, nom);
         else if (type === "division" && parentId)
-          await structureApi.updateDivision(targetId, parentId, payload.nom);
+          await structureApi.updateDivision(targetId, parentId, nom);
         else if (type === "service" && parentId)
-          await structureApi.updateService(targetId, parentId, payload.nom);
+          await structureApi.updateService(targetId, parentId, nom);
       }
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message = err instanceof AxiosError ? (err.response?.data?.error as string) : i18next.t("errors.saveStructure");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.saveStructure");
       return rejectWithValue(message);
     }
   },
@@ -157,7 +150,10 @@ export const deleteStructureNodeThunk = createAsyncThunk(
       if (payload.type === "service") await structureApi.deleteService(payload.id);
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message = err instanceof AxiosError ? (err.response?.data?.error as string) : i18next.t("errors.deleteStructure");
+      const message =
+        err instanceof AxiosError
+          ? (err.response?.data?.error as string)
+          : i18next.t("errors.deleteStructure");
       return rejectWithValue(message);
     }
   },
@@ -166,30 +162,7 @@ export const deleteStructureNodeThunk = createAsyncThunk(
 const structureSlice = createSlice({
   name: "structure",
   initialState,
-  reducers: {
-    openStructurePopup: (
-      state,
-      action: PayloadAction<{
-        mode: "create" | "edit";
-        type: "direction" | "division" | "service";
-        parentId?: number | null;
-        targetId?: number | null;
-        currentText?: string;
-      }>,
-    ) => {
-      state.popup = {
-        isOpen: true,
-        type: action.payload.type,
-        mode: action.payload.mode,
-        parentId: action.payload.parentId ?? null,
-        targetId: action.payload.targetId ?? null,
-        currentText: action.payload.currentText ?? "",
-      };
-    },
-    closeStructurePopup: (state) => {
-      state.popup = initialState.popup;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchStructureDependenciesThunk.pending, (state) => {
@@ -245,7 +218,6 @@ const structureSlice = createSlice({
           action.type.endsWith("/fulfilled") && !action.type.includes("fetchDependencies"),
         (state) => {
           state.actionLoading = false;
-          state.popup = initialState.popup;
         },
       )
       .addMatcher(
@@ -258,5 +230,4 @@ const structureSlice = createSlice({
   },
 });
 
-export const { openStructurePopup, closeStructurePopup } = structureSlice.actions;
 export default structureSlice.reducer;

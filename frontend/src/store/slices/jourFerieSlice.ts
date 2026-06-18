@@ -11,11 +11,6 @@ interface JourFerieState {
   globalLoading: boolean;
   actionLoading: boolean;
   error: string | null;
-  popup: {
-    isOpen: boolean;
-    mode: "create" | "edit";
-    targetItem: JourFerieResponse | null;
-  };
 }
 
 const initialState: JourFerieState = {
@@ -23,11 +18,6 @@ const initialState: JourFerieState = {
   globalLoading: true,
   actionLoading: false,
   error: null,
-  popup: {
-    isOpen: false,
-    mode: "create",
-    targetItem: null,
-  },
 };
 
 // 🌟 Async Thunks
@@ -107,24 +97,6 @@ const jourFerieSlice = createSlice({
   name: "jourFerie",
   initialState,
   reducers: {
-    openHolidayPopup: (
-      state,
-      action: PayloadAction<{
-        mode: "create" | "edit";
-        item?: JourFerieResponse;
-      }>,
-    ) => {
-      state.popup.isOpen = true;
-      state.popup.mode = action.payload.mode;
-      state.popup.targetItem = action.payload.item || null;
-    },
-
-    closeHolidayPopup: (state) => {
-      state.popup.isOpen = false;
-      state.popup.mode = "create";
-      state.popup.targetItem = null;
-    },
-
     clearHolidayError: (state) => {
       state.error = null;
     },
@@ -157,8 +129,6 @@ const jourFerieSlice = createSlice({
         (action) => action.type.endsWith("/fulfilled") && !action.type.includes("fetchAll"),
         (state) => {
           state.actionLoading = false;
-          state.popup.isOpen = false;
-          state.popup.targetItem = null;
         },
       )
 
@@ -172,6 +142,6 @@ const jourFerieSlice = createSlice({
   },
 });
 
-export const { openHolidayPopup, closeHolidayPopup, clearHolidayError } = jourFerieSlice.actions;
+export const { clearHolidayError } = jourFerieSlice.actions;
 
 export default jourFerieSlice.reducer;

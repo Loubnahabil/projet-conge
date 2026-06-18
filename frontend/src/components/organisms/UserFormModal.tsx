@@ -17,7 +17,6 @@ import {
 import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
-import { closePopup, saveUserThunk } from "@/store/slices/userSlice";
 import {
   fetchDivisionsByDirectionThunk,
   fetchServicesByDivisionThunk,
@@ -61,11 +60,25 @@ interface UserFormInputs {
   roleId: number;
 }
 
-export const UserFormModal: React.FC = () => {
+interface UserFormModalProps {
+  isOpen: boolean;
+  mode: "create" | "edit";
+  targetUser: UserResponse | null;
+  actionLoading: boolean;
+  onClose: () => void;
+  onSave: (data: UserRequest) => Promise<void>;
+}
+
+export const UserFormModal: React.FC<UserFormModalProps> = ({
+  isOpen,
+  mode,
+  targetUser,
+  actionLoading,
+  onClose,
+  onSave,
+}) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { isOpen, mode, targetUser } = useSelector((state: RootState) => state.users.popup);
-  const actionLoading = useSelector((state: RootState) => state.users.actionLoading);
   const { directions, currentDivisions, currentServices, roles } = useSelector(
     (state: RootState) => state.structure,
   );
@@ -132,7 +145,7 @@ export const UserFormModal: React.FC = () => {
     prevDivisionId.current = watchedDivisionId;
   }, [watchedDivisionId, setValue]);
 
-  const onSave = (data: UserFormInputs) => {
+  const submitHandler = (data: UserFormInputs) => {
     const payload: UserRequest = {
       nom: data.nom,
       prenom: data.prenom,
@@ -144,8 +157,7 @@ export const UserFormModal: React.FC = () => {
       roleId: data.roleId,
       ...(mode === "create" ? { password: data.password } : {}),
     };
-
-    dispatch(saveUserThunk({ payload, id: targetUser?.id }));
+    onSave(payload);
   };
 
   const formatRoleLabel = (name: string) => {
@@ -156,7 +168,7 @@ export const UserFormModal: React.FC = () => {
   };
 
   return (
-    <Dialog open={isOpen} onClose={() => dispatch(closePopup())} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontWeight: "bold", color: "#1e293b" }}>
         {mode === "create" ? t("userForm.titleCreate") : t("userForm.titleEdit")}
       </DialogTitle>
@@ -342,12 +354,12 @@ export const UserFormModal: React.FC = () => {
         <AppButton
           text={t("common.cancel")}
           variant="outlined"
-          onClick={() => dispatch(closePopup())}
+          onClick={onClose}
           disabled={actionLoading}
         />
         <AppButton
           text={t("userForm.save")}
-          onClick={handleSubmit(onSave)}
+          onClick={handleSubmit(submitHandler)}
           loading={actionLoading}
         />
       </DialogActions>

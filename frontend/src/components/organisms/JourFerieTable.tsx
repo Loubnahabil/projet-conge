@@ -20,10 +20,14 @@ import {
 } from "@mui/material";
 import { Edit, Delete, EventNote } from "@mui/icons-material";
 import type { RootState, AppDispatch } from "@/store";
-import { deleteHolidayThunk, openHolidayPopup } from "@/store/slices/jourFerieSlice";
+import { deleteHolidayThunk } from "@/store/slices/jourFerieSlice";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
-export const JourFerieTable: React.FC = () => {
+interface JourFerieTableProps {
+  onEdit: (item: JourFerieResponse) => void;
+}
+
+export const JourFerieTable: React.FC<JourFerieTableProps> = ({ onEdit }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { list: holidays } = useSelector((state: RootState) => state.jourFerie);
@@ -98,7 +102,7 @@ export const JourFerieTable: React.FC = () => {
                   <TableCell align="right" sx={{ pr: 2 }}>
                     <IconButton
                       size="small"
-                      onClick={() => dispatch(openHolidayPopup({ mode: "edit", item }))}
+                      onClick={() => onEdit(item)}
                       sx={{ color: "#1976d2", mr: 1 }}
                     >
                       <Edit fontSize="small" />
