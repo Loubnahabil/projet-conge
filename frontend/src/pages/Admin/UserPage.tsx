@@ -10,8 +10,8 @@ import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
 import { useExportUsers } from "@/utils/useExportUsers";
 import type { RootState, AppDispatch } from "@/store";
-import { fetchUsersListThunk, setSearchQuery, saveUserThunk } from "@/store/slices/userSlice";
-import { fetchDirectionsThunk, fetchRolesThunk } from "@/store/slices/structureSlice";
+import { fetchUsersListThunk, setSearchQuery, saveUserThunk, fetchRolesThunk } from "@/store/slices/userSlice";
+import { fetchDirectionsThunk } from "@/store/slices/structureSlice";
 import type { UserResponse, UserRequest } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 

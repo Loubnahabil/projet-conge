@@ -17,11 +17,13 @@ const FonctionnaireDashboardPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     statsApi
       .getFonctionnaireDashboard()
-      .then(setStats)
-      .catch(() => setError(t("profile.loadError")))
-      .finally(() => setLoading(false));
+      .then((data) => { if (mounted) setStats(data); })
+      .catch(() => { if (mounted) setError(t("profile.loadError")); })
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, []);
 
   if (loading) {

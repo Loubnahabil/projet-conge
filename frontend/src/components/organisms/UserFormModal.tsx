@@ -79,10 +79,10 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { directions, currentDivisions, currentServices, roles } = useSelector(
+  const { directions, currentDivisions, currentServices } = useSelector(
     (state: RootState) => state.structure,
   );
-  const formError = useSelector((state: RootState) => state.users.error);
+  const { roles, error: formError } = useSelector((state: RootState) => state.users);
 
   const {
     register,
@@ -110,12 +110,6 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
       reset();
       if (mode === "edit" && targetUser) {
         populateEditForm(setValue, targetUser, roles);
-        if (targetUser.directionId) {
-          dispatch(fetchDivisionsByDirectionThunk(targetUser.directionId));
-        }
-        if (targetUser.divisionId) {
-          dispatch(fetchServicesByDivisionThunk(targetUser.divisionId));
-        }
       }
     }
   }, [isOpen, mode, targetUser, reset, setValue, roles, dispatch]);

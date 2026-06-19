@@ -14,11 +14,10 @@ import type {
 
 interface StructureState {
   directions: DirectionResponse[];
-  divisions: DirectionResponse[];
+  divisions: DivisionResponse[];
   services: ServiceResponse[];
   currentDivisions: DivisionResponse[];
   currentServices: ServiceResponse[];
-  roles: { id: number; name: string }[];
   treeData: FullDirection[];
   loading: boolean;
   actionLoading: boolean;
@@ -31,7 +30,6 @@ const initialState: StructureState = {
   services: [],
   currentDivisions: [],
   currentServices: [],
-  roles: [],
   treeData: [],
   loading: false,
   actionLoading: false,
@@ -42,13 +40,12 @@ export const fetchStructureDependenciesThunk = createAsyncThunk(
   "structure/fetchDependencies",
   async (_, { rejectWithValue }) => {
     try {
-      const [dirs, divs, servs, roles] = await Promise.all([
+      const [dirs, divs, servs] = await Promise.all([
         structureApi.getDirections(),
         structureApi.getDivisions(),
         structureApi.getServices(),
-        structureApi.getRoles(),
       ]);
-      return { dirs, divs, servs, roles };
+      return { dirs, divs, servs };
     } catch {
       return rejectWithValue(i18next.t("errors.loadStructures"));
     }
@@ -61,18 +58,6 @@ export const fetchDirectionsThunk = createAsyncThunk(
     try {
       const dirs = await structureApi.getDirections();
       return dirs;
-    } catch {
-      return rejectWithValue(i18next.t("errors.loadStructures"));
-    }
-  },
-);
-
-export const fetchRolesThunk = createAsyncThunk(
-  "structure/fetchRoles",
-  async (_, { rejectWithValue }) => {
-    try {
-      const roles = await structureApi.getRoles();
-      return roles;
     } catch {
       return rejectWithValue(i18next.t("errors.loadStructures"));
     }
@@ -174,7 +159,6 @@ const structureSlice = createSlice({
         state.directions = action.payload.dirs;
         state.divisions = action.payload.divs;
         state.services = action.payload.servs;
-        state.roles = action.payload.roles;
 
         state.treeData = action.payload.dirs.map((dir) => {
           const matchingDivisions = action.payload.divs
@@ -195,9 +179,6 @@ const structureSlice = createSlice({
 
       .addCase(fetchDirectionsThunk.fulfilled, (state, action) => {
         state.directions = action.payload;
-      })
-      .addCase(fetchRolesThunk.fulfilled, (state, action) => {
-        state.roles = action.payload;
       })
       .addCase(fetchDivisionsByDirectionThunk.fulfilled, (state, action) => {
         state.currentDivisions = action.payload;

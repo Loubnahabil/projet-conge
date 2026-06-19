@@ -38,11 +38,13 @@ export const SignatairePage = () => {
   const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(null);
 
   useEffect(() => {
+    let mounted = true;
     dispatch(fetchPendingSignaturesThunk());
     statsApi
       .getSignataireDashboard()
-      .then(setDashboardStats)
+      .then((data) => { if (mounted) setDashboardStats(data); })
       .catch(() => {});
+    return () => { mounted = false; };
   }, [dispatch]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {

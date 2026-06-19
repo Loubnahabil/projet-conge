@@ -35,6 +35,11 @@ export const userApi = {
 
   getMyProfile: () => axiosInstance.get<UserResponse>("/users/me").then((res) => res.data),
 
+  getRoles: () =>
+    axiosInstance
+      .get<{ id: number; name: string }[]>("/roles")
+      .then((res) => res.data),
+
   updateMyProfile: (payload: {
     nom?: string;
     prenom?: string;
