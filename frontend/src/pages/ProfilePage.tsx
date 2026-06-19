@@ -62,9 +62,11 @@ export const ProfilePage = () => {
   });
 
   useEffect(() => {
+    let mounted = true;
     userApi
       .getMyProfile()
       .then((data) => {
+        if (!mounted) return;
         setProfile(data);
         reset({
           nom: data.nom,
@@ -75,8 +77,9 @@ export const ProfilePage = () => {
           confirmPassword: "",
         });
       })
-      .catch(() => setError(t("profile.loadError")))
-      .finally(() => setLoading(false));
+      .catch(() => { if (mounted) setError(t("profile.loadError")); })
+      .finally(() => { if (mounted) setLoading(false); });
+    return () => { mounted = false; };
   }, [reset]);
 
   const onSubmit = async (data: ProfileForm) => {

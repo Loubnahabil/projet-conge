@@ -13,6 +13,7 @@ interface UserState {
   globalLoading: boolean;
   actionLoading: boolean;
   error: string | null;
+  roles: { id: number; name: string }[];
 }
 
 const initialState: UserState = {
@@ -24,6 +25,7 @@ const initialState: UserState = {
   globalLoading: true,
   actionLoading: false,
   error: null,
+  roles: [],
 };
 
 export const fetchUsersListThunk = createAsyncThunk(
@@ -84,6 +86,18 @@ export const deleteUserThunk = createAsyncThunk(
   },
 );
 
+export const fetchRolesThunk = createAsyncThunk(
+  "users/fetchRoles",
+  async (_, { rejectWithValue }) => {
+    try {
+      const roles = await userApi.getRoles();
+      return roles;
+    } catch {
+      return rejectWithValue(i18next.t("errors.loadStructures"));
+    }
+  },
+);
+
 const userSlice = createSlice({
   name: "users",
   initialState,
@@ -131,6 +145,9 @@ const userSlice = createSlice({
       })
       .addCase(deleteUserThunk.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      .addCase(fetchRolesThunk.fulfilled, (state, action) => {
+        state.roles = action.payload;
       });
   },
 });

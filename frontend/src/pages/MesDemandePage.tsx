@@ -142,7 +142,7 @@ export const MesDemandePage = () => {
         await demandeApi.uploadDocument(activeDemandeId, selectedFile, "CERTIFICAT_MEDICAL");
       }
 
-      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
+      dispatch(setDemandePage(0));
       setView("LIST");
     } catch {
       // error already in Redux state
@@ -157,7 +157,7 @@ export const MesDemandePage = () => {
 
     try {
       await dispatch(soumettreDemandeThunk(demande.id)).unwrap();
-      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
+      dispatch(setDemandePage(0));
     } catch {
       // error in Redux
     }
@@ -175,7 +175,7 @@ export const MesDemandePage = () => {
 
     try {
       await dispatch(annulerDemandeThunk(selectedDemandeId)).unwrap();
-      dispatch(fetchMyDemandesThunk({ page: 0, size: rowsPerPage }));
+      dispatch(setDemandePage(0));
       if (view === "DETAIL") setView("LIST");
     } catch {
       // error in Redux

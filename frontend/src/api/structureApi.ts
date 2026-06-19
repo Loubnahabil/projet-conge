@@ -28,11 +28,6 @@ export const structureApi = {
       .get<ServiceResponse[]>(`/services/by-division/${divisionId}`)
       .then((res: AxiosResponse<ServiceResponse[]>) => res.data),
 
-  getRoles: () =>
-    axiosInstance
-      .get<{ id: number; name: string }[]>("/roles")
-      .then((res: AxiosResponse<{ id: number; name: string }[]>) => res.data),
-
   createDirection: (nom: string) =>
     axiosInstance
       .post<DirectionResponse>("/directions", {
