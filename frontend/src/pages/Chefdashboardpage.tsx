@@ -8,9 +8,9 @@ import { ChefDecisionModal } from "@/components/organisms/ChefDecisionModal";
 import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
-  fetchPendingChefVisasThunk,
-  fetchTraiteesChefThunk,
-  visaChefThunk,
+  fetchPendingChefVisas,
+  fetchTraiteesChef,
+  visaChef,
 } from "@/store/slices/demandeSlice";
 import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse } from "@/types/Demande.types";
@@ -37,7 +37,7 @@ export const ChefDashboardPage = () => {
 
   useEffect(() => {
     let mounted = true;
-    dispatch(fetchPendingChefVisasThunk());
+    dispatch(fetchPendingChefVisas());
     statsApi
       .getChefDashboard()
       .then((data) => { if (mounted) setDashboardStats(data); })
@@ -49,7 +49,7 @@ export const ChefDashboardPage = () => {
     setTab(newValue);
     if (newValue === 1 && !traiteesFetched) {
       setLoadingTraitees(true);
-      dispatch(fetchTraiteesChefThunk()).finally(() => {
+      dispatch(fetchTraiteesChef()).finally(() => {
         setLoadingTraitees(false);
         setTraiteesFetched(true);
       });
@@ -64,7 +64,7 @@ export const ChefDashboardPage = () => {
     if (!dialog.targetId || !dialog.mode) return;
     try {
       await dispatch(
-        visaChefThunk({
+        visaChef({
           id: dialog.targetId,
           approve: dialog.mode === "approve",
           commentaire: commentText || undefined,

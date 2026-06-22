@@ -36,7 +36,7 @@ const initialState: StructureState = {
   error: null,
 };
 
-export const fetchStructureDependenciesThunk = createAsyncThunk(
+export const fetchStructureDependencies = createAsyncThunk(
   "structure/fetchDependencies",
   async (_, { rejectWithValue }) => {
     try {
@@ -52,7 +52,7 @@ export const fetchStructureDependenciesThunk = createAsyncThunk(
   },
 );
 
-export const fetchDirectionsThunk = createAsyncThunk(
+export const fetchDirections = createAsyncThunk(
   "structure/fetchDirections",
   async (_, { rejectWithValue }) => {
     try {
@@ -64,7 +64,7 @@ export const fetchDirectionsThunk = createAsyncThunk(
   },
 );
 
-export const fetchDivisionsByDirectionThunk = createAsyncThunk(
+export const fetchDivisionsByDirection = createAsyncThunk(
   "structure/fetchDivisionsByDirection",
   async (directionId: number, { rejectWithValue }) => {
     try {
@@ -75,7 +75,7 @@ export const fetchDivisionsByDirectionThunk = createAsyncThunk(
   },
 );
 
-export const fetchServicesByDivisionThunk = createAsyncThunk(
+export const fetchServicesByDivision = createAsyncThunk(
   "structure/fetchServicesByDivision",
   async (divisionId: number, { rejectWithValue }) => {
     try {
@@ -86,7 +86,7 @@ export const fetchServicesByDivisionThunk = createAsyncThunk(
   },
 );
 
-export const saveStructureNodeThunk = createAsyncThunk(
+export const saveStructureNode = createAsyncThunk(
   "structure/saveNode",
   async (
     payload: {
@@ -112,14 +112,14 @@ export const saveStructureNodeThunk = createAsyncThunk(
         else if (type === "service" && parentId)
           await structureApi.updateService(targetId, parentId, nom);
       }
-      dispatch(fetchStructureDependenciesThunk());
+      dispatch(fetchStructureDependencies());
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.saveStructure"));
     }
   },
 );
 
-export const deleteStructureNodeThunk = createAsyncThunk(
+export const deleteStructureNode = createAsyncThunk(
   "structure/deleteNode",
   async (
     payload: { type: "direction" | "division" | "service"; id: number },
@@ -129,7 +129,7 @@ export const deleteStructureNodeThunk = createAsyncThunk(
       if (payload.type === "direction") await structureApi.deleteDirection(payload.id);
       if (payload.type === "division") await structureApi.deleteDivision(payload.id);
       if (payload.type === "service") await structureApi.deleteService(payload.id);
-      dispatch(fetchStructureDependenciesThunk());
+      dispatch(fetchStructureDependencies());
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.deleteStructure"));
     }
@@ -142,11 +142,11 @@ const structureSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchStructureDependenciesThunk.pending, (state) => {
+      .addCase(fetchStructureDependencies.pending, (state) => {
         state.loading = true;
         state.error = null; // Clean up old errors when re-fetching
       })
-      .addCase(fetchStructureDependenciesThunk.fulfilled, (state, action) => {
+      .addCase(fetchStructureDependencies.fulfilled, (state, action) => {
         state.loading = false;
         state.directions = action.payload.dirs;
         state.divisions = action.payload.divs;
@@ -164,18 +164,18 @@ const structureSlice = createSlice({
           return { ...dir, divisions: matchingDivisions } as FullDirection;
         });
       })
-      .addCase(fetchStructureDependenciesThunk.rejected, (state, action) => {
+      .addCase(fetchStructureDependencies.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || i18next.t("errors.operationError");
       })
 
-      .addCase(fetchDirectionsThunk.fulfilled, (state, action) => {
+      .addCase(fetchDirections.fulfilled, (state, action) => {
         state.directions = action.payload;
       })
-      .addCase(fetchDivisionsByDirectionThunk.fulfilled, (state, action) => {
+      .addCase(fetchDivisionsByDirection.fulfilled, (state, action) => {
         state.currentDivisions = action.payload;
       })
-      .addCase(fetchServicesByDivisionThunk.fulfilled, (state, action) => {
+      .addCase(fetchServicesByDivision.fulfilled, (state, action) => {
         state.currentServices = action.payload;
       })
 

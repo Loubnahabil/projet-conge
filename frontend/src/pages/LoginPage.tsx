@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginThunk } from "@/store/slices/authSlice";
+import { login } from "@/store/slices/authSlice";
 import { loginSchema } from "@/validations/auth.validation";
 import type { AppDispatch, RootState } from "@/store/index";
 import type { LoginRequest } from "@/types/auth.types";
@@ -24,9 +24,9 @@ const LoginPage = () => {
   });
 
   const handleLoginSubmit = async (data: LoginRequest) => {
-    const result = await dispatch(loginThunk(data));
+    const result = await dispatch(login(data));
 
-    if (loginThunk.fulfilled.match(result)) {
+    if (login.fulfilled.match(result)) {
       const role = result.payload.role;
       if (role === "ADMIN") navigate("/dashboard");
       else if (role === "FONCTIONNAIRE") navigate("/fonctionnaire/dashboard");

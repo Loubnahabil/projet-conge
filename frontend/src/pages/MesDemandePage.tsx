@@ -16,13 +16,13 @@ import { DemandeTable } from "@/components/organisms/DemandeTable";
 import { DemandeForm } from "@/components/organisms/DemandeForm";
 import { DemandeDetail } from "@/components/organisms/DemandeDetail";
 import {
-  fetchMyDemandesThunk,
-  fetchEligibleInterimsThunk,
-  createDemandeThunk,
-  updateDemandeThunk,
-  soumettreDemandeThunk,
-  annulerDemandeThunk,
-  fetchDemandeHistoryThunk,
+  fetchMyDemandes,
+  fetchEligibleInterims,
+  createDemande,
+  updateDemande,
+  soumettreDemande,
+  annulerDemande,
+  fetchDemandeHistory,
   clearDemandeError,
   clearSelectedHistory,
   setDemandePage,
@@ -74,8 +74,8 @@ export const MesDemandePage = () => {
   const [selectedDemandeId, setSelectedDemandeId] = useState<number | null>(null);
 
   useEffect(() => {
-    dispatch(fetchMyDemandesThunk({ page, size: rowsPerPage }));
-    dispatch(fetchEligibleInterimsThunk());
+    dispatch(fetchMyDemandes({ page, size: rowsPerPage }));
+    dispatch(fetchEligibleInterims());
   }, [dispatch, page, rowsPerPage]);
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export const MesDemandePage = () => {
     setSelectedDemande(d);
     setView("DETAIL");
     dispatch(clearSelectedHistory());
-    dispatch(fetchDemandeHistoryThunk(d.id));
+    dispatch(fetchDemandeHistory(d.id));
   };
 
   const handleFileChange = (file: File | null) => {
@@ -128,12 +128,12 @@ export const MesDemandePage = () => {
 
       if (editingDemande) {
         const result = await dispatch(
-          updateDemandeThunk({ id: editingDemande.id, payload }),
+          updateDemande({ id: editingDemande.id, payload }),
         ).unwrap();
         activeDemandeId = result.id;
       } else {
         const result = await dispatch(
-          createDemandeThunk({ payload, submit: submitInstantly }),
+          createDemande({ payload, submit: submitInstantly }),
         ).unwrap();
         activeDemandeId = result.id;
       }
@@ -156,7 +156,7 @@ export const MesDemandePage = () => {
     }
 
     try {
-      await dispatch(soumettreDemandeThunk(demande.id)).unwrap();
+      await dispatch(soumettreDemande(demande.id)).unwrap();
       dispatch(setDemandePage(0));
     } catch {
       // error in Redux
@@ -174,7 +174,7 @@ export const MesDemandePage = () => {
     setCancelDialogOpen(false);
 
     try {
-      await dispatch(annulerDemandeThunk(selectedDemandeId)).unwrap();
+      await dispatch(annulerDemande(selectedDemandeId)).unwrap();
       dispatch(setDemandePage(0));
       if (view === "DETAIL") setView("LIST");
     } catch {

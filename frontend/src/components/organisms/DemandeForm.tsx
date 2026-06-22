@@ -22,7 +22,7 @@ import type { UserResponse } from "@/types/user.types";
 import { FileUploadField } from "@/components/molecules/FileUploadField";
 import { useTranslation } from "react-i18next";
 import { calculerJoursOuvrables } from "@/services/leave.service";
-import { fetchHolidaysThunk } from "@/store/slices/jourFerieSlice";
+import { fetchHolidays } from "@/store/slices/jourFerieSlice";
 import type { AppDispatch, RootState } from "@/store";
 
 interface FormInputs {
@@ -59,7 +59,7 @@ export const DemandeForm = ({
   );
 
   useEffect(() => {
-    dispatch(fetchHolidaysThunk());
+    dispatch(fetchHolidays());
   }, [dispatch]);
 
   const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;

@@ -7,9 +7,9 @@ import { JourFerieTable } from "@/components/organisms/JourFerieTable";
 import { JourFerieFormModal } from "@/components/organisms/JourFerieFormModal";
 import type { RootState, AppDispatch } from "@/store";
 import {
-  fetchHolidaysThunk,
-  createHolidayThunk,
-  updateHolidayThunk,
+  fetchHolidays,
+  createHoliday,
+  updateHoliday,
 } from "@/store/slices/jourFerieSlice";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 import { useTranslation } from "react-i18next";
@@ -26,7 +26,7 @@ export const JourFeriePage = () => {
   const [editingHoliday, setEditingHoliday] = useState<JourFerieResponse | null>(null);
 
   useEffect(() => {
-    dispatch(fetchHolidaysThunk());
+    dispatch(fetchHolidays());
   }, [dispatch]);
 
   const handleOpenCreate = () => {
@@ -48,10 +48,10 @@ export const JourFeriePage = () => {
 
   const handleSave = async (data: { date: string; libelle: string }) => {
     if (popupMode === "create") {
-      await dispatch(createHolidayThunk({ date: data.date, libelle: data.libelle }));
+      await dispatch(createHoliday({ date: data.date, libelle: data.libelle }));
     } else if (editingHoliday) {
       await dispatch(
-        updateHolidayThunk({ id: editingHoliday.id, date: data.date, libelle: data.libelle }),
+        updateHoliday({ id: editingHoliday.id, date: data.date, libelle: data.libelle }),
       );
     }
     handleClosePopup();
