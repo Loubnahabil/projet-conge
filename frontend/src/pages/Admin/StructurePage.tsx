@@ -7,9 +7,9 @@ import { AppButton } from "@/components/atoms/AppButton";
 import { StructureFormModal } from "@/components/organisms/StructureFormModal";
 import type { RootState, AppDispatch } from "@/store";
 import {
-  fetchStructureDependenciesThunk,
-  deleteStructureNodeThunk,
-  saveStructureNodeThunk,
+  fetchStructureDependencies,
+  deleteStructureNode,
+  saveStructureNode,
 } from "@/store/slices/structureSlice";
 import type { FullDirection, FullDivision, FullService } from "@/types/structure.types";
 import { useTranslation } from "react-i18next";
@@ -42,7 +42,7 @@ export const StructurePage = () => {
   const [popup, setPopup] = useState<StructurePopupState>(initialPopup);
 
   useEffect(() => {
-    dispatch(fetchStructureDependenciesThunk());
+    dispatch(fetchStructureDependencies());
   }, [dispatch]);
 
   const openPopup = (params: {
@@ -68,7 +68,7 @@ export const StructurePage = () => {
 
   const handleSave = async (nom: string) => {
     await dispatch(
-      saveStructureNodeThunk({
+      saveStructureNode({
         nom,
         mode: popup.mode,
         type: popup.type,
@@ -81,7 +81,7 @@ export const StructurePage = () => {
 
   const handleDeleteItem = (type: "direction" | "division" | "service", id: number) => {
     if (window.confirm(`${t("structure.confirmDelete")} ${type} ?`)) {
-      dispatch(deleteStructureNodeThunk({ type, id }));
+      dispatch(deleteStructureNode({ type, id }));
     }
   };
 

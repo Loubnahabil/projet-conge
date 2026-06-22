@@ -26,7 +26,7 @@ const initialState: QuotaState = {
   feedback: null,
 };
 
-export const fetchQuotasPageThunk = createAsyncThunk(
+export const fetchQuotasPage = createAsyncThunk(
   "quotas/fetchPage",
   async (
     { year, page, size }: { year: number; page: number; size: number },
@@ -58,12 +58,12 @@ const quotaSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchQuotasPageThunk.pending, (state) => {
+      .addCase(fetchQuotasPage.pending, (state) => {
         state.globalLoading = true;
         state.feedback = null;
       })
       .addCase(
-        fetchQuotasPageThunk.fulfilled,
+        fetchQuotasPage.fulfilled,
         (state, action: PayloadAction<SpringPageWrapper<QuotaResponse>>) => {
           state.globalLoading = false;
           state.list = action.payload.content;
@@ -71,7 +71,7 @@ const quotaSlice = createSlice({
           state.totalPages = action.payload.totalPages;
         },
       )
-      .addCase(fetchQuotasPageThunk.rejected, (state, action) => {
+      .addCase(fetchQuotasPage.rejected, (state, action) => {
         state.globalLoading = false;
         state.feedback = { type: "error", text: action.payload as string };
       });

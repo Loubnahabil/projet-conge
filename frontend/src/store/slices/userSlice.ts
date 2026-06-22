@@ -29,7 +29,7 @@ const initialState: UserState = {
   roles: [],
 };
 
-export const fetchUsersListThunk = createAsyncThunk(
+export const fetchUsersList = createAsyncThunk(
   "users/fetchList",
   async (_, { getState, rejectWithValue }) => {
     const { users } = getState() as { users: UserState };
@@ -42,19 +42,19 @@ export const fetchUsersListThunk = createAsyncThunk(
   },
 );
 
-export const toggleUserStatusThunk = createAsyncThunk(
+export const toggleUserStatus = createAsyncThunk(
   "users/toggleStatus",
   async (id: number, { dispatch, rejectWithValue }) => {
     try {
       await userApi.toggleEnabled(id);
-      dispatch(fetchUsersListThunk());
+      dispatch(fetchUsersList());
     } catch {
       return rejectWithValue(i18next.t("errors.toggleUserStatus"));
     }
   },
 );
 
-export const saveUserThunk = createAsyncThunk(
+export const saveUser = createAsyncThunk(
   "users/save",
   async ({ payload, id }: { payload: UserRequest; id?: number }, { dispatch, rejectWithValue }) => {
     try {
@@ -63,36 +63,33 @@ export const saveUserThunk = createAsyncThunk(
       } else {
         await userApi.create(payload);
       }
-      dispatch(fetchUsersListThunk());
+      dispatch(fetchUsersList());
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.saveUser"));
     }
   },
 );
 
-export const deleteUserThunk = createAsyncThunk(
+export const deleteUser = createAsyncThunk(
   "users/delete",
   async (id: number, { dispatch, rejectWithValue }) => {
     try {
       await userApi.delete(id);
-      dispatch(fetchUsersListThunk());
+      dispatch(fetchUsersList());
     } catch {
       return rejectWithValue(i18next.t("errors.deleteUserDependencies"));
     }
   },
 );
 
-export const fetchRolesThunk = createAsyncThunk(
-  "users/fetchRoles",
-  async (_, { rejectWithValue }) => {
-    try {
-      const roles = await userApi.getRoles();
-      return roles;
-    } catch {
-      return rejectWithValue(i18next.t("errors.loadStructures"));
-    }
-  },
-);
+export const fetchRoles = createAsyncThunk("users/fetchRoles", async (_, { rejectWithValue }) => {
+  try {
+    const roles = await userApi.getRoles();
+    return roles;
+  } catch {
+    return rejectWithValue(i18next.t("errors.loadStructures"));
+  }
+});
 
 const userSlice = createSlice({
   name: "users",
@@ -112,37 +109,37 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsersListThunk.pending, (state) => {
+      .addCase(fetchUsersList.pending, (state) => {
         state.globalLoading = true;
         state.error = null;
       })
-      .addCase(fetchUsersListThunk.fulfilled, (state, action) => {
+      .addCase(fetchUsersList.fulfilled, (state, action) => {
         state.globalLoading = false;
         state.list = action.payload.content || [];
         state.totalElements = action.payload.totalElements || 0;
       })
-      .addCase(fetchUsersListThunk.rejected, (state, action) => {
+      .addCase(fetchUsersList.rejected, (state, action) => {
         state.globalLoading = false;
         state.error = action.payload as string;
       })
-      .addCase(saveUserThunk.pending, (state) => {
+      .addCase(saveUser.pending, (state) => {
         state.actionLoading = true;
       })
-      .addCase(saveUserThunk.fulfilled, (state) => {
+      .addCase(saveUser.fulfilled, (state) => {
         state.actionLoading = false;
       })
-      .addCase(saveUserThunk.rejected, (state, action) => {
+      .addCase(saveUser.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
         // NO alert()
       })
-      .addCase(toggleUserStatusThunk.rejected, (state, action) => {
+      .addCase(toggleUserStatus.rejected, (state, action) => {
         state.error = action.payload as string;
       })
-      .addCase(deleteUserThunk.rejected, (state, action) => {
+      .addCase(deleteUser.rejected, (state, action) => {
         state.error = action.payload as string;
       })
-      .addCase(fetchRolesThunk.fulfilled, (state, action) => {
+      .addCase(fetchRoles.fulfilled, (state, action) => {
         state.roles = action.payload;
       });
   },

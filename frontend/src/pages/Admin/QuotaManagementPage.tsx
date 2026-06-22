@@ -5,7 +5,7 @@ import { YearSelector } from "@/components/molecules/YearSelector";
 import { QuotaTable } from "@/components/organisms/QuotaTable";
 import type { RootState, AppDispatch } from "@/store";
 import {
-  fetchQuotasPageThunk,
+  fetchQuotasPage,
   clearFeedback,
   setQuotaPage,
   setQuotaRowsPerPage,
@@ -24,7 +24,7 @@ export default function QuotaManagementPage() {
 
   useEffect(() => {
     dispatch(
-      fetchQuotasPageThunk({
+      fetchQuotasPage({
         year: selectedYear,
         page,
         size: rowsPerPage,

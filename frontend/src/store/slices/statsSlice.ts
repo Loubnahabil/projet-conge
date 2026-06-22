@@ -15,7 +15,7 @@ const initialState: StatsState = {
   error: null,
 };
 
-export const fetchDashboardStatsThunk = createAsyncThunk(
+export const fetchDashboardStats = createAsyncThunk(
   "stats/fetchDashboard",
   async (_, { rejectWithValue }) => {
     try {
@@ -32,15 +32,15 @@ const statsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchDashboardStatsThunk.pending, (state) => {
+      .addCase(fetchDashboardStats.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchDashboardStatsThunk.fulfilled, (state, action) => {
+      .addCase(fetchDashboardStats.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
       })
-      .addCase(fetchDashboardStatsThunk.rejected, (state, action) => {
+      .addCase(fetchDashboardStats.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) || i18next.t("errors.operationError");
       });

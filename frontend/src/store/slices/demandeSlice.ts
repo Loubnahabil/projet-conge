@@ -46,9 +46,9 @@ const initialState: DemandeState = {
   totalPages: 0,
 };
 
-// ── Async Thunks ─────────────────────────────────────────────────────────────
+// ── Async s ─────────────────────────────────────────────────────────────
 
-export const fetchMyDemandesThunk = createAsyncThunk(
+export const fetchMyDemandes = createAsyncThunk(
   "demande/fetchMyDemandes",
   async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
     try {
@@ -60,7 +60,7 @@ export const fetchMyDemandesThunk = createAsyncThunk(
   },
 );
 
-export const fetchEligibleInterimsThunk = createAsyncThunk(
+export const fetchEligibleInterims = createAsyncThunk(
   "demande/fetchEligibleInterims",
   async (_, { rejectWithValue }) => {
     try {
@@ -72,7 +72,7 @@ export const fetchEligibleInterimsThunk = createAsyncThunk(
   },
 );
 
-export const createDemandeThunk = createAsyncThunk(
+export const createDemande = createAsyncThunk(
   "demande/create",
   async (
     { payload, submit }: { payload: DemandeRequest; submit: boolean },
@@ -87,7 +87,7 @@ export const createDemandeThunk = createAsyncThunk(
   },
 );
 
-export const updateDemandeThunk = createAsyncThunk(
+export const updateDemande = createAsyncThunk(
   "demande/update",
   async ({ id, payload }: { id: number; payload: DemandeRequest }, { rejectWithValue }) => {
     try {
@@ -99,7 +99,7 @@ export const updateDemandeThunk = createAsyncThunk(
   },
 );
 
-export const soumettreDemandeThunk = createAsyncThunk(
+export const soumettreDemande = createAsyncThunk(
   "demande/soumettre",
   async (id: number, { rejectWithValue }) => {
     try {
@@ -111,7 +111,7 @@ export const soumettreDemandeThunk = createAsyncThunk(
   },
 );
 
-export const annulerDemandeThunk = createAsyncThunk(
+export const annulerDemande = createAsyncThunk(
   "demande/annuler",
   async (id: number, { rejectWithValue }) => {
     try {
@@ -123,7 +123,7 @@ export const annulerDemandeThunk = createAsyncThunk(
   },
 );
 
-export const fetchDemandeHistoryThunk = createAsyncThunk(
+export const fetchDemandeHistory = createAsyncThunk(
   "demande/fetchHistory",
   async (id: number, { rejectWithValue }) => {
     try {
@@ -135,9 +135,9 @@ export const fetchDemandeHistoryThunk = createAsyncThunk(
   },
 );
 
-// ── Chef Thunks ──────────────────────────────────────────────────────────────
+// ── Chef s ──────────────────────────────────────────────────────────────
 
-export const fetchPendingChefVisasThunk = createAsyncThunk(
+export const fetchPendingChefVisas = createAsyncThunk(
   "demande/fetchPendingChefVisas",
   async (_, { rejectWithValue }) => {
     try {
@@ -149,7 +149,7 @@ export const fetchPendingChefVisasThunk = createAsyncThunk(
   },
 );
 
-export const fetchTraiteesChefThunk = createAsyncThunk(
+export const fetchTraiteesChef = createAsyncThunk(
   "demande/fetchTraiteesChef",
   async (_, { rejectWithValue }) => {
     try {
@@ -161,7 +161,7 @@ export const fetchTraiteesChefThunk = createAsyncThunk(
   },
 );
 
-export const visaChefThunk = createAsyncThunk(
+export const visaChef = createAsyncThunk(
   "demande/visaChef",
   async (
     { id, approve, commentaire }: { id: number; approve: boolean; commentaire?: string },
@@ -176,9 +176,9 @@ export const visaChefThunk = createAsyncThunk(
   },
 );
 
-// ── Signataire Thunks ─────────────────────────────────────────────────────────
+// ── Signataire s ─────────────────────────────────────────────────────────
 
-export const fetchPendingSignaturesThunk = createAsyncThunk(
+export const fetchPendingSignatures = createAsyncThunk(
   "demande/fetchPendingSignatures",
   async (_, { rejectWithValue }) => {
     try {
@@ -190,7 +190,7 @@ export const fetchPendingSignaturesThunk = createAsyncThunk(
   },
 );
 
-export const fetchTraiteesSignataireThunk = createAsyncThunk(
+export const fetchTraiteesSignataire = createAsyncThunk(
   "demande/fetchTraiteesSignataire",
   async (_, { rejectWithValue }) => {
     try {
@@ -202,7 +202,7 @@ export const fetchTraiteesSignataireThunk = createAsyncThunk(
   },
 );
 
-export const signataireApproveThunk = createAsyncThunk(
+export const signataireApprove = createAsyncThunk(
   "demande/signataireApprove",
   async ({ id, file }: { id: number; file: File }, { rejectWithValue }) => {
     try {
@@ -214,7 +214,7 @@ export const signataireApproveThunk = createAsyncThunk(
   },
 );
 
-export const signataireRejectThunk = createAsyncThunk(
+export const signataireReject = createAsyncThunk(
   "demande/signataireReject",
   async ({ id, commentaire }: { id: number; commentaire: string }, { rejectWithValue }) => {
     try {
@@ -249,12 +249,12 @@ const demandeSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch My Demandes
-      .addCase(fetchMyDemandesThunk.pending, (state) => {
+      .addCase(fetchMyDemandes.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(
-        fetchMyDemandesThunk.fulfilled,
+        fetchMyDemandes.fulfilled,
         (
           state,
           action: PayloadAction<{
@@ -273,56 +273,56 @@ const demandeSlice = createSlice({
           state.page = action.payload.number;
         },
       )
-      .addCase(fetchMyDemandesThunk.rejected, (state, action) => {
+      .addCase(fetchMyDemandes.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
 
       // Fetch Interims
       .addCase(
-        fetchEligibleInterimsThunk.fulfilled,
+        fetchEligibleInterims.fulfilled,
         (state, action: PayloadAction<UserResponse[]>) => {
           state.interims = action.payload;
         },
       )
 
       // Create Demande
-      .addCase(createDemandeThunk.pending, (state) => {
+      .addCase(createDemande.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(createDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+      .addCase(createDemande.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
         state.actionLoading = false;
         state.demandes.unshift(action.payload); // Add new to top of tracking list
       })
-      .addCase(createDemandeThunk.rejected, (state, action) => {
+      .addCase(createDemande.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       })
 
       // Update Demande
-      .addCase(updateDemandeThunk.pending, (state) => {
+      .addCase(updateDemande.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(updateDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+      .addCase(updateDemande.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
         state.actionLoading = false;
         const idx = state.demandes.findIndex((d) => d.id === action.payload.id);
         if (idx !== -1) state.demandes[idx] = action.payload;
       })
-      .addCase(updateDemandeThunk.rejected, (state, action) => {
+      .addCase(updateDemande.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       })
 
       // Soumettre Demande
-      .addCase(soumettreDemandeThunk.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
+      .addCase(soumettreDemande.fulfilled, (state, action: PayloadAction<DemandeResponse>) => {
         const idx = state.demandes.findIndex((d) => d.id === action.payload.id);
         if (idx !== -1) state.demandes[idx] = action.payload;
       })
 
       // Annuler Demande
-      .addCase(annulerDemandeThunk.fulfilled, (state, action) => {
+      .addCase(annulerDemande.fulfilled, (state, action) => {
         const idx = state.demandes.findIndex((d) => d.id === action.payload.id);
         if (idx !== -1) {
           state.demandes[idx] = action.payload;
@@ -333,80 +333,80 @@ const demandeSlice = createSlice({
 
       // Fetch History
       .addCase(
-        fetchDemandeHistoryThunk.fulfilled,
+        fetchDemandeHistory.fulfilled,
         (state, action: PayloadAction<HistoryRecord[]>) => {
           state.selectedHistory = action.payload;
         },
       )
 
       // ── Chef ────────────────────────────────────────────────
-      .addCase(fetchPendingChefVisasThunk.pending, (state) => {
+      .addCase(fetchPendingChefVisas.pending, (state) => {
         state.chefLoading = true;
         state.error = null;
       })
-      .addCase(fetchPendingChefVisasThunk.fulfilled, (state, action) => {
+      .addCase(fetchPendingChefVisas.fulfilled, (state, action) => {
         state.chefLoading = false;
         state.pendingChefVisas = action.payload;
       })
-      .addCase(fetchPendingChefVisasThunk.rejected, (state, action) => {
+      .addCase(fetchPendingChefVisas.rejected, (state, action) => {
         state.chefLoading = false;
         state.error = action.payload as string;
       })
-      .addCase(fetchTraiteesChefThunk.fulfilled, (state, action) => {
+      .addCase(fetchTraiteesChef.fulfilled, (state, action) => {
         state.traiteesChef = action.payload;
       })
-      .addCase(visaChefThunk.pending, (state) => {
+      .addCase(visaChef.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(visaChefThunk.fulfilled, (state, action) => {
+      .addCase(visaChef.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.pendingChefVisas = state.pendingChefVisas.filter((d) => d.id !== action.payload.id);
       })
-      .addCase(visaChefThunk.rejected, (state, action) => {
+      .addCase(visaChef.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       })
 
       // ── Signataire ───────────────────────────────────────────
-      .addCase(fetchPendingSignaturesThunk.pending, (state) => {
+      .addCase(fetchPendingSignatures.pending, (state) => {
         state.signataireLoading = true;
         state.error = null;
       })
-      .addCase(fetchPendingSignaturesThunk.fulfilled, (state, action) => {
+      .addCase(fetchPendingSignatures.fulfilled, (state, action) => {
         state.signataireLoading = false;
         state.pendingSignatures = action.payload;
       })
-      .addCase(fetchPendingSignaturesThunk.rejected, (state, action) => {
+      .addCase(fetchPendingSignatures.rejected, (state, action) => {
         state.signataireLoading = false;
         state.error = action.payload as string;
       })
-      .addCase(fetchTraiteesSignataireThunk.fulfilled, (state, action) => {
+      .addCase(fetchTraiteesSignataire.fulfilled, (state, action) => {
         state.traiteesSignataire = action.payload;
       })
-      .addCase(signataireApproveThunk.pending, (state) => {
+      .addCase(signataireApprove.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(signataireApproveThunk.fulfilled, (state, action) => {
+      .addCase(signataireApprove.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.pendingSignatures = state.pendingSignatures.filter(
           (d) => d.id !== action.payload.demandeId,
         );
       })
-      .addCase(signataireApproveThunk.rejected, (state, action) => {
+      .addCase(signataireApprove.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       })
-      .addCase(signataireRejectThunk.pending, (state) => {
+      .addCase(signataireReject.pending, (state) => {
         state.actionLoading = true;
         state.error = null;
       })
-      .addCase(signataireRejectThunk.fulfilled, (state, action) => {
+      .addCase(signataireReject.fulfilled, (state, action) => {
         state.actionLoading = false;
         state.pendingSignatures = state.pendingSignatures.filter((d) => d.id !== action.payload.id);
       })
-      .addCase(signataireRejectThunk.rejected, (state, action) => {
+      .addCase(signataireReject.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload as string;
       });

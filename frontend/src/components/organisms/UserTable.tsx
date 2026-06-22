@@ -20,8 +20,8 @@ import type { RootState } from "@/store";
 import type { AppDispatch } from "@/store";
 import {
   setPagination,
-  fetchUsersListThunk,
-  toggleUserStatusThunk,
+  fetchUsersList,
+  toggleUserStatus,
 } from "@/store/slices/userSlice";
 import type { UserResponse } from "@/types/user.types";
 
@@ -43,13 +43,13 @@ export const UserTable: React.FC<UserTableProps> = ({ onEditUser }) => {
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     dispatch(setPagination({ page: newPage, rowsPerPage }));
-    dispatch(fetchUsersListThunk());
+    dispatch(fetchUsersList());
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const updatedSize = parseInt(event.target.value, 10);
     dispatch(setPagination({ page: 0, rowsPerPage: updatedSize }));
-    dispatch(fetchUsersListThunk());
+    dispatch(fetchUsersList());
   };
 
   // ⚡ Filter the original Redux list locally using your search term
@@ -133,7 +133,7 @@ export const UserTable: React.FC<UserTableProps> = ({ onEditUser }) => {
                   <Switch
                     size="small"
                     checked={user.enabled}
-                    onChange={() => dispatch(toggleUserStatusThunk(user.id))}
+                    onChange={() => dispatch(toggleUserStatus(user.id))}
                     color="primary"
                   />
                 </TableCell>

@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete, EventNote } from "@mui/icons-material";
 import type { RootState, AppDispatch } from "@/store";
-import { deleteHolidayThunk } from "@/store/slices/jourFerieSlice";
+import { deleteHoliday } from "@/store/slices/jourFerieSlice";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 interface JourFerieTableProps {
@@ -48,7 +48,7 @@ export const JourFerieTable: React.FC<JourFerieTableProps> = ({ onEdit }) => {
 
   const handleConfirmDelete = () => {
     if (selectedHolidayId !== null) {
-      dispatch(deleteHolidayThunk(selectedHolidayId));
+      dispatch(deleteHoliday(selectedHolidayId));
     }
     handleCloseConfirm();
   };

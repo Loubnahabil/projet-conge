@@ -21,8 +21,8 @@ const initialState: JourFerieState = {
   error: null,
 };
 
-// 🌟 Async Thunks
-export const fetchHolidaysThunk = createAsyncThunk(
+// 🌟 Async s
+export const fetchHolidays = createAsyncThunk(
   "jourFerie/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
@@ -33,13 +33,13 @@ export const fetchHolidaysThunk = createAsyncThunk(
   },
 );
 
-export const createHolidayThunk = createAsyncThunk(
+export const createHoliday = createAsyncThunk(
   "jourFerie/create",
   async (payload: { date: string; libelle: string }, { dispatch, rejectWithValue }) => {
     try {
       const response = await jourFerieApi.create(payload.date, payload.libelle);
 
-      dispatch(fetchHolidaysThunk());
+      dispatch(fetchHolidays());
       return response;
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.createHoliday"));
@@ -47,13 +47,13 @@ export const createHolidayThunk = createAsyncThunk(
   },
 );
 
-export const updateHolidayThunk = createAsyncThunk(
+export const updateHoliday = createAsyncThunk(
   "jourFerie/update",
   async (payload: { id: number; date: string; libelle: string }, { dispatch, rejectWithValue }) => {
     try {
       const response = await jourFerieApi.update(payload.id, payload.date, payload.libelle);
 
-      dispatch(fetchHolidaysThunk());
+      dispatch(fetchHolidays());
       return response;
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.updateHoliday"));
@@ -61,12 +61,12 @@ export const updateHolidayThunk = createAsyncThunk(
   },
 );
 
-export const deleteHolidayThunk = createAsyncThunk(
+export const deleteHoliday = createAsyncThunk(
   "jourFerie/delete",
   async (id: number, { dispatch, rejectWithValue }) => {
     try {
       await jourFerieApi.delete(id);
-      dispatch(fetchHolidaysThunk());
+      dispatch(fetchHolidays());
       return id;
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, "errors.deleteHoliday"));
@@ -86,14 +86,14 @@ const jourFerieSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch
-      .addCase(fetchHolidaysThunk.pending, (state) => {
+      .addCase(fetchHolidays.pending, (state) => {
         state.error = null;
       })
-      .addCase(fetchHolidaysThunk.fulfilled, (state, action) => {
+      .addCase(fetchHolidays.fulfilled, (state, action) => {
         state.globalLoading = false;
         state.list = action.payload || [];
       })
-      .addCase(fetchHolidaysThunk.rejected, (state, action) => {
+      .addCase(fetchHolidays.rejected, (state, action) => {
         state.globalLoading = false;
         state.error = action.payload as string;
       })

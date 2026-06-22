@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
 import { PerformanceOverview } from "@/components/organisms/PerformanceOverview";
 import { AnalyticsCharts } from "@/components/organisms/AnalyticsCharts";
-import { fetchDashboardStatsThunk } from "@/store/slices/statsSlice";
+import { fetchDashboardStats } from "@/store/slices/statsSlice";
 import type { RootState, AppDispatch } from "@/store";
 import { useTranslation } from "react-i18next";
 
@@ -13,7 +13,7 @@ export const AdminDashboardPage = () => {
   const { error } = useSelector((state: RootState) => state.stats);
 
   useEffect(() => {
-    dispatch(fetchDashboardStatsThunk());
+    dispatch(fetchDashboardStats());
   }, [dispatch]);
 
   const currentYear = new Date().getFullYear();

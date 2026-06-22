@@ -10,10 +10,10 @@ import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer"
 import { demandeApi } from "@/api/demandeApi";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
-  fetchPendingSignaturesThunk,
-  fetchTraiteesSignataireThunk,
-  signataireApproveThunk,
-  signataireRejectThunk,
+  fetchPendingSignatures,
+  fetchTraiteesSignataire,
+  signataireApprove,
+  signataireReject,
 } from "@/store/slices/demandeSlice";
 import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse } from "@/types/Demande.types";
@@ -39,7 +39,7 @@ export const SignatairePage = () => {
 
   useEffect(() => {
     let mounted = true;
-    dispatch(fetchPendingSignaturesThunk());
+    dispatch(fetchPendingSignatures());
     statsApi
       .getSignataireDashboard()
       .then((data) => { if (mounted) setDashboardStats(data); })
@@ -51,7 +51,7 @@ export const SignatairePage = () => {
     setTab(newValue);
     if (newValue === 1 && !traiteesFetched) {
       setLoadingTraitees(true);
-      dispatch(fetchTraiteesSignataireThunk()).finally(() => {
+      dispatch(fetchTraiteesSignataire()).finally(() => {
         setLoadingTraitees(false);
         setTraiteesFetched(true);
       });
@@ -61,7 +61,7 @@ export const SignatairePage = () => {
   const handleUpload = async (file: File) => {
     if (!uploadTargetId) return;
     try {
-      await dispatch(signataireApproveThunk({ id: uploadTargetId, file })).unwrap();
+      await dispatch(signataireApprove({ id: uploadTargetId, file })).unwrap();
       setUploadTargetId(null);
       setTraiteesFetched(false);
     } catch {
@@ -72,7 +72,7 @@ export const SignatairePage = () => {
   const handleReject = async (commentaire: string) => {
     if (!rejectDialog.targetId) return;
     try {
-      await dispatch(signataireRejectThunk({ id: rejectDialog.targetId, commentaire })).unwrap();
+      await dispatch(signataireReject({ id: rejectDialog.targetId, commentaire })).unwrap();
       setTraiteesFetched(false);
       setRejectDialog({ open: false, targetId: null });
     } catch {

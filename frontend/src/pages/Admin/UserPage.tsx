@@ -10,8 +10,8 @@ import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
 import { useExportUsers } from "@/utils/useExportUsers";
 import type { RootState, AppDispatch } from "@/store";
-import { fetchUsersListThunk, setSearchQuery, saveUserThunk, fetchRolesThunk } from "@/store/slices/userSlice";
-import { fetchDirectionsThunk } from "@/store/slices/structureSlice";
+import { fetchUsersList, setSearchQuery, saveUser, fetchRoles } from "@/store/slices/userSlice";
+import { fetchDirections } from "@/store/slices/structureSlice";
 import type { UserResponse, UserRequest } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 
@@ -33,9 +33,9 @@ export const UserPage = () => {
   const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
 
   useEffect(() => {
-    dispatch(fetchUsersListThunk());
-    dispatch(fetchDirectionsThunk());
-    dispatch(fetchRolesThunk());
+    dispatch(fetchUsersList());
+    dispatch(fetchDirections());
+    dispatch(fetchRoles());
   }, [dispatch]);
 
   const handleSearch = (value: string) => {
@@ -60,8 +60,8 @@ export const UserPage = () => {
   };
 
   const handleSave = async (data: UserRequest) => {
-    const result = await dispatch(saveUserThunk({ payload: data, id: editingUser?.id }));
-    if (saveUserThunk.fulfilled.match(result)) {
+    const result = await dispatch(saveUser({ payload: data, id: editingUser?.id }));
+    if (saveUser.fulfilled.match(result)) {
       handleClosePopup();
     }
   };

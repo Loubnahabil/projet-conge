@@ -18,8 +18,8 @@ import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
 import {
-  fetchDivisionsByDirectionThunk,
-  fetchServicesByDivisionThunk,
+  fetchDivisionsByDirection,
+  fetchServicesByDivision,
 } from "@/store/slices/structureSlice";
 import { clearError } from "@/store/slices/userSlice";
 import { userValidationSchema } from "@/validations/userSchema";
@@ -118,7 +118,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
   useEffect(() => {
     if (!watchedDirectionId) return;
-    dispatch(fetchDivisionsByDirectionThunk(watchedDirectionId));
+    dispatch(fetchDivisionsByDirection(watchedDirectionId));
   }, [watchedDirectionId, dispatch]);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
   useEffect(() => {
     if (!watchedDivisionId) return;
-    dispatch(fetchServicesByDivisionThunk(watchedDivisionId));
+    dispatch(fetchServicesByDivision(watchedDivisionId));
   }, [watchedDivisionId, dispatch]);
 
   useEffect(() => {
