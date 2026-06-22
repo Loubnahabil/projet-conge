@@ -4,6 +4,7 @@ import com.example.backend.dto.request.JourFerieRequestDTO;
 import com.example.backend.dto.response.JourFerieResponseDTO;
 import com.example.backend.entity.JourFerie;
 import com.example.backend.exception.DuplicateResourceException;
+import com.example.backend.exception.ErrorCode;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.JourFerieMapper;
 import com.example.backend.repository.JourFerieRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +72,7 @@ public class JourFerieService {
     public JourFerieResponseDTO getById(Long id) {
         JourFerie jourFerie = jourFerieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Jour férié non trouvé avec l'id: " + id));
+                        "Jour férié non trouvé avec l'id: " + id, ErrorCode.RESOURCE_NOT_FOUND));
         return jourFerieMapper.toDTO(jourFerie);
     }
 
@@ -81,7 +83,7 @@ public class JourFerieService {
         // check date not already exists
         if (jourFerieRepository.existsByDate(request.getDate())) {
             throw new DuplicateResourceException(
-                    "Un jour férié existe déjà pour cette date: " + request.getDate());
+                    "Un jour férié existe déjà pour cette date: " + request.getDate(), ErrorCode.HOLIDAY_ALREADY_EXISTS, Map.of("date", request.getDate().toString()));
         }
 
         JourFerie jourFerie = jourFerieMapper.toEntity(request);
@@ -94,13 +96,13 @@ public class JourFerieService {
 
         JourFerie jourFerie = jourFerieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Jour férié non trouvé avec l'id: " + id));
+                        "Jour férié non trouvé avec l'id: " + id, ErrorCode.RESOURCE_NOT_FOUND, Map.of("id", id)));
 
         // check new date not already used by another record
         if (!jourFerie.getDate().equals(request.getDate()) &&
                 jourFerieRepository.existsByDate(request.getDate())) {
             throw new DuplicateResourceException(
-                    "Un jour férié existe déjà pour cette date: " + request.getDate());
+                    "Un jour férié existe déjà pour cette date: " + request.getDate(), ErrorCode.HOLIDAY_ALREADY_EXISTS, Map.of("date", request.getDate().toString()));
         }
 
         jourFerie.setDate(request.getDate());
@@ -114,7 +116,7 @@ public class JourFerieService {
     public void delete(Long id) {
         if (!jourFerieRepository.existsById(id)) {
             throw new ResourceNotFoundException(
-                    "Jour férié non trouvé avec l'id: " + id);
+                    "Jour férié non trouvé avec l'id: " + id, ErrorCode.RESOURCE_NOT_FOUND);
         }
         jourFerieRepository.deleteById(id);
     }

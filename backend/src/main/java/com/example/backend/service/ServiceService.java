@@ -5,6 +5,7 @@ import com.example.backend.dto.response.ServiceResponseDTO;
 import com.example.backend.entity.Division;
 import com.example.backend.entity.ServiceEntity;
 import com.example.backend.exception.DuplicateResourceException;
+import com.example.backend.exception.ErrorCode;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.ServiceMapper;
 import com.example.backend.repository.DivisionRepository;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +35,10 @@ public class ServiceService {
     @Transactional
     public ServiceResponseDTO create(ServiceRequestDTO request) {
         Division parentDivision = divisionRepository.findById(request.getDivisionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Division parente introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Division parente introuvable", ErrorCode.RESOURCE_NOT_FOUND));
 
         if (serviceRepository.existsByCode(request.getCode())) {
-            throw new DuplicateResourceException("Code service déjà existant: " + request.getCode());
+            throw new DuplicateResourceException("Code service déjà existant: " + request.getCode(), ErrorCode.CODE_ALREADY_EXISTS, Map.of("value", request.getCode()));
         }
 
         ServiceEntity serviceEntity = serviceMapper.toEntity(request);
@@ -47,9 +49,9 @@ public class ServiceService {
     @Transactional
     public ServiceResponseDTO update(Long id, ServiceRequestDTO request) {
         ServiceEntity s = serviceRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Service non trouvé"));
+                .orElseThrow(() -> new ResourceNotFoundException("Service non trouvé", ErrorCode.RESOURCE_NOT_FOUND));
         Division parentDivision = divisionRepository.findById(request.getDivisionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Division parente introuvable"));
+                .orElseThrow(() -> new ResourceNotFoundException("Division parente introuvable", ErrorCode.RESOURCE_NOT_FOUND));
 
         s.setNom(request.getNom());
         s.setCode(request.getCode());
@@ -60,7 +62,7 @@ public class ServiceService {
     @Transactional
     public void delete(Long id) {
         if (!serviceRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Service non trouvé");
+            throw new ResourceNotFoundException("Service non trouvé", ErrorCode.RESOURCE_NOT_FOUND);
         }
         serviceRepository.deleteById(id);
     }

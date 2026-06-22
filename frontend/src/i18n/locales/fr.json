@@ -424,5 +424,169 @@
     "bonjour": "Bonjour,",
     "monProfil": "Mon profil",
     "deconnexion": "Déconnexion"
+  },
+  "error": {
+    "auth": {
+      "invalid": {
+        "credentials": "Email ou mot de passe incorrect"
+      },
+      "account": {
+        "disabled": "Ce compte est désactivé. Veuillez contacter votre administrateur.",
+        "locked": "Compte temporairement verrouillé. Veuillez réessayer plus tard."
+      },
+      "refresh": {
+        "token": {
+          "invalid": "Refresh token invalide",
+          "expired": "Refresh token expiré"
+        }
+      }
+    },
+    "user": {
+      "email": {
+        "already": {
+          "used": "Email déjà utilisé: {{value}}"
+        }
+      },
+      "ppr": {
+        "already": {
+          "used": "PPR déjà utilisé: {{value}}"
+        }
+      },
+      "wrong": {
+        "current": {
+          "password": "Mot de passe actuel incorrect"
+        }
+      },
+      "chef": {
+        "already": {
+          "assigned": "Ce service a déjà un chef hiérarchique assigné"
+        }
+      },
+      "signataire": {
+        "already": {
+          "assigned": "Cette direction a déjà un signataire assigné"
+        }
+      },
+      "service": {
+        "no": {
+          "direction": "Ce service n'est pas rattaché à une direction"
+        }
+      },
+      "not": {
+        "found": "Utilisateur introuvable"
+      }
+    },
+    "demande": {
+      "insufficient": {
+        "balance": "Solde de congé insuffisant ! Jours restants disponibles: {{solde}}"
+      },
+      "overlapping": "Vous avez déjà un congé planifié ou en cours de validation sur cette période",
+      "no": {
+        "working": {
+          "days": "La période sélectionnée ne contient aucun jour ouvrable"
+        }
+      },
+      "interim": {
+        "not": {
+          "same": {
+            "service": "L'intérimaire doit appartenir au même service"
+          }
+        },
+        "on": {
+          "leave": "L'intérimaire sélectionné est lui-même en congé sur cette période"
+        }
+      },
+      "start": {
+        "after": {
+          "end": "La date de début ne peut pas être postérieure à la date de fin"
+        }
+      },
+      "not": {
+        "draft": "Seules les demandes en brouillon peuvent être soumises"
+      },
+      "maladie": {
+        "doc": {
+          "required": "Un justificatif médical est obligatoire avant de soumettre un congé maladie"
+        }
+      },
+      "already": {
+        "processed": "La demande a déjà été traitée et ne peut plus être modifiée"
+      },
+      "comment": {
+        "required": {
+          "reject": "Un commentaire est obligatoire en cas de rejet"
+        }
+      },
+      "not": {
+        "authorized": "Action non autorisée"
+      },
+      "cannot": {
+        "modify": {
+          "processed": "Modification impossible: la demande a déjà été traitée"
+        },
+        "cancel": {
+          "processed": "Impossible d'annuler une demande déjà traitée"
+        }
+      },
+      "can": {
+        "only": {
+          "cancel": {
+            "own": "Vous ne pouvez annuler que vos propres demandes"
+          }
+        }
+      },
+      "action": {
+        "refused": "Action refusée"
+      },
+      "file": {
+        "empty": "Le fichier est vide",
+        "too": {
+          "large": "Le fichier dépasse la taille maximale autorisée (5 Mo)"
+        },
+        "format": {
+          "not": {
+            "allowed": "Format de fichier non autorisé. Formats acceptés: PDF, JPG, PNG"
+          }
+        }
+      },
+      "quota": {
+        "not": {
+          "found": "Profil quota introuvable pour cette année administrative"
+        },
+        "insufficient": "Le solde du fonctionnaire est devenu insuffisant entre-temps"
+      },
+      "anciennete": {
+        "insuffisante": "Un fonctionnaire ne peut pas demander de congé avant un an d'ancienneté"
+      }
+    },
+    "structure": {
+      "code": {
+        "already": {
+          "exists": "Code déjà existant: {{value}}"
+        }
+      }
+    },
+    "holiday": {
+      "already": {
+        "exists": "Un jour férié existe déjà pour cette date"
+      }
+    },
+    "resource": {
+      "not": {
+        "found": "Ressource introuvable"
+      }
+    },
+    "file": {
+      "storage": {
+        "failed": "Échec du stockage du fichier sur le disque serveur"
+      },
+      "not": {
+        "found": "Fichier introuvable ou illisible"
+      }
+    },
+    "business": {
+      "generic": "Une erreur est survenue"
+    },
+    "internal": "Une erreur inattendue s'est produite"
   }
 }

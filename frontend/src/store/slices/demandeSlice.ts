@@ -2,8 +2,9 @@ import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import { AxiosError } from "axios";
+import { extractError } from "@/utils/errorUtils";
 import { demandeApi } from "@/api/demandeApi";
+import { DOCUMENT_TYPE } from "@/constants/constants";
 import type { DemandeResponse, DemandeRequest, HistoryRecord } from "@/types/Demande.types";
 import type { UserResponse } from "@/types/user.types";
 
@@ -53,10 +54,7 @@ export const fetchMyDemandesThunk = createAsyncThunk(
     try {
       return await demandeApi.getMyDemandes(page, size);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadDemandes");
+      const message = extractError(err, "errors.loadDemandes");
       return rejectWithValue(message);
     }
   },
@@ -68,10 +66,7 @@ export const fetchEligibleInterimsThunk = createAsyncThunk(
     try {
       return await demandeApi.getSameServiceColleagues();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.signatureError");
+      const message = extractError(err, "errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -86,10 +81,7 @@ export const createDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.create(payload, submit);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.createDemande");
+      const message = extractError(err, "errors.createDemande");
       return rejectWithValue(message);
     }
   },
@@ -101,10 +93,7 @@ export const updateDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.update(id, payload);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.updateDemande");
+      const message = extractError(err, "errors.updateDemande");
       return rejectWithValue(message);
     }
   },
@@ -116,10 +105,7 @@ export const soumettreDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.soumettre(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.submitDemande");
+      const message = extractError(err, "errors.submitDemande");
       return rejectWithValue(message);
     }
   },
@@ -131,10 +117,7 @@ export const annulerDemandeThunk = createAsyncThunk(
     try {
       return await demandeApi.annulerDemande(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.cancelDemande");
+      const message = extractError(err, "errors.cancelDemande");
       return rejectWithValue(message);
     }
   },
@@ -146,10 +129,7 @@ export const fetchDemandeHistoryThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandeHistory(id);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadHistorique");
+      const message = extractError(err, "errors.loadHistorique");
       return rejectWithValue(message);
     }
   },
@@ -163,10 +143,7 @@ export const fetchPendingChefVisasThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesAViser();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadData");
+      const message = extractError(err, "errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -178,10 +155,7 @@ export const fetchTraiteesChefThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesTraiteesChef();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadData");
+      const message = extractError(err, "errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -196,10 +170,7 @@ export const visaChefThunk = createAsyncThunk(
     try {
       return await demandeApi.visaChef(id, approve, { commentaire });
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.visaError");
+      const message = extractError(err, "errors.visaError");
       return rejectWithValue(message);
     }
   },
@@ -213,10 +184,7 @@ export const fetchPendingSignaturesThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesASigner();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadData");
+      const message = extractError(err, "errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -228,10 +196,7 @@ export const fetchTraiteesSignataireThunk = createAsyncThunk(
     try {
       return await demandeApi.getDemandesTraiteesSignataire();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadData");
+      const message = extractError(err, "errors.loadData");
       return rejectWithValue(message);
     }
   },
@@ -241,12 +206,9 @@ export const signataireApproveThunk = createAsyncThunk(
   "demande/signataireApprove",
   async ({ id, file }: { id: number; file: File }, { rejectWithValue }) => {
     try {
-      return await demandeApi.uploadDocument(id, file, "DECISION_SIGNEE");
+      return await demandeApi.uploadDocument(id, file, DOCUMENT_TYPE.DECISION_SIGNEE);
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.signatureError");
+      const message = extractError(err, "errors.signatureError");
       return rejectWithValue(message);
     }
   },
@@ -258,10 +220,7 @@ export const signataireRejectThunk = createAsyncThunk(
     try {
       return await demandeApi.rejetSignataire(id, { commentaire });
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.rejetError");
+      const message = extractError(err, "errors.rejetError");
       return rejectWithValue(message);
     }
   },

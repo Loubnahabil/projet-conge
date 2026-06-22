@@ -42,3 +42,8 @@ export const ROLE_TKEY: Record<string, string> = {
 };
 
 export const ALL_STATUTS = Object.keys(STATUS_COLOR);
+
+export const DOCUMENT_TYPE = {
+  CERTIFICAT_MEDICAL: "CERTIFICAT_MEDICAL",
+  DECISION_SIGNEE: "DECISION_SIGNEE",
+} as const;

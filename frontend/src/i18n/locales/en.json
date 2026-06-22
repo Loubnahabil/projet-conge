@@ -424,5 +424,169 @@
     "bonjour": "Hello,",
     "monProfil": "My Profile",
     "deconnexion": "Logout"
+  },
+  "error": {
+    "auth": {
+      "invalid": {
+        "credentials": "Invalid email or password"
+      },
+      "account": {
+        "disabled": "This account is disabled. Please contact your administrator.",
+        "locked": "Account temporarily locked. Please try again later."
+      },
+      "refresh": {
+        "token": {
+          "invalid": "Invalid refresh token",
+          "expired": "Refresh token expired"
+        }
+      }
+    },
+    "user": {
+      "email": {
+        "already": {
+          "used": "Email already in use: {{value}}"
+        }
+      },
+      "ppr": {
+        "already": {
+          "used": "PPR already in use: {{value}}"
+        }
+      },
+      "wrong": {
+        "current": {
+          "password": "Current password is incorrect"
+        }
+      },
+      "chef": {
+        "already": {
+          "assigned": "This department already has a head assigned"
+        }
+      },
+      "signataire": {
+        "already": {
+          "assigned": "This directorate already has a signatory assigned"
+        }
+      },
+      "service": {
+        "no": {
+          "direction": "This department is not attached to any directorate"
+        }
+      },
+      "not": {
+        "found": "User not found"
+      }
+    },
+    "demande": {
+      "insufficient": {
+        "balance": "Insufficient leave balance! Remaining days: {{solde}}"
+      },
+      "overlapping": "You already have a planned or pending leave request for this period",
+      "no": {
+        "working": {
+          "days": "The selected period contains no working days"
+        }
+      },
+      "interim": {
+        "not": {
+          "same": {
+            "service": "The interim must belong to the same department"
+          }
+        },
+        "on": {
+          "leave": "The selected interim is on leave during this period"
+        }
+      },
+      "start": {
+        "after": {
+          "end": "Start date cannot be after end date"
+        }
+      },
+      "not": {
+        "draft": "Only draft requests can be submitted"
+      },
+      "maladie": {
+        "doc": {
+          "required": "A medical certificate is required before submitting sick leave"
+        }
+      },
+      "already": {
+        "processed": "This request has already been processed and cannot be modified"
+      },
+      "comment": {
+        "required": {
+          "reject": "A comment is required when rejecting"
+        }
+      },
+      "not": {
+        "authorized": "Unauthorized action"
+      },
+      "cannot": {
+        "modify": {
+          "processed": "Cannot modify: request has already been processed"
+        },
+        "cancel": {
+          "processed": "Cannot cancel a request that has already been processed"
+        }
+      },
+      "can": {
+        "only": {
+          "cancel": {
+            "own": "You can only cancel your own requests"
+          }
+        }
+      },
+      "action": {
+        "refused": "Action refused"
+      },
+      "file": {
+        "empty": "File is empty",
+        "too": {
+          "large": "File exceeds the maximum allowed size (5 MB)"
+        },
+        "format": {
+          "not": {
+            "allowed": "File format not allowed. Accepted formats: PDF, JPG, PNG"
+          }
+        }
+      },
+      "quota": {
+        "not": {
+          "found": "Quota profile not found for this administrative year"
+        },
+        "insufficient": "The employee's balance has become insufficient in the meantime"
+      },
+      "anciennete": {
+        "insuffisante": "An employee cannot request leave before one year of service"
+      }
+    },
+    "structure": {
+      "code": {
+        "already": {
+          "exists": "Code already exists: {{value}}"
+        }
+      }
+    },
+    "holiday": {
+      "already": {
+        "exists": "A holiday already exists for this date"
+      }
+    },
+    "resource": {
+      "not": {
+        "found": "Resource not found"
+      }
+    },
+    "file": {
+      "storage": {
+        "failed": "Failed to store file on server disk"
+      },
+      "not": {
+        "found": "File not found or unreadable"
+      }
+    },
+    "business": {
+      "generic": "An error occurred"
+    },
+    "internal": "An unexpected error occurred"
   }
 }

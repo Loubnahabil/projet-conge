@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.exception.BusinessException;
+import com.example.backend.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +28,7 @@ public class DocumentStorageService {
 
     public String storeFile(MultipartFile file) {
         if (file.isEmpty()) {
-            throw new BusinessException("Impossible de stocker un fichier vide.");
+            throw new BusinessException("Impossible de stocker un fichier vide.", ErrorCode.FILE_EMPTY);
         }
 
         try {
@@ -48,7 +49,7 @@ public class DocumentStorageService {
             return "/uploads/" + cleanedFilename;
 
         } catch (IOException e) {
-            throw new BusinessException("Échec du stockage du fichier sur le disque serveur.");
+            throw new BusinessException("Échec du stockage du fichier sur le disque serveur.", ErrorCode.FILE_STORAGE_FAILED);
         }
     }
     public byte[] loadFile(String urlFichier) {
@@ -58,7 +59,7 @@ public class DocumentStorageService {
             Path filePath = rootLocation.resolve(filename).normalize();
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
-            throw new BusinessException("Fichier introuvable ou illisible.");
+            throw new BusinessException("Fichier introuvable ou illisible.", ErrorCode.FILE_NOT_FOUND);
         }
     }
 }
