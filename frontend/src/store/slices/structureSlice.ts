@@ -1,8 +1,8 @@
 import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
 import { structureApi } from "@/api/structureApi";
+import { extractError } from "@/utils/errorUtils";
 import type {
   DirectionResponse,
   DivisionResponse,
@@ -114,11 +114,7 @@ export const saveStructureNodeThunk = createAsyncThunk(
       }
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.saveStructure");
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.saveStructure"));
     }
   },
 );
@@ -135,11 +131,7 @@ export const deleteStructureNodeThunk = createAsyncThunk(
       if (payload.type === "service") await structureApi.deleteService(payload.id);
       dispatch(fetchStructureDependenciesThunk());
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.deleteStructure");
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.deleteStructure"));
     }
   },
 );

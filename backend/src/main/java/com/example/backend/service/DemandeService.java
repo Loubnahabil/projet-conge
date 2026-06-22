@@ -6,6 +6,7 @@ import com.example.backend.dto.response.DemandeResponseDTO;
 import com.example.backend.dto.response.PieceJustificativeResponseDTO;
 import com.example.backend.entity.*;
 import com.example.backend.exception.BusinessException;
+import com.example.backend.exception.ErrorCode;
 import com.example.backend.exception.ResourceNotFoundException;
 import com.example.backend.mapper.DemandeMapper;
 import com.example.backend.repository.*;
@@ -21,6 +22,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,7 +63,7 @@ public class DemandeService {
 
         ServiceEntity chefService = chef.getService();
         if (chefService == null) {
-            throw new BusinessException("Action refusée: Le validateur n'a pas d'affectation administrative valide.");
+            throw new BusinessException("Action refusée: Le validateur n'a pas d'affectation administrative valide.", ErrorCode.ACTION_REFUSED);
         }
 
         List<Demande> pendingDemandes;
@@ -90,37 +92,37 @@ public class DemandeService {
 
         // 1. Seniority Constraint
         if (applicant.getDateDebutFonction() == null || applicant.getDateDebutFonction().plusYears(1).isAfter(LocalDate.now())) {
-            throw new BusinessException("Un fonctionnaire ne peut pas demander de congé avant un an d'ancienneté.");
+            throw new BusinessException("Un fonctionnaire ne peut pas demander de congé avant un an d'ancienneté.", ErrorCode.ANCIENNETE_INSUFFISANTE);
         }
 
         // 2. Same service check
         if (applicant.getService() == null || interim.getService() == null ||
                 !applicant.getService().getId().equals(interim.getService().getId())) {
-            throw new BusinessException("L'intérimaire doit obligatoirement appartenir au même service administratif.");
+            throw new BusinessException("L'intérimaire doit obligatoirement appartenir au même service administratif.", ErrorCode.INTERIM_NOT_SAME_SERVICE);
         }
 
         // 3. Interim availability
         boolean interimIsAway = demandeRepository.isInterimOnLeave(request.getInterimId(), request.getDateDebut(), request.getDateFin());
         if (interimIsAway) {
-            throw new BusinessException("L'intérimaire sélectionné est lui-même en congé ou a une demande validée sur cette période.");
+            throw new BusinessException("L'intérimaire sélectionné est lui-même en congé ou a une demande validée sur cette période.", ErrorCode.INTERIM_ON_LEAVE);
         }
 
         // 4. Date order
         if (request.getDateDebut().isAfter(request.getDateFin())) {
-            throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.");
+            throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.", ErrorCode.START_AFTER_END);
         }
 
         // 5. Overlapping periods
         boolean overlapExists = demandeRepository.hasOverlappingLeave(
                 currentUserId, request.getDateDebut(), request.getDateFin());
         if (overlapExists) {
-            throw new BusinessException("Vous avez déjà un congé planifié ou en cours de validation sur cette période.");
+            throw new BusinessException("Vous avez déjà un congé planifié ou en cours de validation sur cette période.", ErrorCode.OVERLAPPING_LEAVE);
         }
 
         // 6. Calculate business days
         int businessDaysDuration = calculateBusinessDays(request.getDateDebut(), request.getDateFin());
         if (businessDaysDuration <= 0) {
-            throw new BusinessException("La période sélectionnée ne contient aucun jour ouvrable.");
+            throw new BusinessException("La période sélectionnée ne contient aucun jour ouvrable.", ErrorCode.NO_WORKING_DAYS);
         }
 
         // 7. Status mapping
@@ -134,9 +136,9 @@ public class DemandeService {
         // 8. Quota check
         if (request.getTypeConge() == TypeConge.ANNUEL) {
             Quota quota = quotaRepository.findByUserIdAndAnnee(currentUserId, targetYear)
-                    .orElseThrow(() -> new BusinessException("Aucun quota annuel configuré pour l'année administrative " + targetYear));
+                    .orElseThrow(() -> new BusinessException("Aucun quota annuel configuré pour l'année administrative " + targetYear, ErrorCode.QUOTA_NOT_FOUND, Map.of("year", targetYear)));
             if (quota.getJoursRestants() < businessDaysDuration) {
-                throw new BusinessException("Solde de congé insuffisant ! Jours restants disponibles: " + quota.getJoursRestants());
+                throw new BusinessException("Solde de congé insuffisant ! Jours restants disponibles: " + quota.getJoursRestants(), ErrorCode.INSUFFICIENT_BALANCE, Map.of("solde", quota.getJoursRestants()));
             }
         }
 
@@ -185,11 +187,11 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (demande.getStatut() != StatutDemande.SOUMISE) {
-            throw new BusinessException("La demande n'est pas dans un état permettant la validation du chef.");
+            throw new BusinessException("La demande n'est pas dans un état permettant la validation du chef.", ErrorCode.ALREADY_PROCESSED);
         }
 
         if (!approve && (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank())) {
-            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la demande.");
+            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la demande.", ErrorCode.COMMENT_REQUIRED_REJECT);
         }
 
         User chef = userRepository.findById(chefId)
@@ -244,7 +246,7 @@ public class DemandeService {
 
         if ("DECISION_SIGNEE".equalsIgnoreCase(typeDocument)) {
             if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
-                throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.");
+                throw new BusinessException("La demande doit être visée par le chef avant de joindre la décision signée.", ErrorCode.ALREADY_PROCESSED);
             }
 
             verifySignatoryDirection(demande.getUser(), currentUser);
@@ -252,14 +254,14 @@ public class DemandeService {
         }
 
         if (file.isEmpty()) {
-            throw new BusinessException("Le fichier est vide.");
+            throw new BusinessException("Le fichier est vide.", ErrorCode.FILE_EMPTY);
         }
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new BusinessException("Le fichier dépasse la taille maximale autorisée (5 Mo).");
+            throw new BusinessException("Le fichier dépasse la taille maximale autorisée (5 Mo).", ErrorCode.FILE_TOO_LARGE);
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
-            throw new BusinessException("Format de fichier non autorisé. Formats acceptés : PDF, JPG, PNG.");
+            throw new BusinessException("Format de fichier non autorisé. Formats acceptés : PDF, JPG, PNG.", ErrorCode.FILE_FORMAT_NOT_ALLOWED);
         }
 
         String fileUrl = documentStorageService.storeFile(file);
@@ -282,10 +284,10 @@ public class DemandeService {
             if (demande.getTypeConge() == TypeConge.ANNUEL) {
                 int targetYear = demande.getAnnee();
                 Quota quota = quotaRepository.findByUserIdAndAnnee(demande.getUser().getId(), targetYear)
-                        .orElseThrow(() -> new BusinessException("Profil quota introuvable pour cette année administrative."));
+                        .orElseThrow(() -> new BusinessException("Profil quota introuvable pour cette année administrative.", ErrorCode.QUOTA_NOT_FOUND));
 
                 if (quota.getJoursRestants() < demande.getDuree()) {
-                    throw new BusinessException("Le solde du fonctionnaire est devenu insuffisant entre-temps.");
+                    throw new BusinessException("Le solde du fonctionnaire est devenu insuffisant entre-temps.", ErrorCode.QUOTA_INSUFFICIENT);
                 }
 
                 quota.setJoursUtilises(quota.getJoursUtilises() + demande.getDuree());
@@ -325,11 +327,11 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
-            throw new BusinessException("Seules les demandes visées par le chef peuvent être traitées par le signataire.");
+            throw new BusinessException("Seules les demandes visées par le chef peuvent être traitées par le signataire.", ErrorCode.ALREADY_PROCESSED);
         }
 
         if (request == null || request.getCommentaire() == null || request.getCommentaire().isBlank()) {
-            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la direction.");
+            throw new BusinessException("Un commentaire est obligatoire en cas de rejet de la direction.", ErrorCode.COMMENT_REQUIRED_REJECT);
         }
 
         User signataire = userRepository.findById(signataireId)
@@ -362,31 +364,31 @@ public class DemandeService {
         ServiceEntity revService = reviewer.getService();
 
         if (empService == null || revService == null) {
-            throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.");
+            throw new BusinessException("Action refusée: L'employé ou le validateur n'a pas d'affectation de service valide.", ErrorCode.ACTION_REFUSED);
         }
 
         if (checkUserHasRole(reviewer, "CHEF_HIERARCHIE") && empService.getId().equals(revService.getId())) {
             return;
         }
 
-        throw new BusinessException("Action refusée: Vous ne faites pas partie de la ligne hiérarchique de ce fonctionnaire au sein du service.");
+        throw new BusinessException("Action refusée: Vous ne faites pas partie de la ligne hiérarchique de ce fonctionnaire au sein du service.", ErrorCode.ACTION_REFUSED);
     }
 
     private void verifySignatoryDirection(User employee, User signatory) {
         if (!checkUserHasRole(signatory, "SIGNATAIRE")) {
-            throw new BusinessException("Action annulée: L'utilisateur exécutant cette action ne possède pas le rôle de signataire.");
+            throw new BusinessException("Action annulée: L'utilisateur exécutant cette action ne possède pas le rôle de signataire.", ErrorCode.ACTION_REFUSED);
         }
 
         Direction empDirection = getUserDirectionBranch(employee);
         Direction sigDirection = getUserDirectionBranch(signatory);
 
         if (empDirection == null || sigDirection == null) {
-            throw new BusinessException("Action refusée: Structure de Direction introuvable pour le fonctionnaire ou le signataire.");
+            throw new BusinessException("Action refusée: Structure de Direction introuvable pour le fonctionnaire ou le signataire.", ErrorCode.ACTION_REFUSED);
         }
 
         if (!empDirection.getId().equals(sigDirection.getId())) {
             throw new BusinessException("Action refusée: Le signataire doit impérativement appartenir à la même Direction administrative ("
-                    + empDirection.getNom() + ") que le fonctionnaire.");
+                    + empDirection.getNom() + ") que le fonctionnaire.", ErrorCode.ACTION_REFUSED);
         }
     }
 
@@ -465,11 +467,11 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (!demande.getUser().getId().equals(userId)) {
-            throw new BusinessException("Action refusée: Vous ne pouvez annuler que vos propres demandes.");
+            throw new BusinessException("Action refusée: Vous ne pouvez annuler que vos propres demandes.", ErrorCode.CAN_ONLY_CANCEL_OWN);
         }
 
         if (demande.getStatut() != StatutDemande.BROUILLON && demande.getStatut() != StatutDemande.SOUMISE) {
-            throw new BusinessException("Impossible d'annuler une demande déjà traitée ou validée.");
+            throw new BusinessException("Impossible d'annuler une demande déjà traitée ou validée.", ErrorCode.CANNOT_CANCEL_PROCESSED);
         }
 
         User user = userRepository.findById(userId)
@@ -496,7 +498,7 @@ public class DemandeService {
 
         Direction sigDirection = getUserDirectionBranch(signataire);
         if (sigDirection == null) {
-            throw new BusinessException("Action refusée: Le signataire n'a pas d'affectation de Direction valide.");
+            throw new BusinessException("Action refusée: Le signataire n'a pas d'affectation de Direction valide.", ErrorCode.ACTION_REFUSED);
         }
 
         List<Demande> validatedDemandes = demandeRepository
@@ -523,27 +525,27 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (!demande.getUser().getId().equals(userId)) {
-            throw new BusinessException("Action refusée: Vous ne pouvez modifier que vos propres demandes.");
+            throw new BusinessException("Action refusée: Vous ne pouvez modifier que vos propres demandes.", ErrorCode.CAN_ONLY_CANCEL_OWN);
         }
 
         if (demande.getStatut() != StatutDemande.BROUILLON && demande.getStatut() != StatutDemande.SOUMISE) {
-            throw new BusinessException("Modification impossible: la demande a déjà été traitée par le chef hiérarchique.");
+            throw new BusinessException("Modification impossible: la demande a déjà été traitée par le chef hiérarchique.", ErrorCode.CANNOT_MODIFY_PROCESSED);
         }
 
         User interim = userRepository.findById(request.getInterimId())
                 .orElseThrow(() -> new ResourceNotFoundException("Intérimaire introuvable"));
 
         if (!demande.getUser().getService().getId().equals(interim.getService().getId())) {
-            throw new BusinessException("L'intérimaire doit appartenir au même service.");
+            throw new BusinessException("L'intérimaire doit appartenir au même service.", ErrorCode.INTERIM_NOT_SAME_SERVICE);
         }
 
         if (request.getDateDebut().isAfter(request.getDateFin())) {
-            throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.");
+            throw new BusinessException("La date de début ne peut pas être postérieure à la date de fin.", ErrorCode.START_AFTER_END);
         }
 
         int businessDays = calculateBusinessDays(request.getDateDebut(), request.getDateFin());
         if (businessDays <= 0) {
-            throw new BusinessException("La période ne contient aucun jour ouvrable.");
+            throw new BusinessException("La période ne contient aucun jour ouvrable.", ErrorCode.NO_WORKING_DAYS);
         }
 
         demande.setInterim(interim);
@@ -570,17 +572,17 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (!demande.getUser().getId().equals(userId)) {
-            throw new BusinessException("Action refusée.");
+            throw new BusinessException("Action refusée.", ErrorCode.ACTION_REFUSED);
         }
 
         if (demande.getStatut() != StatutDemande.BROUILLON) {
-            throw new BusinessException("Seules les demandes en brouillon peuvent être soumises.");
+            throw new BusinessException("Seules les demandes en brouillon peuvent être soumises.", ErrorCode.NOT_DRAFT);
         }
 
         if (demande.getTypeConge() == TypeConge.MALADIE) {
             boolean hasJustificatif = !demande.getPiecesJustificatives().isEmpty();
             if (!hasJustificatif) {
-                throw new BusinessException("Un justificatif médical est obligatoire avant de soumettre un congé maladie.");
+                throw new BusinessException("Un justificatif médical est obligatoire avant de soumettre un congé maladie.", ErrorCode.MALADIE_DOC_REQUIRED);
             }
         }
 
@@ -608,7 +610,7 @@ public class DemandeService {
         User chef = userRepository.findById(chefId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));
         if (!checkUserHasRole(chef, "CHEF_HIERARCHIE")) {
-            throw new BusinessException("Action refusée: rôle CHEF_HIERARCHIE requis.");
+            throw new BusinessException("Action refusée: rôle CHEF_HIERARCHIE requis.", ErrorCode.ACTION_REFUSED);
         }
         return demandeMapper.toDTOList(demandeRepository.findTraiteesByChefId(chefId));
     }
@@ -618,7 +620,7 @@ public class DemandeService {
         User signataire = userRepository.findById(signataireId)
                 .orElseThrow(() -> new ResourceNotFoundException("Signataire introuvable"));
         if (!checkUserHasRole(signataire, "SIGNATAIRE")) {
-            throw new BusinessException("Action refusée: rôle SIGNATAIRE requis.");
+            throw new BusinessException("Action refusée: rôle SIGNATAIRE requis.", ErrorCode.ACTION_REFUSED);
         }
         return demandeMapper.toDTOList(demandeRepository.findTraiteesBySignataireId(signataireId));
     }
@@ -628,7 +630,7 @@ public class DemandeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
 
         if (demande.getStatut() != StatutDemande.VISEE_CHEF) {
-            throw new BusinessException("Le PDF ne peut être généré que pour les demandes visées par le chef.");
+            throw new BusinessException("Le PDF ne peut être généré que pour les demandes visées par le chef.", ErrorCode.ALREADY_PROCESSED);
         }
 
         User signataire = userRepository.findById(signataireId)

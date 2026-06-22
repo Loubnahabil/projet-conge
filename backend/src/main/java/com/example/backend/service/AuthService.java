@@ -6,6 +6,7 @@ import com.example.backend.entity.RefreshToken;
 import com.example.backend.entity.Role;
 import com.example.backend.entity.User;
 import com.example.backend.exception.BusinessException;
+import com.example.backend.exception.ErrorCode;
 import com.example.backend.repository.RefreshTokenRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtils;
@@ -94,11 +95,11 @@ public class AuthService {
     @Transactional
     public LoginResponseDTO refresh(String refreshTokenStr) {
         RefreshToken stored = refreshTokenRepository.findByToken(refreshTokenStr)
-                .orElseThrow(() -> new BusinessException("Refresh token invalide"));
+                .orElseThrow(() -> new BusinessException("Refresh token invalide", ErrorCode.REFRESH_TOKEN_INVALID));
 
         if (stored.getExpiresAt().isBefore(Instant.now())) {
             refreshTokenRepository.delete(stored);
-            throw new BusinessException("Refresh token expiré");
+            throw new BusinessException("Refresh token expiré", ErrorCode.REFRESH_TOKEN_EXPIRED);
         }
 
         User user = stored.getUser();

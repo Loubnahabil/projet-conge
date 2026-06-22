@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import authApi from "@/api/authApi";
 import type { AuthState, LoginRequest } from "@/types/auth.types";
 import axios from "axios";
+import { extractError } from "@/utils/errorUtils";
 
 // ✅ read from localStorage on page load so refresh doesn't wipe state
 const initialState: AuthState = {
@@ -22,10 +23,9 @@ export const loginThunk = createAsyncThunk(
     } catch (error: unknown) {
       // ✅ Use Axios type guard to cleanly extract the backend error message
       if (axios.isAxiosError(error)) {
-        return rejectWithValue(error.response?.data?.error || i18next.t("errors.loginError"));
+        return rejectWithValue(extractError(error, "errors.loginError"));
       }
 
-      // Fallback for generic/network errors
       return rejectWithValue(i18next.t("errors.loginError"));
     }
   },

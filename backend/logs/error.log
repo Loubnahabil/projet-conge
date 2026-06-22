@@ -20,3 +20,29 @@
 	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
 
 2026-06-18 15:25:11.430 [http-nio-8080-exec-2] ERROR c.e.b.security.RequestLoggingFilter [ANONYMOUS] — POST /api/auth/logout -> 500 (16ms)
+2026-06-22 09:48:05.004 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 09:48:05.271 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 09:48:06.430 [main] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext [ANONYMOUS] — Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-06-22 09:48:06.470 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter [ANONYMOUS] — 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-06-22 09:58:13.302 [http-nio-8080-exec-4] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-22 11:33:57.263 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 11:34:01.538 [http-nio-8080-exec-9] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+

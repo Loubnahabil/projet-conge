@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { userApi } from "@/api/userApi";
 import type { UserResponse, UserRequest } from "@/types/user.types";
+import { extractError } from "@/utils/errorUtils";
 
 interface UserState {
   list: UserResponse[];
@@ -64,12 +65,7 @@ export const saveUserThunk = createAsyncThunk(
       }
       dispatch(fetchUsersListThunk());
     } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { message?: string; error?: string } };
-      };
-      const message =
-        e.response?.data?.message || e.response?.data?.error || i18next.t("errors.saveUser");
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.saveUser"));
     }
   },
 );

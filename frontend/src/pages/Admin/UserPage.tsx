@@ -60,8 +60,10 @@ export const UserPage = () => {
   };
 
   const handleSave = async (data: UserRequest) => {
-    await dispatch(saveUserThunk({ payload: data, id: editingUser?.id }));
-    handleClosePopup();
+    const result = await dispatch(saveUserThunk({ payload: data, id: editingUser?.id }));
+    if (saveUserThunk.fulfilled.match(result)) {
+      handleClosePopup();
+    }
   };
 
   if (globalLoading) {

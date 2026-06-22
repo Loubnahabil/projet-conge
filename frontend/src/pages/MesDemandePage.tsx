@@ -32,7 +32,7 @@ import { demandeApi } from "@/api/demandeApi";
 import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse, DemandeRequest, TypeConge } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
-import { STATUS_COLOR, STATUS_TKEY } from "@/constants/constants";
+import { STATUS_COLOR, STATUS_TKEY, DOCUMENT_TYPE } from "@/constants/constants";
 import { formatDateFR } from "@/utils/dateUtils";
 
 interface FormInputs {
@@ -139,7 +139,7 @@ export const MesDemandePage = () => {
       }
 
       if (selectedFile && activeDemandeId) {
-        await demandeApi.uploadDocument(activeDemandeId, selectedFile, "CERTIFICAT_MEDICAL");
+        await demandeApi.uploadDocument(activeDemandeId, selectedFile, DOCUMENT_TYPE.CERTIFICAT_MEDICAL);
       }
 
       dispatch(setDemandePage(0));

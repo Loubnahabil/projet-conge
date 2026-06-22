@@ -21,6 +21,7 @@ import {
   fetchDivisionsByDirectionThunk,
   fetchServicesByDivisionThunk,
 } from "@/store/slices/structureSlice";
+import { clearError } from "@/store/slices/userSlice";
 import { userValidationSchema } from "@/validations/userSchema";
 import type { UserRequest, UserResponse } from "@/types/user.types";
 
@@ -108,6 +109,7 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
       prevDirectionId.current = undefined;
       prevDivisionId.current = undefined;
       reset();
+      dispatch(clearError());
       if (mode === "edit" && targetUser) {
         populateEditForm(setValue, targetUser, roles);
       }

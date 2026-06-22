@@ -1,18 +1,27 @@
-import { Box, Paper, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { loginThunk } from "@/store/slices/authSlice";
-import { LoginForm } from "@/components/organisms/LoginForm"; // Importing our complete organism!
+import { loginSchema } from "@/validations/auth.validation";
 import type { AppDispatch, RootState } from "@/store/index";
 import type { LoginRequest } from "@/types/auth.types";
 import { useTranslation } from "react-i18next";
+import "./LoginPage.scss";
 
 const LoginPage = () => {
   const { t } = useTranslation();
-  // Grab the global loading/error state from our Redux store
   const { loading, error } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginRequest>({
+    resolver: yupResolver(loginSchema),
+  });
 
   const handleLoginSubmit = async (data: LoginRequest) => {
     const result = await dispatch(loginThunk(data));
@@ -29,34 +38,45 @@ const LoginPage = () => {
   };
 
   return (
-    // This outer Box centers our login box vertically and horizontally on the screen
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh",
-        bgcolor: "#f5f5f5",
-      }}
-    >
-      {/* Paper gives us that nice, clean white card look with shadows */}
-      <Paper elevation={3} sx={{ padding: 4, width: 400, borderRadius: "12px" }}>
-        {/* Title text */}
-        <Typography
-          sx={{
-            fontWeight: "bold",
-            mb: 3,
-            textAlign: "center",
-            fontSize: "1.5rem",
-          }}
-        >
-          {t("auth.loginTitle")}
-        </Typography>
+    <div className="login-page">
+      <div className="login-card">
+        <h1 className="login-title">{t("auth.loginTitle")}</h1>
 
-        {/* We place our finished Organism inside the card layout */}
-        <LoginForm onSubmit={handleLoginSubmit} loading={loading} error={error} />
-      </Paper>
-    </Box>
+        <form onSubmit={handleSubmit(handleLoginSubmit)} noValidate>
+          {error && <div className="login-error">{error}</div>}
+
+          <div className="login-field">
+            <label className="login-label" htmlFor="email">
+              {t("auth.email")}
+            </label>
+            <input
+              id="email"
+              type="email"
+              className={`login-input${errors.email ? " has-error" : ""}`}
+              {...register("email")}
+            />
+            {errors.email && <p className="login-helper-text">{errors.email.message}</p>}
+          </div>
+
+          <div className="login-field">
+            <label className="login-label" htmlFor="password">
+              {t("auth.password")}
+            </label>
+            <input
+              id="password"
+              type="password"
+              className={`login-input${errors.password ? " has-error" : ""}`}
+              {...register("password")}
+            />
+            {errors.password && <p className="login-helper-text">{errors.password.message}</p>}
+          </div>
+
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? <span className="login-spinner" /> : t("auth.loginButton")}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

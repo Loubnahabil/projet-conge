@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 import { AxiosError } from "axios";
+import { extractError } from "@/utils/errorUtils";
 import { jourFerieApi } from "@/api/jourFerieApi";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
@@ -27,12 +28,7 @@ export const fetchHolidaysThunk = createAsyncThunk(
     try {
       return await jourFerieApi.getAll();
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.loadHolidays");
-
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.loadHolidays"));
     }
   },
 );
@@ -46,12 +42,7 @@ export const createHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.createHoliday");
-
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.createHoliday"));
     }
   },
 );
@@ -65,12 +56,7 @@ export const updateHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return response;
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.updateHoliday");
-
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.updateHoliday"));
     }
   },
 );
@@ -83,12 +69,7 @@ export const deleteHolidayThunk = createAsyncThunk(
       dispatch(fetchHolidaysThunk());
       return id;
     } catch (err: unknown) {
-      const message =
-        err instanceof AxiosError
-          ? (err.response?.data?.error as string)
-          : i18next.t("errors.deleteHoliday");
-
-      return rejectWithValue(message);
+      return rejectWithValue(extractError(err, "errors.deleteHoliday"));
     }
   },
 );
