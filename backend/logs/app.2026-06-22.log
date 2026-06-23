@@ -1,0 +1,48 @@
+2026-06-18 10:19:30.369 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-18 10:20:14.535 [http-nio-8080-exec-10] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [testuser@gmail.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-18 10:22:52.936 [http-nio-8080-exec-5] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — HHH000247: ErrorCode: 2627, SQLState: 23000
+2026-06-18 10:22:52.937 [http-nio-8080-exec-5] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — Violation of UNIQUE KEY constraint 'UQ__refresh___CA90DA7A44049A23'. Cannot insert duplicate key in object 'dbo.refresh_tokens'. The duplicate key value is (eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0c2lnbmF0YWlyZUBnbWFpbC5jb20iLCJpYXQiOjE3ODE3NzQ1NzIsImV4cCI6MTc4MjM3OTM3Mn0.yJHUcZLMvODN3HTtf5aBufrDxCJjsNF5aAxu0jhkgN99OtUY7JUYm9UzevZIo5Wj).
+2026-06-18 10:22:52.965 [http-nio-8080-exec-5] ERROR c.e.b.security.RequestLoggingFilter [testsignataire@gmail.com] — POST /api/auth/refresh -> 500 (53ms)
+2026-06-18 10:24:56.760 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-18 10:25:23.674 [http-nio-8080-exec-7] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — HHH000247: ErrorCode: 2627, SQLState: 23000
+2026-06-18 10:25:23.676 [http-nio-8080-exec-7] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — Violation of UNIQUE KEY constraint 'UQ__refresh___CA90DA7A44049A23'. Cannot insert duplicate key in object 'dbo.refresh_tokens'. The duplicate key value is (eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0c2lnbmF0YWlyZUBnbWFpbC5jb20iLCJpYXQiOjE3ODE3NzQ3MjMsImV4cCI6MTc4MjM3OTUyM30._Z5OKyTRnQK6YskkLCCqh6PVG8TtxTm-ywYW_9XkbfLsBzl5jmb48v3YgxsP7pOG).
+2026-06-18 10:25:23.710 [http-nio-8080-exec-7] ERROR c.e.b.security.RequestLoggingFilter [testsignataire@gmail.com] — POST /api/auth/refresh -> 500 (70ms)
+2026-06-18 10:26:23.519 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-18 10:27:01.868 [http-nio-8080-exec-10] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — HHH000247: ErrorCode: 2627, SQLState: 23000
+2026-06-18 10:27:01.870 [http-nio-8080-exec-10] WARN  org.hibernate.orm.jdbc.error [testsignataire@gmail.com] — Violation of UNIQUE KEY constraint 'UQ__refresh___CA90DA7A44049A23'. Cannot insert duplicate key in object 'dbo.refresh_tokens'. The duplicate key value is (eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0c2lnbmF0YWlyZUBnbWFpbC5jb20iLCJpYXQiOjE3ODE3NzQ4MjEsImV4cCI6MTc4MjM3OTYyMX0.R2AFnGnbOQYcwPPFlOnfld9pN0z8gKXCIuTxQsVveKps-pcxA8WA_r_UuDFQowqw).
+2026-06-18 10:27:01.903 [http-nio-8080-exec-10] ERROR c.e.b.security.RequestLoggingFilter [testsignataire@gmail.com] — POST /api/auth/refresh -> 500 (64ms)
+2026-06-18 10:29:51.558 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-18 10:30:09.269 [http-nio-8080-exec-5] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [testuser@gmail.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-18 15:25:11.430 [http-nio-8080-exec-2] ERROR c.e.b.security.RequestLoggingFilter [ANONYMOUS] — POST /api/auth/logout -> 500 (16ms)
+2026-06-22 09:48:05.004 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 09:48:05.271 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 09:48:06.430 [main] WARN  o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext [ANONYMOUS] — Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-06-22 09:48:06.470 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter [ANONYMOUS] — 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+2026-06-22 09:58:13.302 [http-nio-8080-exec-4] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2026-06-22 11:33:57.263 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration [ANONYMOUS] — spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22 11:34:01.538 [http-nio-8080-exec-9] WARN  o.s.d.w.c.SpringDataJackson3Configuration$PageModule$WarningLoggingModifier [admin@test.com] — Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+

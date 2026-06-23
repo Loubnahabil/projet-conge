@@ -8,7 +8,6 @@ import {
   fetchQuotasPage,
   clearFeedback,
   setQuotaPage,
-  setQuotaRowsPerPage,
 } from "@/store/slices/quotaSlice";
 import { useTranslation } from "react-i18next";
 
@@ -18,7 +17,7 @@ export default function QuotaManagementPage() {
 
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
-  const { feedback, page, rowsPerPage, totalElements } = useSelector(
+  const { feedback, page, rowsPerPage } = useSelector(
     (state: RootState) => state.quotas,
   );
 
@@ -46,16 +45,6 @@ export default function QuotaManagementPage() {
     dispatch(setQuotaPage(0));
   };
 
-  const handlePageChange = (_: unknown, newPage: number) => {
-    dispatch(setQuotaPage(newPage));
-  };
-
-  const handleRowsPerPageChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    dispatch(setQuotaRowsPerPage(parseInt(event.target.value, 10)));
-  };
-
   return (
     <Box sx={{ p: 4 }}>
       <Box
@@ -79,13 +68,7 @@ export default function QuotaManagementPage() {
         </Alert>
       )}
 
-      <QuotaTable
-        page={page}
-        rowsPerPage={rowsPerPage}
-        totalElements={totalElements}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
+      <QuotaTable />
     </Box>
   );
 }

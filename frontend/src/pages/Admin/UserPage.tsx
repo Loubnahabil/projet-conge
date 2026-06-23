@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { FileDownload } from "@mui/icons-material";
-import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 
 import { AppButton } from "@/components/atoms/AppButton";
 import { SearchBar } from "@/components/molecules/SearchBar";
@@ -10,8 +9,7 @@ import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
 import { useExportUsers } from "@/utils/useExportUsers";
 import type { RootState, AppDispatch } from "@/store";
-import { fetchUsersList, setSearchQuery, saveUser, fetchRoles } from "@/store/slices/userSlice";
-import { fetchDirections } from "@/store/slices/structureSlice";
+import { setSearchQuery, saveUser } from "@/store/slices/userSlice";
 import type { UserResponse, UserRequest } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 
@@ -20,7 +18,6 @@ export const UserPage = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const {
-    globalLoading,
     searchQuery,
     list: users,
     actionLoading,
@@ -28,58 +25,23 @@ export const UserPage = () => {
 
   const { exportExcel, exportPDF } = useExportUsers(users);
 
-  const [popupOpen, setPopupOpen] = useState(false);
-  const [popupMode, setPopupMode] = useState<"create" | "edit">("create");
-  const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
-
-  useEffect(() => {
-    dispatch(fetchUsersList());
-    dispatch(fetchDirections());
-    dispatch(fetchRoles());
-  }, [dispatch]);
+  const [view, setView] = useState<"closed" | "create" | "edit">("closed");
+  const [editing, setEditing] = useState<UserResponse | null>(null);
 
   const handleSearch = (value: string) => {
     dispatch(setSearchQuery(value));
   };
 
-  const handleOpenCreate = () => {
-    setPopupMode("create");
-    setEditingUser(null);
-    setPopupOpen(true);
-  };
-
-  const handleOpenEdit = (user: UserResponse) => {
-    setPopupMode("edit");
-    setEditingUser(user);
-    setPopupOpen(true);
-  };
-
-  const handleClosePopup = () => {
-    setPopupOpen(false);
-    setEditingUser(null);
-  };
+  const openCreate = () => { setView("create"); setEditing(null); };
+  const openEdit = (user: UserResponse) => { setView("edit"); setEditing(user); };
+  const close = () => setView("closed");
 
   const handleSave = async (data: UserRequest) => {
-    const result = await dispatch(saveUser({ payload: data, id: editingUser?.id }));
+    const result = await dispatch(saveUser({ payload: data, id: editing?.id }));
     if (saveUser.fulfilled.match(result)) {
-      handleClosePopup();
+      close();
     }
   };
-
-  if (globalLoading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "60vh",
-        }}
-      >
-        <LoadingSpinner />
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ p: 1, minHeight: "100vh", bgcolor: "transparent" }}>
@@ -110,7 +72,7 @@ export const UserPage = () => {
             variant="outlined"
             color="error"
           />
-          <AppButton text={t("userTable.addButton")} onClick={handleOpenCreate} />
+          <AppButton text={t("userTable.addButton")} onClick={openCreate} />
         </Box>
       </Box>
 
@@ -122,14 +84,14 @@ export const UserPage = () => {
         />
       </Box>
 
-      <UserTable onEditUser={handleOpenEdit} />
+      <UserTable onEditUser={openEdit} />
 
       <UserFormModal
-        isOpen={popupOpen}
-        mode={popupMode}
-        targetUser={editingUser}
+        isOpen={view !== "closed"}
+        mode={view === "edit" ? "edit" : "create"}
+        targetUser={editing}
         actionLoading={actionLoading}
-        onClose={handleClosePopup}
+        onClose={close}
         onSave={handleSave}
       />
     </Box>

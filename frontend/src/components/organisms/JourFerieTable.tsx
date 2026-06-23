@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { Edit, Delete, EventNote } from "@mui/icons-material";
 import type { RootState, AppDispatch } from "@/store";
-import { deleteHoliday } from "@/store/slices/jourFerieSlice";
+import { fetchHolidays, deleteHoliday } from "@/store/slices/jourFerieSlice";
 import type { JourFerieResponse } from "@/types/jourFerie.types";
 
 interface JourFerieTableProps {
@@ -32,7 +32,10 @@ export const JourFerieTable: React.FC<JourFerieTableProps> = ({ onEdit }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { list: holidays } = useSelector((state: RootState) => state.jourFerie);
 
-  // States to manage the custom confirmation dialog
+  useEffect(() => {
+    dispatch(fetchHolidays());
+  }, [dispatch]);
+
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedHolidayId, setSelectedHolidayId] = useState<number | null>(null);
 
