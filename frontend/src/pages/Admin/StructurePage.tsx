@@ -14,7 +14,7 @@ import {
 import type { FullDirection, FullDivision, FullService } from "@/types/structure.types";
 import { useTranslation } from "react-i18next";
 
-interface StructurePopupState {
+interface StructureModalState {
   isOpen: boolean;
   mode: "create" | "edit";
   type: "direction" | "division" | "service";
@@ -23,7 +23,7 @@ interface StructurePopupState {
   currentText: string;
 }
 
-const initialPopup: StructurePopupState = {
+const initialModal: StructureModalState = {
   isOpen: false,
   mode: "create",
   type: "direction",
@@ -39,20 +39,20 @@ export const StructurePage = () => {
     (state: RootState) => state.structure,
   );
 
-  const [popup, setPopup] = useState<StructurePopupState>(initialPopup);
+  const [modal, setModal] = useState<StructureModalState>(initialModal);
 
   useEffect(() => {
     dispatch(fetchStructureDependencies());
   }, [dispatch]);
 
-  const openPopup = (params: {
+  const open = (params: {
     mode: "create" | "edit";
     type: "direction" | "division" | "service";
     parentId?: number | null;
     targetId?: number | null;
     currentText?: string;
   }) => {
-    setPopup({
+    setModal({
       isOpen: true,
       mode: params.mode,
       type: params.type,
@@ -62,21 +62,21 @@ export const StructurePage = () => {
     });
   };
 
-  const closePopup = () => {
-    setPopup(initialPopup);
+  const close = () => {
+    setModal(initialModal);
   };
 
   const handleSave = async (nom: string) => {
     await dispatch(
       saveStructureNode({
         nom,
-        mode: popup.mode,
-        type: popup.type,
-        parentId: popup.parentId,
-        targetId: popup.targetId,
+        mode: modal.mode,
+        type: modal.type,
+        parentId: modal.parentId,
+        targetId: modal.targetId,
       }),
     );
-    closePopup();
+    close();
   };
 
   const handleDeleteItem = (type: "direction" | "division" | "service", id: number) => {
@@ -115,7 +115,7 @@ export const StructurePage = () => {
         </Typography>
         <AppButton
           text={t("structure.addDirection")}
-          onClick={() => openPopup({ mode: "create", type: "direction" })}
+          onClick={() => open({ mode: "create", type: "direction" })}
         />
       </Box>
 
@@ -135,14 +135,14 @@ export const StructurePage = () => {
               dir.divisions?.flatMap((d: FullDivision) => d.services || []).length || 0
             } services`}
             onAddChild={() =>
-              openPopup({
+              open({
                 mode: "create",
                 type: "division",
                 parentId: dir.id,
               })
             }
             onEdit={() =>
-              openPopup({
+              open({
                 mode: "edit",
                 type: "direction",
                 targetId: dir.id,
@@ -158,14 +158,14 @@ export const StructurePage = () => {
                 type="division"
                 badgeText={`${div.services?.length || 0} services`}
                 onAddChild={() =>
-                  openPopup({
+                  open({
                     mode: "create",
                     type: "service",
                     parentId: div.id,
                   })
                 }
                 onEdit={() =>
-                  openPopup({
+                  open({
                     mode: "edit",
                     type: "division",
                     parentId: dir.id,
@@ -181,7 +181,7 @@ export const StructurePage = () => {
                     title={ser.nom}
                     type="service"
                     onEdit={() =>
-                      openPopup({
+                      open({
                         mode: "edit",
                         type: "service",
                         parentId: ser.divisionId,
@@ -199,12 +199,12 @@ export const StructurePage = () => {
       </Box>
 
       <StructureFormModal
-        isOpen={popup.isOpen}
-        mode={popup.mode}
-        type={popup.type}
-        currentText={popup.currentText}
+        isOpen={modal.isOpen}
+        mode={modal.mode}
+        type={modal.type}
+        currentText={modal.currentText}
         actionLoading={actionLoading}
-        onClose={closePopup}
+        onClose={close}
         onSave={handleSave}
       />
     </Box>

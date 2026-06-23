@@ -66,7 +66,7 @@ export const MesDemandePage = () => {
   } = useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
-  const [editingDemande, setEditingDemande] = useState<DemandeResponse | null>(null);
+  const [editing, setEditing] = useState<DemandeResponse | null>(null);
   const [selectedDemande, setSelectedDemande] = useState<DemandeResponse | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -82,17 +82,17 @@ export const MesDemandePage = () => {
     if (view === "LIST") dispatch(clearDemandeError());
   }, [view, dispatch]);
 
-  const handleOpenCreateForm = () => {
+  const openCreate = () => {
     dispatch(clearDemandeError());
-    setEditingDemande(null);
+    setEditing(null);
     setSelectedFile(null);
     setFileError(null);
     setView("FORM");
   };
 
-  const handleOpenEditForm = (d: DemandeResponse) => {
+  const openEdit = (d: DemandeResponse) => {
     dispatch(clearDemandeError());
-    setEditingDemande(d);
+    setEditing(d);
     setSelectedFile(null);
     setFileError(null);
     setView("FORM");
@@ -126,9 +126,9 @@ export const MesDemandePage = () => {
     try {
       let activeDemandeId: number | null = null;
 
-      if (editingDemande) {
+      if (editing) {
         const result = await dispatch(
-          updateDemande({ id: editingDemande.id, payload }),
+          updateDemande({ id: editing.id, payload }),
         ).unwrap();
         activeDemandeId = result.id;
       } else {
@@ -232,9 +232,9 @@ export const MesDemandePage = () => {
             totalElements={totalElements}
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
-            onOpenCreate={handleOpenCreateForm}
+            onOpenCreate={openCreate}
             onOpenDetail={handleOpenDetailView}
-            onOpenEdit={handleOpenEditForm}
+            onOpenEdit={openEdit}
             onDirectSubmit={handleDirectSubmitFromTable}
             onCancelClick={handleCancelDemandeFromTable}
           />
@@ -243,7 +243,7 @@ export const MesDemandePage = () => {
         {view === "FORM" && (
           <Box sx={{ p: 4 }}>
             <DemandeForm
-              editingDemande={editingDemande}
+              editing={editing}
               colleagues={interims}
               actionLoading={actionLoading}
               onCancel={() => setView("LIST")}

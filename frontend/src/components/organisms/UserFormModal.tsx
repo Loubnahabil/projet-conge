@@ -18,10 +18,11 @@ import { FormInput } from "@/components/molecules/FormInput";
 import { AppButton } from "@/components/atoms/AppButton";
 import type { RootState, AppDispatch } from "@/store";
 import {
+  fetchDirections,
   fetchDivisionsByDirection,
   fetchServicesByDivision,
 } from "@/store/slices/structureSlice";
-import { clearError } from "@/store/slices/userSlice";
+import { clearError, fetchRoles } from "@/store/slices/userSlice";
 import { userValidationSchema } from "@/validations/userSchema";
 import type { UserRequest, UserResponse } from "@/types/user.types";
 
@@ -84,6 +85,11 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
     (state: RootState) => state.structure,
   );
   const { roles, error: formError } = useSelector((state: RootState) => state.users);
+
+  useEffect(() => {
+    dispatch(fetchDirections());
+    dispatch(fetchRoles());
+  }, [dispatch]);
 
   const {
     register,

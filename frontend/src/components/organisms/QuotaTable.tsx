@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Table,
   TableBody,
@@ -13,26 +13,22 @@ import {
   Box,
   CircularProgress,
 } from "@mui/material";
-import type { RootState } from "@/store";
+import type { RootState, AppDispatch } from "@/store";
+import { setQuotaPage, setQuotaRowsPerPage } from "@/store/slices/quotaSlice";
 
-interface QuotaTableProps {
-  page: number;
-  rowsPerPage: number;
-  totalElements: number;
-  onPageChange: (event: unknown, newPage: number) => void;
-  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}
-
-export const QuotaTable: React.FC<QuotaTableProps> = ({
-  page,
-  rowsPerPage,
-  totalElements,
-  onPageChange,
-  onRowsPerPageChange,
-}) => {
+export const QuotaTable: React.FC = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const { list: quotas, globalLoading } = useSelector((state: RootState) => state.quotas);
+  const { list: quotas, globalLoading, page, rowsPerPage, totalElements } = useSelector((state: RootState) => state.quotas);
+
+  const handlePageChange = (_event: unknown, newPage: number) => {
+    dispatch(setQuotaPage(newPage));
+  };
+
+  const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    dispatch(setQuotaRowsPerPage(parseInt(event.target.value, 10)));
+  };
 
   if (globalLoading) {
     return (
@@ -85,9 +81,9 @@ export const QuotaTable: React.FC<QuotaTableProps> = ({
         component="div"
         count={totalElements}
         page={page}
-        onPageChange={onPageChange}
+        onPageChange={handlePageChange}
         rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={onRowsPerPageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
         rowsPerPageOptions={[10, 20, 50]}
         labelRowsPerPage={t("common.linesPerPage")}
       />

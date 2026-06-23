@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import {
@@ -40,6 +40,10 @@ export const UserTable: React.FC<UserTableProps> = ({ onEditUser }) => {
     rowsPerPage,
     searchQuery,
   } = useSelector((state: RootState) => state.users);
+
+  useEffect(() => {
+    dispatch(fetchUsersList());
+  }, [dispatch]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     dispatch(setPagination({ page: newPage, rowsPerPage }));

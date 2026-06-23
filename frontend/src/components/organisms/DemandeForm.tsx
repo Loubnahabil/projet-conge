@@ -33,7 +33,7 @@ interface FormInputs {
 }
 
 interface DemandeFormProps {
-  editingDemande: DemandeResponse | null;
+  editing: DemandeResponse | null;
   colleagues: UserResponse[];
   actionLoading: boolean;
   onCancel: () => void;
@@ -44,7 +44,7 @@ interface DemandeFormProps {
 }
 
 export const DemandeForm = ({
-  editingDemande,
+  editing,
   colleagues,
   actionLoading,
   onCancel,
@@ -62,7 +62,7 @@ export const DemandeForm = ({
     dispatch(fetchHolidays());
   }, [dispatch]);
 
-  const existingFileName = editingDemande?.piecesJustificatives?.[0]?.nomFichier ?? null;
+  const existingFileName = editing?.piecesJustificatives?.[0]?.nomFichier ?? null;
 
   const {
     register,
@@ -72,10 +72,10 @@ export const DemandeForm = ({
   } = useForm<FormInputs>({
     resolver: yupResolver(demandeValidationSchema),
     defaultValues: {
-      typeConge: editingDemande?.typeConge || "",
-      interimId: editingDemande?.interimId?.toString() || "",
-      dateDebut: editingDemande?.dateDebut || "",
-      dateFin: editingDemande?.dateFin || "",
+      typeConge: editing?.typeConge || "",
+      interimId: editing?.interimId?.toString() || "",
+      dateDebut: editing?.dateDebut || "",
+      dateFin: editing?.dateFin || "",
     },
   });
 
@@ -95,8 +95,8 @@ export const DemandeForm = ({
           <ArrowBack />
         </IconButton>
         <Typography variant="h5" sx={{ fontWeight: 700, color: "#1e293b" }}>
-          {editingDemande
-            ? `${t("demandeForm.titleEdit")} #${editingDemande.id}`
+          {editing
+            ? `${t("demandeForm.titleEdit")} #${editing.id}`
             : t("demandeForm.titleCreate")}
         </Typography>
       </Stack>
