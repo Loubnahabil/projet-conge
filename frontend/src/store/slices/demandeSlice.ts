@@ -1,4 +1,3 @@
-import i18next from "i18next";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
@@ -279,12 +278,9 @@ const demandeSlice = createSlice({
       })
 
       // Fetch Interims
-      .addCase(
-        fetchEligibleInterims.fulfilled,
-        (state, action: PayloadAction<UserResponse[]>) => {
-          state.interims = action.payload;
-        },
-      )
+      .addCase(fetchEligibleInterims.fulfilled, (state, action: PayloadAction<UserResponse[]>) => {
+        state.interims = action.payload;
+      })
 
       // Create Demande
       .addCase(createDemande.pending, (state) => {
@@ -332,12 +328,9 @@ const demandeSlice = createSlice({
       })
 
       // Fetch History
-      .addCase(
-        fetchDemandeHistory.fulfilled,
-        (state, action: PayloadAction<HistoryRecord[]>) => {
-          state.selectedHistory = action.payload;
-        },
-      )
+      .addCase(fetchDemandeHistory.fulfilled, (state, action: PayloadAction<HistoryRecord[]>) => {
+        state.selectedHistory = action.payload;
+      })
 
       // ── Chef ────────────────────────────────────────────────
       .addCase(fetchPendingChefVisas.pending, (state) => {

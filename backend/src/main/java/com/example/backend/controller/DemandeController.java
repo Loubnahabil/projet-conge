@@ -48,6 +48,14 @@ public class DemandeController {
         return ResponseEntity.ok(demandeService.getUserDemandes(currentUserId, pageable));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DemandeResponseDTO> getDemandeById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long currentUserId = getAuthenticatedUserId(userDetails);
+        return ResponseEntity.ok(demandeService.getDemandeById(id, currentUserId));
+    }
+
     // Handles GET /api/demandes/a-viser for supervisor profiles
     @GetMapping("/a-viser")
     public ResponseEntity<List<DemandeResponseDTO>> getDemandesAViser(@AuthenticationPrincipal UserDetails userDetails) {
