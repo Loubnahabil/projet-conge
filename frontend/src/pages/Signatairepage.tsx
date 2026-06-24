@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Box, Typography, Alert, Tabs, Tab, Grid } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { statsApi } from "@/api/Statsapi";
 import { SignataireDemandeTable } from "@/components/organisms/SignataireDemandeTable";
 import { SignataireDecisionModal } from "@/components/organisms/SignataireDecisionModal";
 import { SignataireUploadModal } from "@/components/organisms/SignataireUploadModal";
-import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer";
 import { demandeApi } from "@/api/demandeApi";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
@@ -16,13 +16,13 @@ import {
   signataireReject,
 } from "@/store/slices/demandeSlice";
 import type { AppDispatch, RootState } from "@/store";
-import type { DemandeResponse } from "@/types/Demande.types";
 import type { SignataireDashboardStats } from "@/types/Stats.types";
 import { useTranslation } from "react-i18next";
 
 export const SignatairePage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { pendingSignatures, traiteesSignataire, signataireLoading, actionLoading, error } =
     useSelector((state: RootState) => state.demande);
 
@@ -35,7 +35,6 @@ export const SignatairePage = () => {
     open: boolean;
     targetId: number | null;
   }>({ open: false, targetId: null });
-  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -158,7 +157,7 @@ export const SignatairePage = () => {
           onSignClick={(id) => setUploadTargetId(id)}
           onDownloadClick={(id) => demandeApi.generatePdf(id)}
           onRejectClick={(id) => setRejectDialog({ open: true, targetId: id })}
-          onViewClick={(d) => setDrawerDemande(d)}
+          onViewClick={(d) => navigate(`/signataire/demandes/${d.id}`)}
           emptyMessage={t("signataire.aucuneAttente")}
         />
       )}
@@ -171,7 +170,7 @@ export const SignatairePage = () => {
         ) : (
           <SignataireDemandeTable
             data={traiteesSignataire}
-            onViewClick={(d) => setDrawerDemande(d)}
+            onViewClick={(d) => navigate(`/signataire/demandes/${d.id}`)}
             emptyMessage={t("signataire.aucuneTraitee")}
           />
         ))}
@@ -192,11 +191,6 @@ export const SignatairePage = () => {
         onConfirm={handleReject}
       />
 
-      <DemandeDetailDrawer
-        open={!!drawerDemande}
-        demande={drawerDemande}
-        onClose={() => setDrawerDemande(null)}
-      />
     </Box>
   );
 };

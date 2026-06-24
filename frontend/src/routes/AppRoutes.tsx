@@ -2,6 +2,8 @@ import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/index";
 import LoginPage from "@/pages/LoginPage";
+import ErrorPage from "@/pages/ErrorPage";
+import DemandeDetailPage from "@/pages/DemandeDetailPage";
 import { MainLayout } from "@/components/templates/MainLayout";
 import PrivateRoute from "@/routes/PrivateRoute";
 import { StructurePage } from "@/pages/Admin/StructurePage";
@@ -52,113 +54,136 @@ const SignataireRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const validateIdLoader = async ({ params }: { params: { id?: string } }) => {
+  if (!params.id || !/^\d+$/.test(params.id)) {
+    throw new Response("L'identifiant de la demande doit être un nombre", {
+      status: 400,
+      statusText: "ID invalide",
+    });
+  }
+  return null;
+};
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace />,
-  },
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
-  {
-    element: (
-      <PrivateRoute>
-        <MainLayout />
-      </PrivateRoute>
-    ),
+    errorElement: <ErrorPage />,
     children: [
+      { index: true, element: <Navigate to="/login" replace /> },
+      { path: "login", element: <LoginPage /> },
       {
-        path: "/dashboard",
         element: (
-          <AdminRoute>
-            <AdminDashboardPage />
-          </AdminRoute>
+          <PrivateRoute>
+            <MainLayout />
+          </PrivateRoute>
         ),
-      },
-      // ── Fonctionnaire ──────────────────────────────────────────────────────
-      {
-        path: "/fonctionnaire/dashboard",
-        element: (
-          <FonctionnaireRoute>
-            <FonctionnaireDashboardPage />
-          </FonctionnaireRoute>
-        ),
-      },
-      {
-        path: "/mes-demandes",
-        element: <MesDemandePage />,
-      },
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-      },
-      // ── Chef ──────────────────────────────────────────────────────────────
-      {
-        path: "/chef/demandes",
-        element: (
-          <ChefRoute>
-            <ChefDashboardPage />
-          </ChefRoute>
-        ),
-      },
-      // ── Signataire ────────────────────────────────────────────────────────
-      {
-        path: "/signataire/demandes",
-        element: (
-          <SignataireRoute>
-            <SignatairePage />
-          </SignataireRoute>
-        ),
-      },
-      // ── Admin ─────────────────────────────────────────────────────────────
-      {
-        path: "/admin/structure",
-        element: (
-          <AdminRoute>
-            <StructurePage />
-          </AdminRoute>
-        ),
-      },
-      {
-        path: "/admin/jours-feries",
-        element: (
-          <AdminRoute>
-            <JourFeriePage />
-          </AdminRoute>
-        ),
-      },
-      {
-        path: "/admin/fonctionnaires",
-        element: (
-          <AdminRoute>
-            <UserPage />
-          </AdminRoute>
-        ),
-      },
-      {
-        path: "/admin/quotas",
-        element: (
-          <AdminRoute>
-            <QuotaManagementPage />
-          </AdminRoute>
-        ),
-      },
-      {
-        path: "/admin/audit",
-        element: (
-          <AdminRoute>
-            <AuditPage />
-          </AdminRoute>
-        ),
+        children: [
+          {
+            path: "dashboard",
+            element: (
+              <AdminRoute>
+                <AdminDashboardPage />
+              </AdminRoute>
+            ),
+          },
+          // ── Fonctionnaire ──────────────────────────────────────────────────
+          {
+            path: "fonctionnaire/dashboard",
+            element: (
+              <FonctionnaireRoute>
+                <FonctionnaireDashboardPage />
+              </FonctionnaireRoute>
+            ),
+          },
+          {
+            path: "mes-demandes",
+            element: <MesDemandePage />,
+          },
+          {
+            path: "mes-demandes/:id",
+            element: <DemandeDetailPage />,
+            loader: validateIdLoader,
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />,
+          },
+          // ── Chef ──────────────────────────────────────────────────────────
+          {
+            path: "chef/demandes",
+            element: (
+              <ChefRoute>
+                <ChefDashboardPage />
+              </ChefRoute>
+            ),
+          },
+          {
+            path: "chef/demandes/:id",
+            element: <DemandeDetailPage />,
+            loader: validateIdLoader,
+          },
+          // ── Signataire ────────────────────────────────────────────────────
+          {
+            path: "signataire/demandes",
+            element: (
+              <SignataireRoute>
+                <SignatairePage />
+              </SignataireRoute>
+            ),
+          },
+          {
+            path: "signataire/demandes/:id",
+            element: <DemandeDetailPage />,
+            loader: validateIdLoader,
+          },
+          // ── Admin ─────────────────────────────────────────────────────────
+          {
+            path: "admin/structure",
+            element: (
+              <AdminRoute>
+                <StructurePage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "admin/jours-feries",
+            element: (
+              <AdminRoute>
+                <JourFeriePage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "admin/fonctionnaires",
+            element: (
+              <AdminRoute>
+                <UserPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "admin/quotas",
+            element: (
+              <AdminRoute>
+                <QuotaManagementPage />
+              </AdminRoute>
+            ),
+          },
+          {
+            path: "admin/audit",
+            element: (
+              <AdminRoute>
+                <AuditPage />
+              </AdminRoute>
+            ),
+          },
+        ],
       },
     ],
-  },
-  {
-    path: "*",
-    element: <Navigate to="/login" replace />,
   },
 ]);
 

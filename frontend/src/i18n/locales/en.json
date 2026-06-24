@@ -426,6 +426,10 @@
     "deconnexion": "Logout"
   },
   "error": {
+    "notFound": "Page not found",
+    "generic": "Error",
+    "oups": "Oops!",
+    "goHome": "Back to home",
     "auth": {
       "invalid": {
         "credentials": "Invalid email or password"

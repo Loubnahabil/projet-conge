@@ -127,6 +127,12 @@ export const demandeApi = {
     return response.data;
   },
 
+  // GET /demandes/{id}
+  getById: async (id: number): Promise<DemandeResponse> => {
+    const response = await axiosInstance.get<DemandeResponse>(`/demandes/${id}`);
+    return response.data;
+  },
+
   // GET /demandes/{id}/generate-pdf
   generatePdf: async (id: number): Promise<void> => {
     const response = await axiosInstance.get(`/demandes/${id}/generate-pdf`, {

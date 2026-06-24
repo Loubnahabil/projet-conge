@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -14,7 +15,6 @@ import {
 
 import { DemandeTable } from "@/components/organisms/DemandeTable";
 import { DemandeForm } from "@/components/organisms/DemandeForm";
-import { DemandeDetail } from "@/components/organisms/DemandeDetail";
 import {
   fetchMyDemandes,
   fetchEligibleInterims,
@@ -22,9 +22,7 @@ import {
   updateDemande,
   soumettreDemande,
   annulerDemande,
-  fetchDemandeHistory,
   clearDemandeError,
-  clearSelectedHistory,
   setDemandePage,
   setDemandeRowsPerPage,
 } from "@/store/slices/demandeSlice";
@@ -33,7 +31,6 @@ import type { AppDispatch, RootState } from "@/store";
 import type { DemandeResponse, DemandeRequest, TypeConge } from "@/types/Demande.types";
 import { useTranslation } from "react-i18next";
 import { STATUS_COLOR, STATUS_TKEY, DOCUMENT_TYPE } from "@/constants/constants";
-import { formatDateFR } from "@/utils/dateUtils";
 
 interface FormInputs {
   dateDebut: string;
@@ -44,6 +41,7 @@ interface FormInputs {
 
 export const MesDemandePage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const statutConfig = Object.keys(STATUS_COLOR).reduce(
     (acc, key) => {
@@ -59,15 +57,13 @@ export const MesDemandePage = () => {
     interims,
     actionLoading,
     error,
-    selectedHistory,
     page,
     rowsPerPage,
     totalElements,
   } = useSelector((state: RootState) => state.demande);
 
-  const [view, setView] = useState<"LIST" | "FORM" | "DETAIL">("LIST");
+  const [view, setView] = useState<"LIST" | "FORM">("LIST");
   const [editing, setEditing] = useState<DemandeResponse | null>(null);
-  const [selectedDemande, setSelectedDemande] = useState<DemandeResponse | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
@@ -98,11 +94,8 @@ export const MesDemandePage = () => {
     setView("FORM");
   };
 
-  const handleOpenDetailView = async (d: DemandeResponse) => {
-    setSelectedDemande(d);
-    setView("DETAIL");
-    dispatch(clearSelectedHistory());
-    dispatch(fetchDemandeHistory(d.id));
+  const handleOpenDetailView = (d: DemandeResponse) => {
+    navigate(`/mes-demandes/${d.id}`);
   };
 
   const handleFileChange = (file: File | null) => {
@@ -176,24 +169,12 @@ export const MesDemandePage = () => {
     try {
       await dispatch(annulerDemande(selectedDemandeId)).unwrap();
       dispatch(setDemandePage(0));
-      if (view === "DETAIL") setView("LIST");
     } catch {
       // error in Redux
     } finally {
       setSelectedDemandeId(null);
     }
   };
-
-  const getInterimName = useCallback(
-    (id?: number) => {
-      if (!id) return t("quota.nonSpecifie");
-      const found = interims.find((c) => c.id === id);
-      return found ? `${found.nom} ${found.prenom}` : `ID: ${id}`;
-    },
-    [interims],
-  );
-
-  const formatDate = (iso: string) => formatDateFR(iso);
 
   const displayError = error;
 
@@ -255,20 +236,6 @@ export const MesDemandePage = () => {
           </Box>
         )}
 
-        {view === "DETAIL" && selectedDemande && (
-          <Box sx={{ p: 4 }}>
-            <DemandeDetail
-              selectedDemande={selectedDemande}
-              demandeHistory={selectedHistory}
-              actionLoading={actionLoading}
-              statutConfig={statutConfig}
-              onBack={() => setView("LIST")}
-              onCancelClick={handleCancelDemandeFromTable}
-              getInterimName={getInterimName}
-              formatDate={formatDate}
-            />
-          </Box>
-        )}
       </Paper>
 
       <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)}>

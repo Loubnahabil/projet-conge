@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { Box, Typography, Alert, Tabs, Tab, Grid } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { statsApi } from "@/api/Statsapi";
 import { ChefDemandeTable } from "@/components/organisms/ChefDemandeTable";
 import { ChefDecisionModal } from "@/components/organisms/ChefDecisionModal";
-import { DemandeDetailDrawer } from "@/components/organisms/DemandeDetailDrawer";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
   fetchPendingChefVisas,
@@ -13,13 +13,13 @@ import {
   visaChef,
 } from "@/store/slices/demandeSlice";
 import type { AppDispatch, RootState } from "@/store";
-import type { DemandeResponse } from "@/types/Demande.types";
 import type { ChefDashboardStats } from "@/types/Stats.types";
 import { useTranslation } from "react-i18next";
 
 export const ChefDashboardPage = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { pendingChefVisas, traiteesChef, chefLoading, actionLoading, error } = useSelector(
     (state: RootState) => state.demande,
   );
@@ -33,7 +33,6 @@ export const ChefDashboardPage = () => {
     mode: "approve" | "reject" | null;
     targetId: number | null;
   }>({ open: false, mode: null, targetId: null });
-  const [drawerDemande, setDrawerDemande] = useState<DemandeResponse | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -153,7 +152,7 @@ export const ChefDashboardPage = () => {
           data={pendingDemandes}
           showActions
           onActionClick={handleOpenDecisionWorkflow}
-          onViewClick={(d) => setDrawerDemande(d)}
+          onViewClick={(d) => navigate(`/chef/demandes/${d.id}`)}
           emptyMessage={t("chef.aucuneAttente")}
         />
       )}
@@ -166,7 +165,7 @@ export const ChefDashboardPage = () => {
         ) : (
           <ChefDemandeTable
             data={traiteesChef}
-            onViewClick={(d) => setDrawerDemande(d)}
+            onViewClick={(d) => navigate(`/chef/demandes/${d.id}`)}
             emptyMessage={t("chef.aucuneTraitee")}
           />
         ))}
@@ -180,11 +179,6 @@ export const ChefDashboardPage = () => {
         onConfirm={handleExecuteWorkflowAction}
       />
 
-      <DemandeDetailDrawer
-        open={!!drawerDemande}
-        demande={drawerDemande}
-        onClose={() => setDrawerDemande(null)}
-      />
     </Box>
   );
 };

@@ -57,6 +57,46 @@ public class DemandeService {
     }
 
     @Transactional(readOnly = true)
+    public DemandeResponseDTO getDemandeById(Long demandeId, Long currentUserId) {
+        Demande demande = demandeRepository.findById(demandeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Demande introuvable"));
+        User currentUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable"));
+
+        boolean isOwner = demande.getUser().getId().equals(currentUserId);
+        boolean isAdmin = checkUserHasRole(currentUser, "ADMIN");
+
+        if (isOwner || isAdmin) {
+            return demandeMapper.toDTO(demande);
+        }
+
+        boolean isChef = checkUserHasRole(currentUser, "CHEF_HIERARCHIE");
+        if (isChef) {
+            ServiceEntity chefService = currentUser.getService();
+            if (chefService != null && demande.getUser().getService() != null
+                    && chefService.getId().equals(demande.getUser().getService().getId())) {
+                return demandeMapper.toDTO(demande);
+            }
+        }
+
+        boolean isSignataire = checkUserHasRole(currentUser, "SIGNATAIRE");
+        if (isSignataire) {
+            Direction signataireDirection = currentUser.getService() != null
+                    && currentUser.getService().getDivision() != null
+                    ? currentUser.getService().getDivision().getDirection() : null;
+            Direction demandeDirection = demande.getUser().getService() != null
+                    && demande.getUser().getService().getDivision() != null
+                    ? demande.getUser().getService().getDivision().getDirection() : null;
+            if (signataireDirection != null && demandeDirection != null
+                    && signataireDirection.getId().equals(demandeDirection.getId())) {
+                return demandeMapper.toDTO(demande);
+            }
+        }
+
+        throw new BusinessException("Accès refusé à cette demande", ErrorCode.ACTION_REFUSED);
+    }
+
+    @Transactional(readOnly = true)
     public List<DemandeResponseDTO> getDemandesAViserPourChef(Long chefId) {
         User chef = userRepository.findById(chefId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chef introuvable"));

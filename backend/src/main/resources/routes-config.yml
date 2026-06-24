@@ -8,6 +8,9 @@ routes:
 
   demande-urls:
     - pattern: /demandes/*
+      method: GET
+      roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE, ADMIN ]
+    - pattern: /demandes/*
       method: PUT
       roles: [ FONCTIONNAIRE, CHEF_HIERARCHIE, SIGNATAIRE ]
     - pattern: /demandes/*/upload
