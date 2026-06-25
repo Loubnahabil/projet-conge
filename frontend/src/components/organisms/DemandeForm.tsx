@@ -59,8 +59,10 @@ export const DemandeForm = ({
   );
 
   useEffect(() => {
-    dispatch(fetchHolidays());
-  }, [dispatch]);
+    if (holidays.length === 0) {
+      dispatch(fetchHolidays());
+    }
+  }, [dispatch, holidays.length]);
 
   const existingFileName = editing?.piecesJustificatives?.[0]?.nomFichier ?? null;
 

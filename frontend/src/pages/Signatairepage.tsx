@@ -10,6 +10,7 @@ import { SignataireUploadModal } from "@/components/organisms/SignataireUploadMo
 import { demandeApi } from "@/api/demandeApi";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
+  cleanUpDemandes,
   fetchPendingSignatures,
   fetchTraiteesSignataire,
   signataireApprove,
@@ -43,7 +44,10 @@ export const SignatairePage = () => {
       .getSignataireDashboard()
       .then((data) => { if (mounted) setDashboardStats(data); })
       .catch(() => {});
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      dispatch(cleanUpDemandes());
+    };
   }, [dispatch]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {

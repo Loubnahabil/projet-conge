@@ -8,6 +8,7 @@ import { ChefDemandeTable } from "@/components/organisms/ChefDemandeTable";
 import { ChefDecisionModal } from "@/components/organisms/ChefDecisionModal";
 import { StatCard } from "@/components/molecules/StatCard";
 import {
+  cleanUpDemandes,
   fetchPendingChefVisas,
   fetchTraiteesChef,
   visaChef,
@@ -41,7 +42,10 @@ export const ChefDashboardPage = () => {
       .getChefDashboard()
       .then((data) => { if (mounted) setDashboardStats(data); })
       .catch(() => {});
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      dispatch(cleanUpDemandes());
+    };
   }, [dispatch]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {

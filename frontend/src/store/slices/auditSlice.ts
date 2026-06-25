@@ -38,6 +38,7 @@ const auditSlice = createSlice({
   name: "audit",
   initialState,
   reducers: {
+    cleanUpAudit: () => initialState,
     setAuditPage: (state, action) => {
       state.page = action.payload;
     },
@@ -67,5 +68,5 @@ const auditSlice = createSlice({
   },
 });
 
-export const { setAuditPage, setAuditRowsPerPage } = auditSlice.actions;
+export const { cleanUpAudit, setAuditPage, setAuditRowsPerPage } = auditSlice.actions;
 export default auditSlice.reducer;

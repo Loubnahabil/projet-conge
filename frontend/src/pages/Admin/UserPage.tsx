@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography } from "@mui/material";
 import { FileDownload } from "@mui/icons-material";
@@ -9,7 +9,7 @@ import { UserTable } from "@/components/organisms/UserTable";
 import { UserFormModal } from "@/components/organisms/UserFormModal";
 import { useExportUsers } from "@/utils/useExportUsers";
 import type { RootState, AppDispatch } from "@/store";
-import { setSearchQuery, saveUser } from "@/store/slices/userSlice";
+import { cleanUpUsers, setSearchQuery, saveUser } from "@/store/slices/userSlice";
 import type { UserResponse, UserRequest } from "@/types/user.types";
 import { useTranslation } from "react-i18next";
 
@@ -22,6 +22,12 @@ export const UserPage = () => {
     list: users,
     actionLoading,
   } = useSelector((state: RootState) => state.users);
+
+  useEffect(() => {
+    return () => {
+      dispatch(cleanUpUsers());
+    };
+  }, [dispatch]);
 
   const { exportExcel, exportPDF } = useExportUsers(users);
 

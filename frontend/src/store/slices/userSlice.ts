@@ -95,6 +95,7 @@ const userSlice = createSlice({
   name: "users",
   initialState,
   reducers: {
+    cleanUpUsers: () => initialState,
     setPagination: (state, action: PayloadAction<{ page: number; rowsPerPage: number }>) => {
       state.page = action.payload.page;
       state.rowsPerPage = action.payload.rowsPerPage;
@@ -145,5 +146,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setPagination, setSearchQuery, clearError } = userSlice.actions;
+export const { cleanUpUsers, setPagination, setSearchQuery, clearError } = userSlice.actions;
 export default userSlice.reducer;

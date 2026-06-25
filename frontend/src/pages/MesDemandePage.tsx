@@ -16,6 +16,7 @@ import {
 import { DemandeTable } from "@/components/organisms/DemandeTable";
 import { DemandeForm } from "@/components/organisms/DemandeForm";
 import {
+  cleanUpDemandes,
   fetchMyDemandes,
   fetchEligibleInterims,
   createDemande,
@@ -52,15 +53,8 @@ export const MesDemandePage = () => {
   );
 
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    demandes,
-    interims,
-    actionLoading,
-    error,
-    page,
-    rowsPerPage,
-    totalElements,
-  } = useSelector((state: RootState) => state.demande);
+  const { demandes, interims, actionLoading, error, page, rowsPerPage, totalElements } =
+    useSelector((state: RootState) => state.demande);
 
   const [view, setView] = useState<"LIST" | "FORM">("LIST");
   const [editing, setEditing] = useState<DemandeResponse | null>(null);
@@ -77,6 +71,12 @@ export const MesDemandePage = () => {
   useEffect(() => {
     if (view === "LIST") dispatch(clearDemandeError());
   }, [view, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(cleanUpDemandes());
+    };
+  }, [dispatch]);
 
   const openCreate = () => {
     dispatch(clearDemandeError());
@@ -120,19 +120,19 @@ export const MesDemandePage = () => {
       let activeDemandeId: number | null = null;
 
       if (editing) {
-        const result = await dispatch(
-          updateDemande({ id: editing.id, payload }),
-        ).unwrap();
+        const result = await dispatch(updateDemande({ id: editing.id, payload })).unwrap();
         activeDemandeId = result.id;
       } else {
-        const result = await dispatch(
-          createDemande({ payload, submit: submitInstantly }),
-        ).unwrap();
+        const result = await dispatch(createDemande({ payload, submit: submitInstantly })).unwrap();
         activeDemandeId = result.id;
       }
 
       if (selectedFile && activeDemandeId) {
-        await demandeApi.uploadDocument(activeDemandeId, selectedFile, DOCUMENT_TYPE.CERTIFICAT_MEDICAL);
+        await demandeApi.uploadDocument(
+          activeDemandeId,
+          selectedFile,
+          DOCUMENT_TYPE.CERTIFICAT_MEDICAL,
+        );
       }
 
       dispatch(setDemandePage(0));
@@ -235,7 +235,6 @@ export const MesDemandePage = () => {
             />
           </Box>
         )}
-
       </Paper>
 
       <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)}>

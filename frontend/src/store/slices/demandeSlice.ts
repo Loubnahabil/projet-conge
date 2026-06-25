@@ -231,6 +231,7 @@ const demandeSlice = createSlice({
   name: "demande",
   initialState,
   reducers: {
+    cleanUpDemandes: () => initialState,
     clearDemandeError: (state) => {
       state.error = null;
     },
@@ -406,6 +407,6 @@ const demandeSlice = createSlice({
   },
 });
 
-export const { clearDemandeError, clearSelectedHistory, setDemandePage, setDemandeRowsPerPage } =
+export const { cleanUpDemandes, clearDemandeError, clearSelectedHistory, setDemandePage, setDemandeRowsPerPage } =
   demandeSlice.actions;
 export default demandeSlice.reducer;

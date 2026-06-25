@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
 import { PerformanceOverview } from "@/components/organisms/PerformanceOverview";
 import { AnalyticsCharts } from "@/components/organisms/AnalyticsCharts";
-import { fetchDashboardStats } from "@/store/slices/statsSlice";
+import { cleanUpStats, fetchDashboardStats } from "@/store/slices/statsSlice";
 import type { RootState, AppDispatch } from "@/store";
 import { useTranslation } from "react-i18next";
 
@@ -14,6 +14,9 @@ export const AdminDashboardPage = () => {
 
   useEffect(() => {
     dispatch(fetchDashboardStats());
+    return () => {
+      dispatch(cleanUpStats());
+    };
   }, [dispatch]);
 
   const currentYear = new Date().getFullYear();
