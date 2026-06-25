@@ -87,9 +87,9 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   const { roles, error: formError } = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
-    dispatch(fetchDirections());
-    dispatch(fetchRoles());
-  }, [dispatch]);
+    if (directions.length === 0) dispatch(fetchDirections());
+    if (roles.length === 0) dispatch(fetchRoles());
+  }, [dispatch, directions.length, roles.length]);
 
   const {
     register,

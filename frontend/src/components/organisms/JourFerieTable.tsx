@@ -33,8 +33,10 @@ export const JourFerieTable: React.FC<JourFerieTableProps> = ({ onEdit }) => {
   const { list: holidays } = useSelector((state: RootState) => state.jourFerie);
 
   useEffect(() => {
-    dispatch(fetchHolidays());
-  }, [dispatch]);
+    if (holidays.length === 0) {
+      dispatch(fetchHolidays());
+    }
+  }, [dispatch, holidays.length]);
 
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedHolidayId, setSelectedHolidayId] = useState<number | null>(null);

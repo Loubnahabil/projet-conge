@@ -29,7 +29,9 @@ export const fetchDashboardStats = createAsyncThunk(
 const statsSlice = createSlice({
   name: "stats",
   initialState,
-  reducers: {},
+  reducers: {
+    cleanUpStats: () => initialState,
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDashboardStats.pending, (state) => {
@@ -47,4 +49,5 @@ const statsSlice = createSlice({
   },
 });
 
+export const { cleanUpStats } = statsSlice.actions;
 export default statsSlice.reducer;

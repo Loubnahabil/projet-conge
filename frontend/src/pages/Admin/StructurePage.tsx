@@ -42,8 +42,10 @@ export const StructurePage = () => {
   const [modal, setModal] = useState<StructureModalState>(initialModal);
 
   useEffect(() => {
-    dispatch(fetchStructureDependencies());
-  }, [dispatch]);
+    if (treeData.length === 0) {
+      dispatch(fetchStructureDependencies());
+    }
+  }, [dispatch, treeData.length]);
 
   const open = (params: {
     mode: "create" | "edit";

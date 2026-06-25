@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Box, Typography, Alert } from "@mui/material";
 import { LoadingSpinner } from "@/components/atoms/LoadingSpinner";
 import { AuditTable } from "@/components/organisms/AuditTable";
-import { fetchJournalAudit } from "@/store/slices/auditSlice";
+import { cleanUpAudit, fetchJournalAudit } from "@/store/slices/auditSlice";
 import type { RootState, AppDispatch } from "@/store";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +15,12 @@ export const AuditPage = () => {
   useEffect(() => {
     dispatch(fetchJournalAudit({ page, size: rowsPerPage }));
   }, [dispatch, page, rowsPerPage]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(cleanUpAudit());
+    };
+  }, [dispatch]);
 
   if (loading) {
     return (
